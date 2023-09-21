@@ -40,8 +40,8 @@ def _np2ct(x, expected, contiguous=True):
             raise ValueError('only contiguous NumPy arrays are supported')
     return x.ctypes.data
 
-lib.py_fetch_booleans.restype = ct.c_uint8
-lib.py_fetch_booleans.argtypes = [
+lib.py_fetch_csv_booleans.restype = ct.c_uint8
+lib.py_fetch_csv_booleans.argtypes = [
     ct.c_void_p,
     ct.c_int32,
     ct.c_void_p,
@@ -50,8 +50,8 @@ lib.py_fetch_booleans.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
-lib.py_fetch_numbers.restype = ct.c_uint8
-lib.py_fetch_numbers.argtypes = [
+lib.py_fetch_csv_numbers.restype = ct.c_uint8
+lib.py_fetch_csv_numbers.argtypes = [
     ct.c_void_p,
     ct.c_int32,
     ct.c_void_p,
@@ -61,8 +61,8 @@ lib.py_fetch_numbers.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
-lib.py_fetch_strings.restype = ct.c_uint8
-lib.py_fetch_strings.argtypes = [
+lib.py_fetch_csv_strings.restype = None
+lib.py_fetch_csv_strings.argtypes = [
     ct.c_void_p,
     ct.c_int32,
     ct.c_char_p,
@@ -78,8 +78,8 @@ lib.py_free_csv.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
-lib.py_get_column_stats.restype = None
-lib.py_get_column_stats.argtypes = [
+lib.py_get_csv_column_stats.restype = None
+lib.py_get_csv_column_stats.argtypes = [
     ct.c_void_p,
     ct.c_int32,
     ct.POINTER(ct.c_int32),
@@ -89,8 +89,22 @@ lib.py_get_column_stats.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
-lib.py_get_string_stats.restype = ct.c_uint8
-lib.py_get_string_stats.argtypes = [
+lib.py_get_csv_num_fields.restype = ct.c_int32
+lib.py_get_csv_num_fields.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_get_csv_num_records.restype = ct.c_int32
+lib.py_get_csv_num_records.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_get_csv_string_stats.restype = ct.c_uint8
+lib.py_get_csv_string_stats.argtypes = [
     ct.c_void_p,
     ct.c_int32,
     ct.c_void_p,
@@ -106,23 +120,29 @@ lib.py_load_csv.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
-def fetch_booleans(ptr, column, contents, pop):
-    return _catch_errors(lib.py_fetch_booleans)(ptr, column, _np2ct(contents, np.uint8), pop)
+def fetch_csv_booleans(ptr, column, contents, pop):
+    return _catch_errors(lib.py_fetch_csv_booleans)(ptr, column, _np2ct(contents, np.uint8), pop)
 
-def fetch_numbers(ptr, column, contents, mask, pop):
-    return _catch_errors(lib.py_fetch_numbers)(ptr, column, _np2ct(contents, np.float64), _np2ct(mask, np.uint8), pop)
+def fetch_csv_numbers(ptr, column, contents, mask, pop):
+    return _catch_errors(lib.py_fetch_csv_numbers)(ptr, column, _np2ct(contents, np.float64), _np2ct(mask, np.uint8), pop)
 
-def fetch_strings(ptr, column, contents, pop):
-    return _catch_errors(lib.py_fetch_strings)(ptr, column, contents, pop)
+def fetch_csv_strings(ptr, column, contents, pop):
+    return _catch_errors(lib.py_fetch_csv_strings)(ptr, column, contents, pop)
 
 def free_csv(ptr):
     return _catch_errors(lib.py_free_csv)(ptr)
 
-def get_column_stats(ptr, column, type, size, loaded):
-    return _catch_errors(lib.py_get_column_stats)(ptr, column, type, size, loaded)
+def get_csv_column_stats(ptr, column, type, size, loaded):
+    return _catch_errors(lib.py_get_csv_column_stats)(ptr, column, type, size, loaded)
 
-def get_string_stats(ptr, column, lengths, mask):
-    return _catch_errors(lib.py_get_string_stats)(ptr, column, _np2ct(lengths, np.int32), _np2ct(mask, np.uint8))
+def get_csv_num_fields(ptr):
+    return _catch_errors(lib.py_get_csv_num_fields)(ptr)
+
+def get_csv_num_records(ptr):
+    return _catch_errors(lib.py_get_csv_num_records)(ptr)
+
+def get_csv_string_stats(ptr, column, lengths, mask):
+    return _catch_errors(lib.py_get_csv_string_stats)(ptr, column, _np2ct(lengths, np.int32), _np2ct(mask, np.uint8))
 
 def load_csv(path):
     return _catch_errors(lib.py_load_csv)(path)

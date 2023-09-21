@@ -2,6 +2,7 @@ from typing import Any, Tuple
 from biocframe import BiocFrame
 import numpy as np
 import os
+import gzip
 
 from .stage_object import stage_object
 from .write_metadata import write_metadata
@@ -20,9 +21,15 @@ def _numpy_element_to_string(s):
 
 
 def _quotify_string(s):
+    if '"' in s:
+        s = s.replace('"', '""')
+    return '"' + s + '"'
+
+
+def _quotify_string_or_none(s):
     if s is None:
         return "NA"
-    return '"' + s + '"'
+    return _quotify_string(s)
 
 
 def _process_columns(x: BiocFrame) -> Tuple:
@@ -60,7 +67,7 @@ def _process_columns(x: BiocFrame) -> Tuple:
                 operations.append(_list_element_to_string)
             elif final_type == str:
                 columns.append({ "type": "string", "name": col })
-                operations.append(_quotify_string)
+                operations.append(_quotify_string_or_none)
             elif final_type == bool:
                 columns.append({ "type": "boolean", "name": col })
                 operations.append(_list_element_to_string)
@@ -90,7 +97,7 @@ def _process_columns(x: BiocFrame) -> Tuple:
     return columns, otherable, operations
 
 
-def stage_data_frame_csv(x: BiocFrame, dir: str, path: str, is_child: bool) -> Tuple:
+def _stage_data_frame_csv(x: BiocFrame, dir: str, path: str, is_child: bool) -> Tuple:
     columns, otherable, operations = _process_columns(x)
     nr = x.shape[0]
 
@@ -106,18 +113,27 @@ def stage_data_frame_csv(x: BiocFrame, dir: str, path: str, is_child: bool) -> T
     full = os.path.join(dir, newpath)
 
     with gzip.open(full, "wb") as handle:
+        header_line = ""
+        if has_row_names:
+            header_line += _quotify_string("row_names")
+        for c in x.column_names:
+            if header_line:
+                header_line += ","
+            header_line += _quotify_string(c)
+        header_line += "\n"
+        handle.write(header_line.encode("ASCII"))
+
         for r in range(nr):
             if has_row_names:
-                line = '"' + extracted_row_names[r] + '"'
+                line = _quotify_string(extracted_row_names[r])
             else:
                 line = ""
-
             for i, trans in enumerate(operations):
                 if line:
                     line += ","
-                line += trans(extracted[i][r])
-
-            handle.write(line + "\n")
+                line += trans(extracted_columns[i][r])
+            line += "\n"
+            handle.write(line.encode("ASCII"))
 
     metadata = {
         "$schema": "csv_data_frame/v1.json",
@@ -138,7 +154,9 @@ def stage_data_frame_csv(x: BiocFrame, dir: str, path: str, is_child: bool) -> T
 
 @stage_object.register
 def stage_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool = False, **kwargs) -> dict[str, Any]:
+    os.mkdir(os.path.join(dir, path))
     meta, other = _stage_data_frame_csv(x, dir, path, is_child=is_child)
+
     for i in other:
         more_meta = stage_object(x.column(i), dir, path, is_child = True)
         resource_stub = write_metadata(more_meta, dir=dir)

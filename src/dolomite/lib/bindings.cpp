@@ -17,17 +17,21 @@ static char* copy_error_message(const char* original) {
     return copy;
 }
 
-uint8_t fetch_booleans(void*, int32_t, uint8_t*, uint8_t);
+uint8_t fetch_csv_booleans(void*, int32_t, uint8_t*, uint8_t);
 
-uint8_t fetch_numbers(void*, int32_t, double*, uint8_t*, uint8_t);
+uint8_t fetch_csv_numbers(void*, int32_t, double*, uint8_t*, uint8_t);
 
-uint8_t fetch_strings(void*, int32_t, char*, uint8_t);
+void fetch_csv_strings(void*, int32_t, char*, uint8_t);
 
 void free_csv(void*);
 
-void get_column_stats(void*, int32_t, int32_t*, int32_t*, int32_t*);
+void get_csv_column_stats(void*, int32_t, int32_t*, int32_t*, int32_t*);
 
-uint8_t get_string_stats(void*, int32_t, int32_t*, uint8_t*);
+int32_t get_csv_num_fields(void*);
+
+int32_t get_csv_num_records(void*);
+
+uint8_t get_csv_string_stats(void*, int32_t, int32_t*, uint8_t*);
 
 void* load_csv(const char*);
 
@@ -37,10 +41,10 @@ PYAPI void free_error_message(char** msg) {
     delete [] *msg;
 }
 
-PYAPI uint8_t py_fetch_booleans(void* ptr, int32_t column, uint8_t* contents, uint8_t pop, int32_t* errcode, char** errmsg) {
+PYAPI uint8_t py_fetch_csv_booleans(void* ptr, int32_t column, uint8_t* contents, uint8_t pop, int32_t* errcode, char** errmsg) {
     uint8_t output = 0;
     try {
-        output = fetch_booleans(ptr, column, contents, pop);
+        output = fetch_csv_booleans(ptr, column, contents, pop);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -51,10 +55,10 @@ PYAPI uint8_t py_fetch_booleans(void* ptr, int32_t column, uint8_t* contents, ui
     return output;
 }
 
-PYAPI uint8_t py_fetch_numbers(void* ptr, int32_t column, double* contents, uint8_t* mask, uint8_t pop, int32_t* errcode, char** errmsg) {
+PYAPI uint8_t py_fetch_csv_numbers(void* ptr, int32_t column, double* contents, uint8_t* mask, uint8_t pop, int32_t* errcode, char** errmsg) {
     uint8_t output = 0;
     try {
-        output = fetch_numbers(ptr, column, contents, mask, pop);
+        output = fetch_csv_numbers(ptr, column, contents, mask, pop);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -65,10 +69,9 @@ PYAPI uint8_t py_fetch_numbers(void* ptr, int32_t column, double* contents, uint
     return output;
 }
 
-PYAPI uint8_t py_fetch_strings(void* ptr, int32_t column, char* contents, uint8_t pop, int32_t* errcode, char** errmsg) {
-    uint8_t output = 0;
+PYAPI void py_fetch_csv_strings(void* ptr, int32_t column, char* contents, uint8_t pop, int32_t* errcode, char** errmsg) {
     try {
-        output = fetch_strings(ptr, column, contents, pop);
+        fetch_csv_strings(ptr, column, contents, pop);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -76,7 +79,6 @@ PYAPI uint8_t py_fetch_strings(void* ptr, int32_t column, char* contents, uint8_
         *errcode = 1;
         *errmsg = copy_error_message("unknown C++ exception");
     }
-    return output;
 }
 
 PYAPI void py_free_csv(void* ptr, int32_t* errcode, char** errmsg) {
@@ -91,9 +93,9 @@ PYAPI void py_free_csv(void* ptr, int32_t* errcode, char** errmsg) {
     }
 }
 
-PYAPI void py_get_column_stats(void* ptr, int32_t column, int32_t* type, int32_t* size, int32_t* loaded, int32_t* errcode, char** errmsg) {
+PYAPI void py_get_csv_column_stats(void* ptr, int32_t column, int32_t* type, int32_t* size, int32_t* loaded, int32_t* errcode, char** errmsg) {
     try {
-        get_column_stats(ptr, column, type, size, loaded);
+        get_csv_column_stats(ptr, column, type, size, loaded);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -103,10 +105,38 @@ PYAPI void py_get_column_stats(void* ptr, int32_t column, int32_t* type, int32_t
     }
 }
 
-PYAPI uint8_t py_get_string_stats(void* ptr, int32_t column, int32_t* lengths, uint8_t* mask, int32_t* errcode, char** errmsg) {
+PYAPI int32_t py_get_csv_num_fields(void* ptr, int32_t* errcode, char** errmsg) {
+    int32_t output = 0;
+    try {
+        output = get_csv_num_fields(ptr);
+    } catch(std::exception& e) {
+        *errcode = 1;
+        *errmsg = copy_error_message(e.what());
+    } catch(...) {
+        *errcode = 1;
+        *errmsg = copy_error_message("unknown C++ exception");
+    }
+    return output;
+}
+
+PYAPI int32_t py_get_csv_num_records(void* ptr, int32_t* errcode, char** errmsg) {
+    int32_t output = 0;
+    try {
+        output = get_csv_num_records(ptr);
+    } catch(std::exception& e) {
+        *errcode = 1;
+        *errmsg = copy_error_message(e.what());
+    } catch(...) {
+        *errcode = 1;
+        *errmsg = copy_error_message("unknown C++ exception");
+    }
+    return output;
+}
+
+PYAPI uint8_t py_get_csv_string_stats(void* ptr, int32_t column, int32_t* lengths, uint8_t* mask, int32_t* errcode, char** errmsg) {
     uint8_t output = 0;
     try {
-        output = get_string_stats(ptr, column, lengths, mask);
+        output = get_csv_string_stats(ptr, column, lengths, mask);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());

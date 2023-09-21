@@ -14,7 +14,17 @@ void free_csv(void* ptr) {
 }
 
 //[[export]]
-void get_column_stats(void* ptr, int32_t column, int32_t* type, int32_t* size, int32_t* loaded) {
+int32_t get_csv_num_fields(void* ptr) {
+    return reinterpret_cast<const comservatory::Contents*>(ptr)->num_fields();
+}
+
+//[[export]]
+int32_t get_csv_num_records(void* ptr) {
+    return reinterpret_cast<const comservatory::Contents*>(ptr)->num_records();
+}
+
+//[[export]]
+void get_csv_column_stats(void* ptr, int32_t column, int32_t* type, int32_t* size, int32_t* loaded) {
     auto mat = reinterpret_cast<const comservatory::Contents*>(ptr);
     const auto& current = mat->fields[column];
 
@@ -37,7 +47,7 @@ void get_column_stats(void* ptr, int32_t column, int32_t* type, int32_t* size, i
 }
 
 //[[export]]
-uint8_t fetch_numbers(void* ptr, int32_t column, double* contents /** numpy */, uint8_t* mask /** numpy */, uint8_t pop) {
+uint8_t fetch_csv_numbers(void* ptr, int32_t column, double* contents /** numpy */, uint8_t* mask /** numpy */, uint8_t pop) {
     auto mat = reinterpret_cast<comservatory::Contents*>(ptr);
     auto& current = mat->fields[column];
 
@@ -55,7 +65,7 @@ uint8_t fetch_numbers(void* ptr, int32_t column, double* contents /** numpy */, 
 }
 
 //[[export]]
-uint8_t fetch_booleans(void* ptr, int32_t column, uint8_t* contents /** numpy */, uint8_t pop) {
+uint8_t fetch_csv_booleans(void* ptr, int32_t column, uint8_t* contents /** numpy */, uint8_t pop) {
     auto mat = reinterpret_cast<comservatory::Contents*>(ptr);
     auto& current = mat->fields[column];
 
@@ -73,7 +83,7 @@ uint8_t fetch_booleans(void* ptr, int32_t column, uint8_t* contents /** numpy */
 }
 
 //[[export]]
-uint8_t get_string_stats(void* ptr, int32_t column, int32_t* lengths /** numpy */, uint8_t* mask /** numpy */) {
+uint8_t get_csv_string_stats(void* ptr, int32_t column, int32_t* lengths /** numpy */, uint8_t* mask /** numpy */) {
     auto mat = reinterpret_cast<const comservatory::Contents*>(ptr);
     const auto& current = mat->fields[column];
 
@@ -91,7 +101,7 @@ uint8_t get_string_stats(void* ptr, int32_t column, int32_t* lengths /** numpy *
 }
 
 //[[export]]
-uint8_t fetch_strings(void* ptr, int32_t column, char* contents, uint8_t pop) {
+void fetch_csv_strings(void* ptr, int32_t column, char* contents, uint8_t pop) {
     auto mat = reinterpret_cast<comservatory::Contents*>(ptr);
     auto& current = mat->fields[column];
 
@@ -104,6 +114,4 @@ uint8_t fetch_strings(void* ptr, int32_t column, char* contents, uint8_t pop) {
     if (pop) { // save memory by freeing the memory immediately.
         current.reset();
     }
-
-    return !(nptr->missing.empty());
 }
