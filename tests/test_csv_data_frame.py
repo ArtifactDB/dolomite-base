@@ -215,10 +215,10 @@ def test_csv_data_frame_nested():
     liella_df = roundtrip.column("liella")
     assert isinstance(liella_df, BiocFrame)
     assert liella_df.column("first") == df.column("liella").column("first")
-    assert liella_df.column("second") == df.column("liella").column("second")
+    assert liella_df.column("last") == df.column("liella").column("last")
     assert (liella_df.column("best") == np.array([False, False, False, True, False ])).all()
 
     bsb_df = roundtrip.column("bsb")
     assert isinstance(bsb_df, BiocFrame)
-    assert liella_df.column("first") == df.column("bsb").column("first")
-    assert liella_df.column("second") == df.column("bsb").column("second")
+    assert bsb_df.column("first") == df.column("bsb").column("first")
+    assert bsb_df.column("last") == df.column("bsb").column("last")
