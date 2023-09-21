@@ -3,7 +3,7 @@ import dolomite as dl
 import numpy as np
 from tempfile import mkdtemp
 
-def test_data_frame_csv_list():
+def test_csv_data_frame_list():
     df = BiocFrame({
         "akari": [ 1, 2, 3, 4, 5 ],
         "aika": [ "sydney", "melbourne", "", "perth", "adelaide" ],
@@ -21,7 +21,7 @@ def test_data_frame_csv_list():
     assert meta["data_frame"]["columns"][4] == { "type": "number", "name": "alicia" }
 #    dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_data_frame_csv(meta, dir)
+    roundtrip = dl.load_csv_data_frame(meta, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert list(roundtrip.column("akari")) == df.column("akari")
     assert roundtrip.column("aika") == df.column("aika")
@@ -30,7 +30,7 @@ def test_data_frame_csv_list():
     assert list(roundtrip.column("alicia")) == df.column("alicia")
 
 
-def test_data_frame_csv_row_names():
+def test_csv_data_frame_row_names():
     df = BiocFrame({
         "akari": [ 1, 2, 3, 4, 5 ],
         "aika": [ "sydney", "melbourne", "", "perth", "adelaide" ],
@@ -43,12 +43,12 @@ def test_data_frame_csv_row_names():
     assert meta["data_frame"]["row_names"]
 #    dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_data_frame_csv(meta, dir)
+    roundtrip = dl.load_csv_data_frame(meta, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert df.row_names == roundtrip.row_names
 
 
-def test_data_frame_csv_wild_strings():
+def test_csv_data_frame_wild_strings():
     df = BiocFrame({
         "lyrics": [ "Ochite\niku\tsunadokei\nbakari\tmiteru\tyo", "foo\"asdasd", "multie\"foo\"asdas" ],
     }, row_names = [ "nagisa\"", "\"fuko\"", "okazaki\nasdasd" ])
@@ -58,13 +58,13 @@ def test_data_frame_csv_wild_strings():
     assert meta["data_frame"]["row_names"]
 #    dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_data_frame_csv(meta, dir)
+    roundtrip = dl.load_csv_data_frame(meta, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert df.row_names == roundtrip.row_names
     assert df.column("lyrics") == roundtrip.column("lyrics")
 
 
-def test_data_frame_csv_none():
+def test_csv_data_frame_none():
     df = BiocFrame({
         "akari": [ 1, 2, None, 4, 5 ],
         "aika": [ "sydney", None, "", "perth", "adelaide" ],
@@ -88,7 +88,7 @@ def test_data_frame_csv_none():
             else:
                 assert np.ma.is_masked(m[i])
 
-    roundtrip = dl.load_data_frame_csv(meta, dir)
+    roundtrip = dl.load_csv_data_frame(meta, dir)
     assert isinstance(roundtrip, BiocFrame)
     compare_masked_to_list(df.column("akari"), roundtrip.column("akari"))
     assert roundtrip.column("aika") == df.column("aika")
@@ -96,7 +96,7 @@ def test_data_frame_csv_none():
     compare_masked_to_list(df.column("ai"), roundtrip.column("ai"))
 
 
-def test_data_frame_csv_numpy():
+def test_csv_data_frame_numpy():
     df = BiocFrame({
         "alicia": np.array([ 1, 2, 3, 4, 5 ]),
         "akira": np.array([ True, True, False, False, True ]),
@@ -110,14 +110,14 @@ def test_data_frame_csv_numpy():
     assert meta["data_frame"]["columns"][2] == { "type": "number", "name": "athena" }
 #    dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_data_frame_csv(meta, dir)
+    roundtrip = dl.load_csv_data_frame(meta, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert (roundtrip.column("alicia") == df.column("alicia")).all()
     assert (roundtrip.column("akira") == df.column("akira")).all()
     assert (roundtrip.column("athena") == df.column("athena")).all()
 
 
-def test_data_frame_csv_masked():
+def test_csv_data_frame_masked():
     df = BiocFrame({
         "alicia": np.ma.array(np.array([ 1, 2, 3, 4, 5 ]), mask=[0, 1, 0, 1, 0]),
         "akira": np.ma.array(np.array([ True, True, False, False, True ]), mask=[1, 1, 0, 0, 0]),
@@ -131,25 +131,25 @@ def test_data_frame_csv_masked():
     assert meta["data_frame"]["columns"][2] == { "type": "number", "name": "athena" }
 #    dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_data_frame_csv(meta, dir)
+    roundtrip = dl.load_csv_data_frame(meta, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert (roundtrip.column("alicia") == df.column("alicia")).all()
     assert (roundtrip.column("akira") == df.column("akira")).all()
     assert (roundtrip.column("athena") == df.column("athena")).all()
 
 
-def test_data_frame_csv_empty():
+def test_csv_data_frame_empty():
     df = BiocFrame({}, row_names=["chihaya", "mami", "ami", "miki", "haruka"])
     dir = mkdtemp()
 
     meta = dl.stage_object(df, dir, "foo")
-    roundtrip = dl.load_data_frame_csv(meta, dir)
+    roundtrip = dl.load_csv_data_frame(meta, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert df.row_names == roundtrip.row_names
 
     df = BiocFrame(number_of_rows=10)
     meta = dl.stage_object(df, dir, "empty")
-    roundtrip = dl.load_data_frame_csv(meta, dir)
+    roundtrip = dl.load_csv_data_frame(meta, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert df.shape == roundtrip.shape
     assert roundtrip.row_names is None

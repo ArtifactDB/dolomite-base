@@ -84,7 +84,7 @@ class _LoadedCsvHolder:
             return NotImplementedError("not-yet-supported type for column " + str(i) + " of the CSV (" + str(col_type.value) + ")")
 
 
-def load_data_frame_csv(meta: dict[str, Any], dir: str, **kwargs):
+def load_csv_data_frame(meta: dict[str, Any], dir: str, **kwargs):
     full_path = os.path.join(dir, meta["path"])
     handle = _LoadedCsvHolder(lib.load_csv(full_path.encode("UTF8")))
 
@@ -104,6 +104,9 @@ def load_data_frame_csv(meta: dict[str, Any], dir: str, **kwargs):
     contents = []
     row_names = None
     for f in range(observed_cols):
+        # Always popping columns from the C++ representation as soon as we're
+        # done, so as to free up memory. Not really sure whether this has much
+        # of an effect as the C++/Python heaps aren't the same.
         current = handle.column(f, pop=True)
         if f == 0 and has_row_names:
             row_names = current
