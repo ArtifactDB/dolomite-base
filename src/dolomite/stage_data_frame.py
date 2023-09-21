@@ -75,17 +75,18 @@ def _process_columns(x: BiocFrame) -> Tuple:
                 raise NotImplementedError("saving a list of " + str(list(all_types)[0]) + " is not supported yet")
 
         elif isinstance(current, np.ndarray):
-            if issubclass(current.dtype, np.integer):
+            dt = current.dtype.type
+            if issubclass(dt, np.integer):
                 columns.append({ "type": "integer", "name": col })
-            elif issubclass(current.dtype, np.floating):
+            elif issubclass(dt, np.floating):
                 columns.append({ "type": "number", "name": col })
-            elif issubclass(current.dtype, np.bool_):
+            elif issubclass(dt, np.bool_):
                 columns.append({ "type": "boolean", "name": col })
             else:
                 raise NotImplementedError("saving a NumPy array of " + str(current.dtype) + " is not supported yet")
 
             if np.ma.is_masked(current):
-                operations.append(_numpy_elements_to_str)
+                operations.append(_numpy_element_to_string)
             else:
                 operations.append(str)
 

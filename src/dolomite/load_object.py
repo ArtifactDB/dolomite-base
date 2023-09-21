@@ -1,5 +1,7 @@
-from ._schema_cache import _hunt_for_schemas
+from typing import Any
 import os
+
+from ._schemas import _hunt_for_schemas
 
 
 def custom_load_object_helper(meta: dict, project: Any, locations: list, memory: dict[str, Any], **kwargs) -> Any:

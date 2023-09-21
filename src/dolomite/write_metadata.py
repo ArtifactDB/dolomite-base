@@ -1,7 +1,7 @@
 from typing import Any
 from hashlib import md5
 from jsonschema import validate
-from ._schema_cache import _fetch_schemas
+from ._schemas import _fetch_schema
 
 
 def _strip_none_values(x):
