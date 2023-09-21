@@ -20,3 +20,5 @@ from .stage_data_frame import stage_data_frame
 from .write_metadata import write_metadata
 from .load_object import *
 from .load_csv_data_frame import load_csv_data_frame
+from .acquire_metadata import acquire_metadata
+from .acquire_file import acquire_file

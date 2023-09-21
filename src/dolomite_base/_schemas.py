@@ -24,7 +24,7 @@ def _fetch_schema(pkg, schema):
 def _hunt_for_schemas(locations, schema, fallback = None):
     schema_details = None
     for pkg in locations:
-        schema_details = _fetch_schemas(pkg, schema)
+        schema_details = _fetch_schema(pkg, schema)
         if schema_details is not None:
             break
 

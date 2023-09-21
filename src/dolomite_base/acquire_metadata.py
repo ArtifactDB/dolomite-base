@@ -26,6 +26,8 @@ def acquire_metadata(project: Any, path: str) -> dict[str, Any]:
 
 @acquire_metadata.register
 def acquire_metadata_from_dir(project: str, path: str) -> str:
+    if not path.endswith(".json"):
+        path += ".json"
     fpath = os.path.join(project, path)
     with open(fpath, "r") as handle:
         return json.load(handle)

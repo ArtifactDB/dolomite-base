@@ -19,9 +19,10 @@ def test_csv_data_frame_list():
     assert meta["data_frame"]["columns"][2] == { "type": "boolean", "name": "alice" }
     assert meta["data_frame"]["columns"][3] == { "type": "number", "name": "ai" }
     assert meta["data_frame"]["columns"][4] == { "type": "number", "name": "alicia" }
-#    dl.write_metadata(meta, dir)
+    dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_csv_data_frame(meta, dir)
+    meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
+    roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert list(roundtrip.column("akari")) == df.column("akari")
     assert roundtrip.column("aika") == df.column("aika")
@@ -41,9 +42,10 @@ def test_csv_data_frame_row_names():
     dir = mkdtemp()
     meta = dl.stage_object(df, dir, "foo")
     assert meta["data_frame"]["row_names"]
-#    dl.write_metadata(meta, dir)
+    dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_csv_data_frame(meta, dir)
+    meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
+    roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert df.row_names == roundtrip.row_names
 
@@ -56,9 +58,10 @@ def test_csv_data_frame_wild_strings():
     dir = mkdtemp()
     meta = dl.stage_object(df, dir, "foo")
     assert meta["data_frame"]["row_names"]
-#    dl.write_metadata(meta, dir)
+    dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_csv_data_frame(meta, dir)
+    meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
+    roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert df.row_names == roundtrip.row_names
     assert df.column("lyrics") == roundtrip.column("lyrics")
@@ -78,7 +81,7 @@ def test_csv_data_frame_none():
     assert meta["data_frame"]["columns"][1] == { "type": "string", "name": "aika" }
     assert meta["data_frame"]["columns"][2] == { "type": "boolean", "name": "alice" }
     assert meta["data_frame"]["columns"][3] == { "type": "number", "name": "ai" }
-#    dl.write_metadata(meta, dir)
+    dl.write_metadata(meta, dir)
 
     def compare_masked_to_list(l, m):
         assert len(l) == len(m)
@@ -88,7 +91,8 @@ def test_csv_data_frame_none():
             else:
                 assert np.ma.is_masked(m[i])
 
-    roundtrip = dl.load_csv_data_frame(meta, dir)
+    meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
+    roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
     compare_masked_to_list(df.column("akari"), roundtrip.column("akari"))
     assert roundtrip.column("aika") == df.column("aika")
@@ -108,9 +112,10 @@ def test_csv_data_frame_numpy():
     assert meta["data_frame"]["columns"][0] == { "type": "integer", "name": "alicia" }
     assert meta["data_frame"]["columns"][1] == { "type": "boolean", "name": "akira" }
     assert meta["data_frame"]["columns"][2] == { "type": "number", "name": "athena" }
-#    dl.write_metadata(meta, dir)
+    dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_csv_data_frame(meta, dir)
+    meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
+    roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert (roundtrip.column("alicia") == df.column("alicia")).all()
     assert (roundtrip.column("akira") == df.column("akira")).all()
@@ -129,9 +134,10 @@ def test_csv_data_frame_masked():
     assert meta["data_frame"]["columns"][0] == { "type": "integer", "name": "alicia" }
     assert meta["data_frame"]["columns"][1] == { "type": "boolean", "name": "akira" }
     assert meta["data_frame"]["columns"][2] == { "type": "number", "name": "athena" }
-#    dl.write_metadata(meta, dir)
+    dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_csv_data_frame(meta, dir)
+    meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
+    roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert (roundtrip.column("alicia") == df.column("alicia")).all()
     assert (roundtrip.column("akira") == df.column("akira")).all()
@@ -139,17 +145,25 @@ def test_csv_data_frame_masked():
 
 
 def test_csv_data_frame_empty():
-    df = BiocFrame({}, row_names=["chihaya", "mami", "ami", "miki", "haruka"])
     dir = mkdtemp()
 
+    # Empty except for row names.
+    df = BiocFrame({}, row_names=["chihaya", "mami", "ami", "miki", "haruka"])
     meta = dl.stage_object(df, dir, "foo")
-    roundtrip = dl.load_csv_data_frame(meta, dir)
+    dl.write_metadata(meta, dir)
+
+    meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
+    roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert df.row_names == roundtrip.row_names
 
+    # Fully empty
     df = BiocFrame(number_of_rows=10)
     meta = dl.stage_object(df, dir, "empty")
-    roundtrip = dl.load_csv_data_frame(meta, dir)
+    dl.write_metadata(meta, dir)
+
+    meta2 = dl.acquire_metadata(dir, "empty/simple.csv.gz")
+    roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert df.shape == roundtrip.shape
     assert roundtrip.row_names is None

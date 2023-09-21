@@ -1,4 +1,5 @@
 from typing import Any
+from importlib import import_module
 import os
 
 from ._schemas import _hunt_for_schemas
@@ -16,17 +17,22 @@ def custom_load_object_helper(meta: dict, project: Any, locations: list, memory:
                 res_meta = attr_meta["restore"]
                 if "python" in res_meta:
                     command = res_meta["python"]
+
         if command is None:
-            raise NotImplementedError("could not find a Python context to restore '" + schema + "'")
+            # TODO: replace these in the schemas themselves, once everything has settled down.
+            if schema == "csv_data_frame/v1.json":
+                command = "dolomite_base.load_csv_data_frame"
+            else:
+                raise NotImplementedError("could not find a Python context to restore '" + schema + "'")
 
         first_period = command.find(".")
-        mod = importlib.import_module(command[:first_period])
+        mod = import_module(command[:first_period])
         memory[schema] = getattr(mod, command[first_period + 1:])
 
     return memory[schema](meta, project, **kwargs)
 
 
-default_locations = [ "dolomite.schemas" ]
+default_locations = [ "dolomite_schemas" ]
 
 
 _schema_restoration = {}
