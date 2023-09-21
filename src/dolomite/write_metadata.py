@@ -1,9 +1,7 @@
 from typing import Any
-from importlib import import_module 
-import json
-from copy import copy
 from hashlib import md5
 from jsonschema import validate
+from ._schema_cache import _fetch_schemas
 
 
 def _strip_none_values(x):
@@ -24,9 +22,6 @@ def _strip_none_values(x):
                 _strip_none_values(v)
 
 
-_schema_details = {}
-
-
 def write_metadata(meta: dict[str, Any], dir: str, ignore_none: bool = True) -> dict[str, str]:
     meta = copy(meta) # make an internal copy.
     if ignore_none:
@@ -37,18 +32,8 @@ def write_metadata(meta: dict[str, Any], dir: str, ignore_none: bool = True) -> 
         meta["$schema"] = schema[0]
         pkg = schema[1]
     else:
-        pkg = "dolomite_schemas"
-
-    # Cache the schema to avoid a repeated read from disk.
-    if pkg not in _schema_details:
-        _schema_details[pkg] = {}
-    cached_schemas = _schema_details[pkg]
-    if schema not in cached_schemas:
-        schema_pkg = import_module(pkg)
-        schema_path = os.path.join(os.dirname(schema_pkg.__file__), "schemas", schema)
-        with open(schema_path, "r") as handle:
-            cached_schemas[schema] = json.load(handle)
-    schema_details = cached_schemas[schema]
+        pkg = "dolomite.schemas"
+    schema_details = _fetch_schema(pkg, schema)
 
     if meta["path"].startswith("./"): # removing for convenience
         meta["path"] = meta["path"][2:]
