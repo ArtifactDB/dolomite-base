@@ -11,7 +11,7 @@ def _fetch_schema(pkg, schema):
     current_cache = _schema_cache[pkg]
     if schema not in current_cache:
         schema_pkg = import_module(pkg)
-        schema_path = os.path.join(os.dirname(schema_pkg.__file__), "schemas", schema)
+        schema_path = os.path.join(os.path.dirname(schema_pkg.__file__), "schemas", schema)
         if os.path.exists(schema_path):
             with open(schema_path, "r") as handle:
                 current_cache[schema] = json.load(handle)

@@ -107,8 +107,8 @@ def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> 
 
     # Manual serialization into a Gzip-compressed CSV, because 
     # pandas doesn't quite give me what I want... oh well.
-    newpath = os.path.join(path, "simple.csv.gz")
-    full = os.path.join(dir, newpath)
+    basename = "simple.csv.gz"
+    full = os.path.join(dir, path, basename)
 
     with gzip.open(full, "wb") as handle:
         header_line = ""
@@ -135,7 +135,7 @@ def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> 
 
     metadata = {
         "$schema": "csv_data_frame/v1.json",
-        "path": newpath,
+        "path": path + "/" + basename,
         "is_child": is_child,
         "data_frame": {
             "columns": columns,
