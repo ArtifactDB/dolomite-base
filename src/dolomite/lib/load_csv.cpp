@@ -5,12 +5,12 @@
 void* load_csv(const char* path) {
     comservatory::ReadCsv reader;
     auto contents = reader.read(path); // throws error for invalid formats.
-    return new Contents(std::move(contents));
+    return new comservatory::Contents(std::move(contents));
 }
 
 //[[export]]
 void free_csv(void* ptr) {
-    delete reinterpret_cast<Contents*>(ptr);
+    delete reinterpret_cast<comservatory::Contents*>(ptr);
 }
 
 //[[export]]
@@ -20,15 +20,15 @@ void get_column_stats(void* ptr, int32_t column, int32_t* type, int32_t* size, i
 
     // Manually specifying it here, so that we're robust to changes in comservatory itself.
     auto mytype = current->type();
-    if (type == comservatory::STRING) {
+    if (mytype == comservatory::STRING) {
         *type = 0;
-    } else if (type == comservatory::NUMBER) {
+    } else if (mytype == comservatory::NUMBER) {
         *type = 1;
-    } else if (type == comservatory::COMPLEX) {
+    } else if (mytype == comservatory::COMPLEX) {
         *type = 2;
-    } else if (type == comservatory::BOOLEAN) {
+    } else if (mytype == comservatory::BOOLEAN) {
         *type = 3;
-    } else if (type == comservatory::UNKNOWN) {
+    } else if (mytype == comservatory::UNKNOWN) {
         *type = -1;
     }
 
@@ -37,12 +37,12 @@ void get_column_stats(void* ptr, int32_t column, int32_t* type, int32_t* size, i
 }
 
 //[[export]]
-uint8_t fetch_numbers(void* ptr, int32_t column, double* output /** numpy */, uint8_t* mask /** numpy */, uint8_t pop) {
+uint8_t fetch_numbers(void* ptr, int32_t column, double* contents /** numpy */, uint8_t* mask /** numpy */, uint8_t pop) {
     auto mat = reinterpret_cast<comservatory::Contents*>(ptr);
     auto& current = mat->fields[column];
 
     auto nptr = reinterpret_cast<const comservatory::FilledNumberField*>(current.get());
-    std::copy(nptr->values.begin(), nptr->values.end(), output);
+    std::copy(nptr->values.begin(), nptr->values.end(), contents);
     for (auto i : nptr->missing) {
         mask[i] = 1;
     }
@@ -55,14 +55,14 @@ uint8_t fetch_numbers(void* ptr, int32_t column, double* output /** numpy */, ui
 }
 
 //[[export]]
-uint8_t fetch_booleans(void* ptr, int32_t column, uint8_t* output /** numpy */, uint8_t pop) {
+uint8_t fetch_booleans(void* ptr, int32_t column, uint8_t* contents /** numpy */, uint8_t pop) {
     auto mat = reinterpret_cast<comservatory::Contents*>(ptr);
     auto& current = mat->fields[column];
 
     auto nptr = reinterpret_cast<const comservatory::FilledBooleanField*>(current.get());
-    std::copy(nptr->values.begin(), nptr->values.end(), output);
+    std::copy(nptr->values.begin(), nptr->values.end(), contents);
     for (auto i : nptr->missing) {
-        output[i] = 2;
+        contents[i] = 2;
     }
 
     if (pop) { // save memory by freeing the memory immediately.
@@ -83,7 +83,7 @@ uint8_t get_string_stats(void* ptr, int32_t column, int32_t* lengths /** numpy *
         ++lengths;
     }
 
-    for (auto i : nptr->mask) {
+    for (auto i : nptr->missing) {
         mask[i] = 1;
     }
 
@@ -91,14 +91,14 @@ uint8_t get_string_stats(void* ptr, int32_t column, int32_t* lengths /** numpy *
 }
 
 //[[export]]
-uint8_t fetch_strings(void* ptr, int32_t column, char* output, uint8_t pop) {
+uint8_t fetch_strings(void* ptr, int32_t column, char* contents, uint8_t pop) {
     auto mat = reinterpret_cast<comservatory::Contents*>(ptr);
     auto& current = mat->fields[column];
 
     auto nptr = reinterpret_cast<const comservatory::FilledStringField*>(current.get());
     for (const auto& x : nptr->values) {
-        std::copy(x.begin(), x.end(), output);
-        output += x.size();
+        std::copy(x.begin(), x.end(), contents);
+        contents += x.size();
     }
 
     if (pop) { // save memory by freeing the memory immediately.

@@ -19,9 +19,44 @@
 A longer description of your project goes here...
 
 
-<!-- pyscaffold-notes -->
+## Developer notes
 
-## Note
+Obtain the headers:
 
-This project has been set up using PyScaffold 4.5. For details and usage
-information on PyScaffold see https://pyscaffold.org/.
+```shell
+(cd extern && ./fetch)
+```
+
+Build the shared object file:
+
+```shell
+CC="ccache clang++" python setup.py build_ext --inplace
+```
+
+For installation:
+
+```shell
+CC="ccache clang++" python setup.py install --user
+```
+
+For quick testing:
+
+```shell
+pytest
+```
+
+For more complex testing:
+
+```shell
+python setup.py build_ext --inplace && tox
+```
+
+To rebuild the **ctypes** bindings with [**cpptypes**](https://github.com/BiocPy/ctypes-wrapper):
+
+```shell
+cpptypes src/dolomite/lib \
+    --py src/dolomite/_cpphelpers.py \
+    --cpp src/dolomite/lib/bindings.cpp \
+    --dll _core
+```
+

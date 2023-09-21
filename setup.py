@@ -6,7 +6,9 @@
     PyScaffold helps you to put up the scaffold of your new Python project.
     Learn more under: https://pyscaffold.org/
 """
-from setuptools import setup
+from setuptools import setup, Extension
+import assorthead
+from glob import glob
 
 
 if __name__ == "__main__":
@@ -25,6 +27,9 @@ if __name__ == "__main__":
                     language="c++",
                     extra_compile_args=[
                         "-std=c++17",
+                    ],
+                    extra_link_args=[
+                        "-lz"
                     ],
                 )
             ]
