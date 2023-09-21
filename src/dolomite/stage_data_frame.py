@@ -4,6 +4,7 @@ import numpy as np
 import os
 
 from .stage_object import stage_object
+from .write_metadata import write_metadata
 
 
 def _list_element_to_string(s):
