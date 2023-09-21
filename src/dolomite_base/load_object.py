@@ -32,7 +32,7 @@ def custom_load_object_helper(meta: dict, project: Any, locations: list, memory:
     return memory[schema](meta, project, **kwargs)
 
 
-default_locations = [ "dolomite_schemas" ]
+DEFAULT_SCHEMA_LOCATIONS = [ "dolomite_schemas" ]
 
 
 _schema_restoration = {}
@@ -42,7 +42,7 @@ def load_object(meta: dict, project: Any, **kwargs) -> Any:
     return custom_load_object_helper(
         meta, 
         project, 
-        locations = default_locations, 
+        locations = DEFAULT_SCHEMA_LOCATIONS, 
         memory = _schema_restoration, 
         **kwargs
     ) 

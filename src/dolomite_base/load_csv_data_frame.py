@@ -118,6 +118,8 @@ def load_csv_data_frame(meta: dict[str, Any], dir: str, **kwargs):
         curval = columns[i]
         if curval["type"] == "other":
             raise NotImplementedError("oops, can't load complex data frame columns yet") 
+        if curval["type"] == "integer":
+            c = c.astype(np.int32)
         output[curval["name"]] = c
    
     return output

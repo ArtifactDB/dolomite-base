@@ -24,11 +24,20 @@ def test_csv_data_frame_list():
     meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
     roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
+
     assert list(roundtrip.column("akari")) == df.column("akari")
+    assert roundtrip.column("akari").dtype.type == np.int32
+
     assert roundtrip.column("aika") == df.column("aika")
+
     assert list(roundtrip.column("alice")) == df.column("alice")
+    assert roundtrip.column("alice").dtype.type == np.bool_
+
     assert list(roundtrip.column("ai")) == df.column("ai")
+    assert roundtrip.column("ai").dtype.type == np.float64
+
     assert list(roundtrip.column("alicia")) == df.column("alicia")
+    assert roundtrip.column("alicia").dtype.type == np.float64
 
 
 def test_csv_data_frame_row_names():
@@ -94,10 +103,17 @@ def test_csv_data_frame_none():
     meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
     roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
+
     compare_masked_to_list(df.column("akari"), roundtrip.column("akari"))
+    assert roundtrip.column("akari").dtype.type == np.int32
+
     assert roundtrip.column("aika") == df.column("aika")
+
     compare_masked_to_list(df.column("alice"), roundtrip.column("alice"))
+    assert roundtrip.column("alice").dtype.type == np.bool_
+
     compare_masked_to_list(df.column("ai"), roundtrip.column("ai"))
+    assert roundtrip.column("ai").dtype.type == np.float64
 
 
 def test_csv_data_frame_numpy():
@@ -118,6 +134,7 @@ def test_csv_data_frame_numpy():
     roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert (roundtrip.column("alicia") == df.column("alicia")).all()
+    assert roundtrip.column("alicia").dtype == np.int32
     assert (roundtrip.column("akira") == df.column("akira")).all()
     assert (roundtrip.column("athena") == df.column("athena")).all()
 
