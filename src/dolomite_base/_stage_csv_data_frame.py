@@ -89,7 +89,7 @@ def _process_columns(x: BiocFrame) -> Tuple:
 
         else:
             columns.append({ "type": "other", "name": col })
-            operations.append(lambda x : 0)
+            operations.append(lambda x : "0")
             otherable.append(i)
 
     return columns, otherable, operations
@@ -100,6 +100,7 @@ def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> 
     nr = x.shape[0]
 
     extracted_row_names = x.row_names
+    print(x)
     has_row_names = extracted_row_names is not None
     extracted_columns = []
     for y in x.column_names:

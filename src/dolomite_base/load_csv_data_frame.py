@@ -5,6 +5,10 @@ import numpy as np
 import os
 
 from . import _cpphelpers as lib
+from .acquire_file import acquire_file
+from .acquire_metadata import acquire_metadata
+from .load_object import load_object
+
 
 class _LoadedCsvHolder:
     def __init__(self, ptr):
@@ -84,8 +88,24 @@ class _LoadedCsvHolder:
             return NotImplementedError("not-yet-supported type for column " + str(i) + " of the CSV (" + str(col_type.value) + ")")
 
 
-def load_csv_data_frame(meta: dict[str, Any], dir: str, **kwargs):
-    full_path = os.path.join(dir, meta["path"])
+def load_csv_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFrame:
+    """Load a data frame from a (possibly Gzip-compressed) CSV file in the
+    **comservatory** format.
+
+    Args:
+        meta: Metadata for this CSV data frame.
+
+        project: Value specifying the project of interest. This is most
+            typically a string containing a file path to a staging directory
+            but may also be an application-specific object that works with
+            :py:meth:`~dolomite_base.acquire_file.acquire_file`.
+
+        kwargs: Further arguments, passed to nested objects.
+
+    Returns:
+        A data frame.
+    """
+    full_path = acquire_file(project, meta["path"])
     handle = _LoadedCsvHolder(lib.load_csv(full_path.encode("UTF8")))
 
     has_row_names = "row_names" in meta["data_frame"] and meta["data_frame"]["row_names"]
@@ -117,8 +137,9 @@ def load_csv_data_frame(meta: dict[str, Any], dir: str, **kwargs):
     for i, c in enumerate(contents):
         curval = columns[i]
         if curval["type"] == "other":
-            raise NotImplementedError("oops, can't load complex data frame columns yet") 
-        if curval["type"] == "integer":
+            child_meta = acquire_metadata(project, curval["resource"]["path"])
+            c = load_object(child_meta, project, **kwargs)
+        elif curval["type"] == "integer":
             c = c.astype(np.int32)
         output[curval["name"]] = c
    

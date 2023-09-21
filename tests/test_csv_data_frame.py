@@ -3,6 +3,7 @@ import dolomite_base as dl
 import numpy as np
 from tempfile import mkdtemp
 
+
 def test_csv_data_frame_list():
     df = BiocFrame({
         "akari": [ 1, 2, 3, 4, 5 ],
@@ -184,3 +185,40 @@ def test_csv_data_frame_empty():
     assert isinstance(roundtrip, BiocFrame)
     assert df.shape == roundtrip.shape
     assert roundtrip.row_names is None
+
+
+def test_csv_data_frame_nested():
+    df = BiocFrame({
+        "odd": [ 1, 3, 5, 7, 9 ],
+        "liella": BiocFrame({ 
+            "first": [ "kanon", "keke", "chisato", "sumire", "ren" ],
+            "last": [ "shibuya", "tang", "arashi", "heanna", "hazuki" ],
+            "best": [ False, False, False, True, False ],
+        }),
+        "even": [ 0, 2, 4, 6, 8 ],
+        "bsb": BiocFrame({ 
+            "first": [ "nick", "kevin", "brian", "AJ", "howie" ],
+            "last": [ "carter", "richardson", "litrell", "maclean", "dorough" ]
+        }),
+    })
+
+    dir = mkdtemp()
+    meta = dl.stage_object(df, dir, "foo")
+    assert meta["data_frame"]["columns"][1]["type"] == "other"
+    assert meta["data_frame"]["columns"][3]["type"] == "other"
+    dl.write_metadata(meta, dir)
+
+    meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
+    roundtrip = dl.load_object(meta2, dir)
+    assert isinstance(roundtrip, BiocFrame)
+
+    liella_df = roundtrip.column("liella")
+    assert isinstance(liella_df, BiocFrame)
+    assert liella_df.column("first") == df.column("liella").column("first")
+    assert liella_df.column("second") == df.column("liella").column("second")
+    assert (liella_df.column("best") == np.array([False, False, False, True, False ])).all()
+
+    bsb_df = roundtrip.column("bsb")
+    assert isinstance(bsb_df, BiocFrame)
+    assert liella_df.column("first") == df.column("bsb").column("first")
+    assert liella_df.column("second") == df.column("bsb").column("second")
