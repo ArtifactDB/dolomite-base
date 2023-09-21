@@ -52,3 +52,7 @@ MANIFEST
 .venv*/
 .conda*/
 .python-version
+
+# Other stuff
+src/dolomite/include
+extern/sources/

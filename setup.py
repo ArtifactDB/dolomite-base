@@ -8,9 +8,27 @@
 """
 from setuptools import setup
 
+
 if __name__ == "__main__":
+    import os
     try:
-        setup(use_scm_version={"version_scheme": "no-guess-dev"})
+        setup(
+            use_scm_version={"version_scheme": "no-guess-dev"},
+            ext_modules=[
+                Extension(
+                    "dolomite._core",
+                    sorted(glob("src/dolomite/lib/*.cpp")),
+                    include_dirs=[
+                        assorthead.includes(),
+                        "src/dolomite/include"
+                    ],
+                    language="c++",
+                    extra_compile_args=[
+                        "-std=c++17",
+                    ],
+                )
+            ]
+        )
     except:  # noqa
         print(
             "\n\nAn error occurred while building the project, "
