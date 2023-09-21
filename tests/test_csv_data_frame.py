@@ -1,5 +1,5 @@
 from biocframe import BiocFrame
-import dolomite as dl
+import dolomite.base as dl
 import numpy as np
 from tempfile import mkdtemp
 

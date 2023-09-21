@@ -54,9 +54,9 @@ python setup.py build_ext --inplace && tox
 To rebuild the **ctypes** bindings with [**cpptypes**](https://github.com/BiocPy/ctypes-wrapper):
 
 ```shell
-cpptypes src/dolomite/lib \
-    --py src/dolomite/_cpphelpers.py \
-    --cpp src/dolomite/lib/bindings.cpp \
+cpptypes src/dolomite_base/lib \
+    --py src/dolomite_base/_cpphelpers.py \
+    --cpp src/dolomite_base/lib/bindings.cpp \
     --dll _core
 ```
 

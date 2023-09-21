@@ -1,5 +1,5 @@
 """
-    Setup file for dolomite.
+    Setup file for dolomite_base.
     Use setup.cfg to configure your project.
 
     This file was generated with PyScaffold 4.5.
@@ -18,11 +18,11 @@ if __name__ == "__main__":
             use_scm_version={"version_scheme": "no-guess-dev"},
             ext_modules=[
                 Extension(
-                    "dolomite._core",
-                    sorted(glob("src/dolomite/lib/*.cpp")),
+                    "dolomite_base._core",
+                    sorted(glob("src/dolomite_base/lib/*.cpp")),
                     include_dirs=[
                         assorthead.includes(),
-                        "src/dolomite/include"
+                        "src/dolomite_base/include"
                     ],
                     language="c++",
                     extra_compile_args=[

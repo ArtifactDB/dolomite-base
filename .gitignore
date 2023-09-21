@@ -54,5 +54,5 @@ MANIFEST
 .python-version
 
 # Other stuff
-src/dolomite/include
+src/dolomite_base/include
 extern/sources/
