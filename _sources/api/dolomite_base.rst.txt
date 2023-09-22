@@ -1,0 +1,77 @@
+dolomite\_base package
+======================
+
+Submodules
+----------
+
+dolomite\_base.acquire\_file module
+-----------------------------------
+
+.. automodule:: dolomite_base.acquire_file
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.acquire\_metadata module
+---------------------------------------
+
+.. automodule:: dolomite_base.acquire_metadata
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.load\_csv\_data\_frame module
+--------------------------------------------
+
+.. automodule:: dolomite_base.load_csv_data_frame
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.load\_object module
+----------------------------------
+
+.. automodule:: dolomite_base.load_object
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.skeleton module
+------------------------------
+
+.. automodule:: dolomite_base.skeleton
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.stage\_data\_frame module
+----------------------------------------
+
+.. automodule:: dolomite_base.stage_data_frame
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.stage\_object module
+-----------------------------------
+
+.. automodule:: dolomite_base.stage_object
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.write\_metadata module
+-------------------------------------
+
+.. automodule:: dolomite_base.write_metadata
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: dolomite_base
+   :members:
+   :undoc-members:
+   :show-inheritance:
