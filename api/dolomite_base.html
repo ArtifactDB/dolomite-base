@@ -203,23 +203,317 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">#</a></h2>
 </section>
-<section id="dolomite-base-acquire-file-module">
-<h2>dolomite_base.acquire_file module<a class="headerlink" href="#dolomite-base-acquire-file-module" title="Link to this heading">#</a></h2>
+<section id="module-dolomite_base.acquire_file">
+<span id="dolomite-base-acquire-file-module"></span><h2>dolomite_base.acquire_file module<a class="headerlink" href="#module-dolomite_base.acquire_file" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.acquire_file.acquire_file">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.acquire_file.</span></span><span class="sig-name descname"><span class="pre">acquire_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/acquire_file.html#acquire_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.acquire_file.acquire_file" title="Link to this definition">#</a></dt>
+<dd><p>Acquire the file path for a resource. Applications should define methods
+for this generic to acquire metadata from other places.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>) – Any value that specifies the project of interest.  By default, this
+should be a path to a staging directory, but other applications may
+provide their own classes, e.g., identify projects on remotes.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Relative path to the resource of interest inside the project.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>File path to the resource, possibly after downloading and caching.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.acquire_file.acquire_file_from_dir">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.acquire_file.</span></span><span class="sig-name descname"><span class="pre">acquire_file_from_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/acquire_file.html#acquire_file_from_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.acquire_file.acquire_file_from_dir" title="Link to this definition">#</a></dt>
+<dd><p>Acquire the file path for a resource in a local staging directory.
+This is a method for the <a class="reference internal" href="#dolomite_base.acquire_file.acquire_file" title="dolomite_base.acquire_file.acquire_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire_file()</span></code></a> generic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Path to a staging directory.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Relative path to the resource of interest inside the project.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>File path to the resource, possibly after downloading and caching.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-acquire-metadata-module">
-<h2>dolomite_base.acquire_metadata module<a class="headerlink" href="#dolomite-base-acquire-metadata-module" title="Link to this heading">#</a></h2>
+<section id="module-dolomite_base.acquire_metadata">
+<span id="dolomite-base-acquire-metadata-module"></span><h2>dolomite_base.acquire_metadata module<a class="headerlink" href="#module-dolomite_base.acquire_metadata" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.acquire_metadata.acquire_metadata">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.acquire_metadata.</span></span><span class="sig-name descname"><span class="pre">acquire_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/acquire_metadata.html#acquire_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.acquire_metadata.acquire_metadata" title="Link to this definition">#</a></dt>
+<dd><p>Acquire metadata for a resource inside a project. Applications should
+define methods for this generic to acquire metadata from different places.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>) – Any value that specifies the project of interest.  By default, this
+should be a path to a staging directory, but other applications may
+provide their own classes, e.g., to identify projects on remotes.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Relative path to the resource of interest inside the project.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary representing the JSON metadata.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.acquire_metadata.acquire_metadata_from_dir">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.acquire_metadata.</span></span><span class="sig-name descname"><span class="pre">acquire_metadata_from_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/acquire_metadata.html#acquire_metadata_from_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.acquire_metadata.acquire_metadata_from_dir" title="Link to this definition">#</a></dt>
+<dd><p>Acquire metadata for a resource inside a local staging directory.
+This is a method for the <a class="reference internal" href="#dolomite_base.acquire_metadata.acquire_metadata" title="dolomite_base.acquire_metadata.acquire_metadata"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire_metadata()</span></code></a> generic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Path to a staging directory.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Relative path to the resource of interest inside the project.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary representing the JSON metadata.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-load-csv-data-frame-module">
-<h2>dolomite_base.load_csv_data_frame module<a class="headerlink" href="#dolomite-base-load-csv-data-frame-module" title="Link to this heading">#</a></h2>
+<section id="module-dolomite_base.load_csv_data_frame">
+<span id="dolomite-base-load-csv-data-frame-module"></span><h2>dolomite_base.load_csv_data_frame module<a class="headerlink" href="#module-dolomite_base.load_csv_data_frame" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.load_csv_data_frame.load_csv_data_frame">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.load_csv_data_frame.</span></span><span class="sig-name descname"><span class="pre">load_csv_data_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/load_csv_data_frame.html#load_csv_data_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.load_csv_data_frame.load_csv_data_frame" title="Link to this definition">#</a></dt>
+<dd><p>Load a data frame from a (possibly Gzip-compressed) CSV file in the
+<strong>comservatory</strong> format. In general, this function should not be called
+directly but instead via <a class="reference internal" href="#dolomite_base.load_object.load_object" title="dolomite_base.load_object.load_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_object()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]) – Metadata for this CSV data frame.</p></li>
+<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>) – Value specifying the project of interest. This is most
+typically a string containing a file path to a staging directory
+but may also be an application-specific object that works with
+<a class="reference internal" href="#dolomite_base.acquire_file.acquire_file" title="dolomite_base.acquire_file.acquire_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire_file()</span></code></a>.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, passed to nested objects.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A data frame.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-load-object-module">
-<h2>dolomite_base.load_object module<a class="headerlink" href="#dolomite-base-load-object-module" title="Link to this heading">#</a></h2>
+<section id="module-dolomite_base.load_object">
+<span id="dolomite-base-load-object-module"></span><h2>dolomite_base.load_object module<a class="headerlink" href="#module-dolomite_base.load_object" title="Link to this heading">#</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="dolomite_base.load_object.DEFAULT_SCHEMA_LOCATIONS">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.load_object.</span></span><span class="sig-name descname"><span class="pre">DEFAULT_SCHEMA_LOCATIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['dolomite_schemas']</span></em><a class="headerlink" href="#dolomite_base.load_object.DEFAULT_SCHEMA_LOCATIONS" title="Link to this definition">#</a></dt>
+<dd><p>Default locations (as package names) in which to search for schemas.
+Each package should have a <code class="docutils literal notranslate"><span class="pre">schemas/</span></code> subdirectory containing all schemas.
+Advanced users can insert their own packages here to influence the search.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.load_object.custom_load_object_helper">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.load_object.</span></span><span class="sig-name descname"><span class="pre">custom_load_object_helper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/load_object.html#custom_load_object_helper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.load_object.custom_load_object_helper" title="Link to this definition">#</a></dt>
+<dd><p>Helper function to create application-specific variants of
+<a class="reference internal" href="#dolomite_base.load_object.load_object" title="dolomite_base.load_object.load_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_object()</span></code></a>. This allows
+applications to divert to different schema locations and/or
+loading functions for one or multiple object classes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – Metadata for this object.</p></li>
+<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>) – Value specifying the project of interest. This is most
+typically a string containing a file path to a staging directory
+but may also be an application-specific object that works with
+<a class="reference internal" href="#dolomite_base.acquire_file.acquire_file" title="dolomite_base.acquire_file.acquire_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire_file()</span></code></a>.</p></li>
+<li><p><strong>locations</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>) – Application-specific list of names of packages to be searched for
+object schemas. It is expected that the schema for each object
+specifies the function required to create that object from its file
+representations.</p></li>
+<li><p><strong>memory</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]) – Application-specific cache of restoration functions for each object
+schema. This avoids redundant look-ups if the same <code class="docutils literal notranslate"><span class="pre">memory</span></code> is
+recycled across calls.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, passed to individual methods.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Some kind of object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.load_object.load_object">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.load_object.</span></span><span class="sig-name descname"><span class="pre">load_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/load_object.html#load_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.load_object.load_object" title="Link to this definition">#</a></dt>
+<dd><p>Load an object from a resource inside a project. This uses the schemas
+in <a class="reference internal" href="#dolomite_base.load_object.DEFAULT_SCHEMA_LOCATIONS" title="dolomite_base.load_object.DEFAULT_SCHEMA_LOCATIONS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_SCHEMA_LOCATIONS</span></code></a> to identify the restoration functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – Metadata for this object.</p></li>
+<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>) – Value specifying the project of interest. This is most
+typically a string containing a file path to a staging directory
+but may also be an application-specific object that can be handled
+by <a class="reference internal" href="#dolomite_base.acquire_file.acquire_file" title="dolomite_base.acquire_file.acquire_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire_file()</span></code></a>.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, passed to individual methods.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Some kind of object.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-skeleton-module">
-<h2>dolomite_base.skeleton module<a class="headerlink" href="#dolomite-base-skeleton-module" title="Link to this heading">#</a></h2>
+<section id="module-dolomite_base.skeleton">
+<span id="dolomite-base-skeleton-module"></span><h2>dolomite_base.skeleton module<a class="headerlink" href="#module-dolomite_base.skeleton" title="Link to this heading">#</a></h2>
+<p>This is a skeleton file that can serve as a starting point for a Python
+console script. To run this script uncomment the following lines in the
+<code class="docutils literal notranslate"><span class="pre">[options.entry_points]</span></code> section in <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">console_scripts</span> <span class="o">=</span>
+     <span class="n">fibonacci</span> <span class="o">=</span> <span class="n">dolomite</span><span class="o">.</span><span class="n">skeleton</span><span class="p">:</span><span class="n">run</span>
+</pre></div>
+</div>
+<p>Then run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code> (or <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> for editable mode)
+which will install the command <code class="docutils literal notranslate"><span class="pre">fibonacci</span></code> inside your current environment.</p>
+<p>Besides console scripts, the header (i.e. until <code class="docutils literal notranslate"><span class="pre">_logger</span></code>…) of this file can
+also be used as template for Python modules.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This file can be renamed depending on your needs or safely removed if not needed.</p>
+</div>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://setuptools.pypa.io/en/latest/userguide/entry_point.html">https://setuptools.pypa.io/en/latest/userguide/entry_point.html</a></p></li>
+<li><p><a class="reference external" href="https://pip.pypa.io/en/stable/reference/pip_install">https://pip.pypa.io/en/stable/reference/pip_install</a></p></li>
+</ul>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.skeleton.fib">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.skeleton.</span></span><span class="sig-name descname"><span class="pre">fib</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/skeleton.html#fib"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.skeleton.fib" title="Link to this definition">#</a></dt>
+<dd><p>Fibonacci example function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – integer</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>n-th Fibonacci number</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.skeleton.main">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.skeleton.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/skeleton.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.skeleton.main" title="Link to this definition">#</a></dt>
+<dd><p>Wrapper allowing <a class="reference internal" href="#dolomite_base.skeleton.fib" title="dolomite_base.skeleton.fib"><code class="xref py py-func docutils literal notranslate"><span class="pre">fib()</span></code></a> to be called with string arguments in a CLI fashion</p>
+<p>Instead of returning the value from <a class="reference internal" href="#dolomite_base.skeleton.fib" title="dolomite_base.skeleton.fib"><code class="xref py py-func docutils literal notranslate"><span class="pre">fib()</span></code></a>, it prints the result to the
+<code class="docutils literal notranslate"><span class="pre">stdout</span></code> in a nicely formatted message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em>) – command line parameters as list of strings
+(for example  <code class="docutils literal notranslate"><span class="pre">[&quot;--verbose&quot;,</span> <span class="pre">&quot;42&quot;]</span></code>).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.skeleton.parse_args">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.skeleton.</span></span><span class="sig-name descname"><span class="pre">parse_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/skeleton.html#parse_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.skeleton.parse_args" title="Link to this definition">#</a></dt>
+<dd><p>Parse command line parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em>) – command line parameters as list of strings
+(for example  <code class="docutils literal notranslate"><span class="pre">[&quot;--help&quot;]</span></code>).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>command line parameters namespace</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/argparse.html#argparse.Namespace" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">argparse.Namespace</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.skeleton.run">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.skeleton.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/skeleton.html#run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.skeleton.run" title="Link to this definition">#</a></dt>
+<dd><p>Calls <a class="reference internal" href="#dolomite_base.skeleton.main" title="dolomite_base.skeleton.main"><code class="xref py py-func docutils literal notranslate"><span class="pre">main()</span></code></a> passing the CLI arguments extracted from <a class="reference external" href="https://docs.python.org/3.9/library/sys.html#sys.argv" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sys.argv</span></code></a></p>
+<p>This function can be used as entry point to create console scripts with setuptools.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.skeleton.setup_logging">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.skeleton.</span></span><span class="sig-name descname"><span class="pre">setup_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loglevel</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/skeleton.html#setup_logging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.skeleton.setup_logging" title="Link to this definition">#</a></dt>
+<dd><p>Setup basic logging</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>loglevel</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – minimum loglevel for emitting messages</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-stage-data-frame-module">
-<h2>dolomite_base.stage_data_frame module<a class="headerlink" href="#dolomite-base-stage-data-frame-module" title="Link to this heading">#</a></h2>
+<section id="module-dolomite_base.stage_data_frame">
+<span id="dolomite-base-stage-data-frame-module"></span><h2>dolomite_base.stage_data_frame module<a class="headerlink" href="#module-dolomite_base.stage_data_frame" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.stage_data_frame.stage_data_frame">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.stage_data_frame.</span></span><span class="sig-name descname"><span class="pre">stage_data_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_child</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/stage_data_frame.html#stage_data_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.stage_data_frame.stage_data_frame" title="Link to this definition">#</a></dt>
+<dd><p>Method for saving <a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>
+objects to the corresponding file representations, see
+<a class="reference internal" href="#dolomite_base.stage_object.stage_object" title="dolomite_base.stage_object.stage_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stage_object()</span></code></a> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>) – Object to be staged.</p></li>
+<li><p><strong>dir</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Staging directory.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Relative path inside <code class="docutils literal notranslate"><span class="pre">dir</span></code> to save the object.</p></li>
+<li><p><strong>is_child</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Is <code class="docutils literal notranslate"><span class="pre">x</span></code> a child of another object?</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Metadata that can be edited by calling methods and then saved with
+<a class="reference internal" href="#dolomite_base.write_metadata.write_metadata" title="dolomite_base.write_metadata.write_metadata"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write_metadata()</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-dolomite_base.stage_object">
 <span id="dolomite-base-stage-object-module"></span><h2>dolomite_base.stage_object module<a class="headerlink" href="#module-dolomite_base.stage_object" title="Link to this heading">#</a></h2>
@@ -243,7 +537,7 @@ This will be used to create a subdirectory inside <code class="docutils literal 
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Metadata for <code class="docutils literal notranslate"><span class="pre">x</span></code>, which can be edited by calling methods and then
-saved with <code class="xref py py-meth docutils literal notranslate"><span class="pre">write_metadata()</span></code>.
+saved with <a class="reference internal" href="#dolomite_base.write_metadata.write_metadata" title="dolomite_base.write_metadata.write_metadata"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write_metadata()</span></code></a>.
 This should contain at least a <code class="docutils literal notranslate"><span class="pre">$schema</span></code> property, specifying the
 schema to use for validation of the metadata; and a <code class="docutils literal notranslate"><span class="pre">path</span></code> property,
 specifying the relative path to the file representation of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
@@ -252,11 +546,46 @@ specifying the relative path to the file representation of <code class="docutils
 </dd></dl>
 
 </section>
-<section id="dolomite-base-write-metadata-module">
-<h2>dolomite_base.write_metadata module<a class="headerlink" href="#dolomite-base-write-metadata-module" title="Link to this heading">#</a></h2>
+<section id="module-dolomite_base.write_metadata">
+<span id="dolomite-base-write-metadata-module"></span><h2>dolomite_base.write_metadata module<a class="headerlink" href="#module-dolomite_base.write_metadata" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.write_metadata.write_metadata">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.write_metadata.</span></span><span class="sig-name descname"><span class="pre">write_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_none</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/write_metadata.html#write_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.write_metadata.write_metadata" title="Link to this definition">#</a></dt>
+<dd><p>Write metadata to disk after validating it against its schema.</p>
+<p><code class="docutils literal notranslate"><span class="pre">meta</span></code> should contain at least the <code class="docutils literal notranslate"><span class="pre">$schema</span></code> and <code class="docutils literal notranslate"><span class="pre">path</span></code> keys.
+<code class="docutils literal notranslate"><span class="pre">$schema</span></code> is used to identify the schema for validation; it should be
+a string or a 2-tuple containing the schema name and the name of the
+package in which the schema file can be found.</p>
+<p>If the metadata describes a resource with a file representation, that file
+should already be present inside <code class="docutils literal notranslate"><span class="pre">dir</span></code> at the specified <code class="docutils literal notranslate"><span class="pre">path</span></code>.  Also,
+if no <code class="docutils literal notranslate"><span class="pre">md5sum</span></code> key is present,  the MD5 checksum of the file at <code class="docutils literal notranslate"><span class="pre">path</span></code>
+is computed and added to the metadata before saving.</p>
+<p>Any preceding <code class="docutils literal notranslate"><span class="pre">./</span></code> in the <code class="docutils literal notranslate"><span class="pre">path</span></code> is automatically removed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]) – Metadata for an object, typically generated by a
+<a class="reference internal" href="#dolomite_base.stage_object.stage_object" title="dolomite_base.stage_object.stage_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stage_object()</span></code></a> method.</p></li>
+<li><p><strong>dir</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Path to the staging directory.</p></li>
+<li><p><strong>ignore_none</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Whether keys with None values should be automatically removed from
+<code class="docutils literal notranslate"><span class="pre">meta</span></code>. This is useful for sanitizing messy user-supplied inputs.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary that can be added as the <code class="docutils literal notranslate"><span class="pre">resource</span></code> property of parent
+metadata, if the current object is a child of another object. The
+metadata itself is written to a JSON file at a path derived from
+(or equal to) <code class="docutils literal notranslate"><span class="pre">meta[&quot;path&quot;]</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
+<section id="module-dolomite_base">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dolomite_base" title="Link to this heading">#</a></h2>
 </section>
 </section>
 
@@ -309,18 +638,47 @@ specifying the relative path to the file representation of <code class="docutils
             <ul>
 <li><a class="reference internal" href="#">dolomite_base package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#dolomite-base-acquire-file-module">dolomite_base.acquire_file module</a></li>
-<li><a class="reference internal" href="#dolomite-base-acquire-metadata-module">dolomite_base.acquire_metadata module</a></li>
-<li><a class="reference internal" href="#dolomite-base-load-csv-data-frame-module">dolomite_base.load_csv_data_frame module</a></li>
-<li><a class="reference internal" href="#dolomite-base-load-object-module">dolomite_base.load_object module</a></li>
-<li><a class="reference internal" href="#dolomite-base-skeleton-module">dolomite_base.skeleton module</a></li>
-<li><a class="reference internal" href="#dolomite-base-stage-data-frame-module">dolomite_base.stage_data_frame module</a></li>
+<li><a class="reference internal" href="#module-dolomite_base.acquire_file">dolomite_base.acquire_file module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.acquire_file.acquire_file"><code class="docutils literal notranslate"><span class="pre">acquire_file()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.acquire_file.acquire_file_from_dir"><code class="docutils literal notranslate"><span class="pre">acquire_file_from_dir()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.acquire_metadata">dolomite_base.acquire_metadata module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.acquire_metadata.acquire_metadata"><code class="docutils literal notranslate"><span class="pre">acquire_metadata()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.acquire_metadata.acquire_metadata_from_dir"><code class="docutils literal notranslate"><span class="pre">acquire_metadata_from_dir()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.load_csv_data_frame">dolomite_base.load_csv_data_frame module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.load_csv_data_frame.load_csv_data_frame"><code class="docutils literal notranslate"><span class="pre">load_csv_data_frame()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.load_object">dolomite_base.load_object module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.load_object.DEFAULT_SCHEMA_LOCATIONS"><code class="docutils literal notranslate"><span class="pre">DEFAULT_SCHEMA_LOCATIONS</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.load_object.custom_load_object_helper"><code class="docutils literal notranslate"><span class="pre">custom_load_object_helper()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.load_object.load_object"><code class="docutils literal notranslate"><span class="pre">load_object()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.skeleton">dolomite_base.skeleton module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.skeleton.fib"><code class="docutils literal notranslate"><span class="pre">fib()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.skeleton.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.skeleton.parse_args"><code class="docutils literal notranslate"><span class="pre">parse_args()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.skeleton.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.skeleton.setup_logging"><code class="docutils literal notranslate"><span class="pre">setup_logging()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.stage_data_frame">dolomite_base.stage_data_frame module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.stage_data_frame.stage_data_frame"><code class="docutils literal notranslate"><span class="pre">stage_data_frame()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-dolomite_base.stage_object">dolomite_base.stage_object module</a><ul>
 <li><a class="reference internal" href="#dolomite_base.stage_object.stage_object"><code class="docutils literal notranslate"><span class="pre">stage_object()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#dolomite-base-write-metadata-module">dolomite_base.write_metadata module</a></li>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li><a class="reference internal" href="#module-dolomite_base.write_metadata">dolomite_base.write_metadata module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.write_metadata.write_metadata"><code class="docutils literal notranslate"><span class="pre">write_metadata()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base">Module contents</a></li>
 </ul>
 </li>
 </ul>
