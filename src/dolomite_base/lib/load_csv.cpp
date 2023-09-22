@@ -9,6 +9,13 @@ void* load_csv(const char* path) {
 }
 
 //[[export]]
+void validate_csv(const char* path) {
+    comservatory::ReadCsv reader;
+    reader.validate_only = true;
+    reader.read(path);
+}
+
+//[[export]]
 void free_csv(void* ptr) {
     delete reinterpret_cast<comservatory::Contents*>(ptr);
 }

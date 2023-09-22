@@ -3,6 +3,7 @@ from biocframe import BiocFrame
 import numpy as np
 import os
 import gzip
+from . import _cpphelpers as lib
 
 
 def _list_element_to_string(s):
@@ -134,6 +135,7 @@ def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> 
             line += "\n"
             handle.write(line.encode("ASCII"))
 
+    lib.validate_csv(full.encode("UTF8"))
     metadata = {
         "$schema": "csv_data_frame/v1.json",
         "path": path + "/" + basename,

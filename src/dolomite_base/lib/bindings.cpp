@@ -35,6 +35,8 @@ uint8_t get_csv_string_stats(void*, int32_t, int32_t*, uint8_t*);
 
 void* load_csv(const char*);
 
+void validate_csv(const char*);
+
 extern "C" {
 
 PYAPI void free_error_message(char** msg) {
@@ -159,6 +161,18 @@ PYAPI void* py_load_csv(const char* path, int32_t* errcode, char** errmsg) {
         *errmsg = copy_error_message("unknown C++ exception");
     }
     return output;
+}
+
+PYAPI void py_validate_csv(const char* path, int32_t* errcode, char** errmsg) {
+    try {
+        validate_csv(path);
+    } catch(std::exception& e) {
+        *errcode = 1;
+        *errmsg = copy_error_message(e.what());
+    } catch(...) {
+        *errcode = 1;
+        *errmsg = copy_error_message("unknown C++ exception");
+    }
 }
 
 }
