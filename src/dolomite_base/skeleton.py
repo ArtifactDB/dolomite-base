@@ -24,7 +24,7 @@ import argparse
 import logging
 import sys
 
-from dolomite import __version__
+from dolomite_base import __version__
 
 __author__ = "Aaron Lun"
 __copyright__ = "Aaron Lun"

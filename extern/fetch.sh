@@ -3,7 +3,7 @@
 set -e
 set -u
 
-includedir=../src/dolomite/include
+includedir=../src/dolomite_base/include
 mkdir -p $includedir
 transplant_headers() {
     local src=$1

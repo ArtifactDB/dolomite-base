@@ -1,6 +1,6 @@
 import pytest
 
-from dolomite.skeleton import fib, main
+from dolomite_base.skeleton import fib, main
 
 __author__ = "Aaron Lun"
 __copyright__ = "Aaron Lun"

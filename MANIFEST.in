@@ -1,0 +1,2 @@
+recursive-include src/dolomite_base/include *
+recursive-exclude extern/sources *
