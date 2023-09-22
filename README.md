@@ -11,13 +11,15 @@
 -->
 
 [![Project generated with PyScaffold](https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold)](https://pyscaffold.org/)
+![Unit tests](https://github.com/ArtifactDB/dolomite-base/actions/workflows/pypi-test.yml/badge.svg)
 
-# dolomite
+# Save and load Bioconductor objects in Python
 
-> Add a short description here!
+## Overview
 
-A longer description of your project goes here...
-
+The **dolomite-base** package is the Python counterpart to the [**alabaster.base**](https://github.com/ArtifactDB/alabaster.base) R package,
+defining the basic generics for language-agnostic reading and writing of Bioconductor objects with their associated metadata.
+Implementations of methods for these generics can be found in the other **dolomite-** packages.
 
 ## Developer notes
 

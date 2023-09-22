@@ -27,6 +27,7 @@ def acquire_metadata(project: Any, path: str) -> dict[str, Any]:
 @acquire_metadata.register
 def acquire_metadata_from_dir(project: str, path: str) -> str:
     """Acquire metadata for a resource inside a local staging directory.
+    This is a method for the :py:meth:`~acquire_metadata` generic.
 
     Args:
         project: 

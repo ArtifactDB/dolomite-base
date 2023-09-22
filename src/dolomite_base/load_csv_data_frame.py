@@ -90,7 +90,8 @@ class _LoadedCsvHolder:
 
 def load_csv_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFrame:
     """Load a data frame from a (possibly Gzip-compressed) CSV file in the
-    **comservatory** format.
+    **comservatory** format. In general, this function should not be called
+    directly but instead via :py:meth:`~dolomite_base.load_object.load_object`.
 
     Args:
         meta: Metadata for this CSV data frame.

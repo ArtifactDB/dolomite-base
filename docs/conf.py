@@ -34,7 +34,7 @@ except ImportError:
     from sphinx import apidoc
 
 output_dir = os.path.join(__location__, "api")
-module_dir = os.path.join(__location__, "../src/dolomite")
+module_dir = os.path.join(__location__, "../src/dolomite_base")
 try:
     shutil.rmtree(output_dir)
 except FileNotFoundError:
@@ -72,6 +72,7 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
+    "sphinx_autodoc_typehints",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -105,7 +106,7 @@ source_suffix = [".rst", ".md"]
 master_doc = "index"
 
 # General information about the project.
-project = "dolomite"
+project = "dolomite-base"
 copyright = "2023, Aaron Lun"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -117,7 +118,7 @@ copyright = "2023, Aaron Lun"
 # If you don’t need the separation provided between version and release,
 # just set them both to the same value.
 try:
-    from dolomite import __version__ as version
+    from dolomite_base import __version__ as version
 except ImportError:
     version = ""
 
@@ -171,7 +172,7 @@ todo_emit_warnings = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "alabaster"
+html_theme = "furo"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -247,7 +248,7 @@ html_static_path = ["_static"]
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "dolomite-doc"
+htmlhelp_basename = "dolomite-base-doc"
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -264,7 +265,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ("index", "user_guide.tex", "dolomite Documentation", "Aaron Lun", "manual")
+    ("index", "user_guide.tex", "dolomite-base Documentation", "Aaron Lun", "manual")
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -299,6 +300,7 @@ intersphinx_mapping = {
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "setuptools": ("https://setuptools.pypa.io/en/stable/", None),
     "pyscaffold": ("https://pyscaffold.org/en/stable", None),
+    "biocframe": ("https://biocpy.github.io/BiocFrame", None),
 }
 
 print(f"loading configurations for {project} {version} ...", file=sys.stderr)

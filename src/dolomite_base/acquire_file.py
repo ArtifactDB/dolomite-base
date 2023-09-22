@@ -26,6 +26,7 @@ def acquire_file(project: Any, path : str) -> str:
 @acquire_file.register
 def acquire_file_from_dir(project: str, path: str) -> str:
     """Acquire the file path for a resource in a local staging directory.
+    This is a method for the :py:meth:`~acquire_file` generic.
 
     Arguments:
         project: 

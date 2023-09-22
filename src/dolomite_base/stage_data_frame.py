@@ -9,7 +9,9 @@ from .write_metadata import write_metadata
 
 @stage_object.register
 def stage_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool = False, **kwargs) -> dict[str, Any]:
-    """See :py:meth:`~dolomite_base.stage_object.stage_object` for details.
+    """Method for saving :py:class:`~biocframe.BiocFrame.BiocFrame`
+    objects to the corresponding file representations, see
+    :py:meth:`~dolomite_base.stage_object.stage_object` for details.
 
     Args:
         x: Object to be staged.
