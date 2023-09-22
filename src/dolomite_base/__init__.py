@@ -8,9 +8,17 @@ else:
 
 try:
     # Change here if project is renamed and does not equal the package name
-    dist_name = __name__
+    dist_name = "dolomite-base"
     __version__ = version(dist_name)
 except PackageNotFoundError:  # pragma: no cover
     __version__ = "unknown"
 finally:
     del version, PackageNotFoundError
+
+from .stage_object import stage_object
+from .stage_data_frame import stage_data_frame
+from .write_metadata import write_metadata
+from .load_object import *
+from .load_csv_data_frame import load_csv_data_frame
+from .acquire_metadata import acquire_metadata
+from .acquire_file import acquire_file
