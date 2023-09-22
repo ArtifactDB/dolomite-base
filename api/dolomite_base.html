@@ -396,96 +396,6 @@ by <a class="reference internal" href="#dolomite_base.acquire_file.acquire_file"
 </dd></dl>
 
 </section>
-<section id="module-dolomite_base.skeleton">
-<span id="dolomite-base-skeleton-module"></span><h2>dolomite_base.skeleton module<a class="headerlink" href="#module-dolomite_base.skeleton" title="Link to this heading">#</a></h2>
-<p>This is a skeleton file that can serve as a starting point for a Python
-console script. To run this script uncomment the following lines in the
-<code class="docutils literal notranslate"><span class="pre">[options.entry_points]</span></code> section in <code class="docutils literal notranslate"><span class="pre">setup.cfg</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">console_scripts</span> <span class="o">=</span>
-     <span class="n">fibonacci</span> <span class="o">=</span> <span class="n">dolomite</span><span class="o">.</span><span class="n">skeleton</span><span class="p">:</span><span class="n">run</span>
-</pre></div>
-</div>
-<p>Then run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code> (or <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> for editable mode)
-which will install the command <code class="docutils literal notranslate"><span class="pre">fibonacci</span></code> inside your current environment.</p>
-<p>Besides console scripts, the header (i.e. until <code class="docutils literal notranslate"><span class="pre">_logger</span></code>…) of this file can
-also be used as template for Python modules.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This file can be renamed depending on your needs or safely removed if not needed.</p>
-</div>
-<p class="rubric">References</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://setuptools.pypa.io/en/latest/userguide/entry_point.html">https://setuptools.pypa.io/en/latest/userguide/entry_point.html</a></p></li>
-<li><p><a class="reference external" href="https://pip.pypa.io/en/stable/reference/pip_install">https://pip.pypa.io/en/stable/reference/pip_install</a></p></li>
-</ul>
-<dl class="py function">
-<dt class="sig sig-object py" id="dolomite_base.skeleton.fib">
-<span class="sig-prename descclassname"><span class="pre">dolomite_base.skeleton.</span></span><span class="sig-name descname"><span class="pre">fib</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/skeleton.html#fib"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.skeleton.fib" title="Link to this definition">#</a></dt>
-<dd><p>Fibonacci example function</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – integer</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>n-th Fibonacci number</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dolomite_base.skeleton.main">
-<span class="sig-prename descclassname"><span class="pre">dolomite_base.skeleton.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/skeleton.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.skeleton.main" title="Link to this definition">#</a></dt>
-<dd><p>Wrapper allowing <a class="reference internal" href="#dolomite_base.skeleton.fib" title="dolomite_base.skeleton.fib"><code class="xref py py-func docutils literal notranslate"><span class="pre">fib()</span></code></a> to be called with string arguments in a CLI fashion</p>
-<p>Instead of returning the value from <a class="reference internal" href="#dolomite_base.skeleton.fib" title="dolomite_base.skeleton.fib"><code class="xref py py-func docutils literal notranslate"><span class="pre">fib()</span></code></a>, it prints the result to the
-<code class="docutils literal notranslate"><span class="pre">stdout</span></code> in a nicely formatted message.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>args</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em>) – command line parameters as list of strings
-(for example  <code class="docutils literal notranslate"><span class="pre">[&quot;--verbose&quot;,</span> <span class="pre">&quot;42&quot;]</span></code>).</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dolomite_base.skeleton.parse_args">
-<span class="sig-prename descclassname"><span class="pre">dolomite_base.skeleton.</span></span><span class="sig-name descname"><span class="pre">parse_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/skeleton.html#parse_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.skeleton.parse_args" title="Link to this definition">#</a></dt>
-<dd><p>Parse command line parameters</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>args</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>]</em>) – command line parameters as list of strings
-(for example  <code class="docutils literal notranslate"><span class="pre">[&quot;--help&quot;]</span></code>).</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>command line parameters namespace</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.9/library/argparse.html#argparse.Namespace" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">argparse.Namespace</span></code></a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dolomite_base.skeleton.run">
-<span class="sig-prename descclassname"><span class="pre">dolomite_base.skeleton.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/skeleton.html#run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.skeleton.run" title="Link to this definition">#</a></dt>
-<dd><p>Calls <a class="reference internal" href="#dolomite_base.skeleton.main" title="dolomite_base.skeleton.main"><code class="xref py py-func docutils literal notranslate"><span class="pre">main()</span></code></a> passing the CLI arguments extracted from <a class="reference external" href="https://docs.python.org/3.9/library/sys.html#sys.argv" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sys.argv</span></code></a></p>
-<p>This function can be used as entry point to create console scripts with setuptools.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dolomite_base.skeleton.setup_logging">
-<span class="sig-prename descclassname"><span class="pre">dolomite_base.skeleton.</span></span><span class="sig-name descname"><span class="pre">setup_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loglevel</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/skeleton.html#setup_logging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.skeleton.setup_logging" title="Link to this definition">#</a></dt>
-<dd><p>Setup basic logging</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>loglevel</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – minimum loglevel for emitting messages</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
 <section id="module-dolomite_base.stage_data_frame">
 <span id="dolomite-base-stage-data-frame-module"></span><h2>dolomite_base.stage_data_frame module<a class="headerlink" href="#module-dolomite_base.stage_data_frame" title="Link to this heading">#</a></h2>
 <dl class="py function">
@@ -656,14 +566,6 @@ metadata itself is written to a JSON file at a path derived from
 <li><a class="reference internal" href="#dolomite_base.load_object.DEFAULT_SCHEMA_LOCATIONS"><code class="docutils literal notranslate"><span class="pre">DEFAULT_SCHEMA_LOCATIONS</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.load_object.custom_load_object_helper"><code class="docutils literal notranslate"><span class="pre">custom_load_object_helper()</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.load_object.load_object"><code class="docutils literal notranslate"><span class="pre">load_object()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-dolomite_base.skeleton">dolomite_base.skeleton module</a><ul>
-<li><a class="reference internal" href="#dolomite_base.skeleton.fib"><code class="docutils literal notranslate"><span class="pre">fib()</span></code></a></li>
-<li><a class="reference internal" href="#dolomite_base.skeleton.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
-<li><a class="reference internal" href="#dolomite_base.skeleton.parse_args"><code class="docutils literal notranslate"><span class="pre">parse_args()</span></code></a></li>
-<li><a class="reference internal" href="#dolomite_base.skeleton.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
-<li><a class="reference internal" href="#dolomite_base.skeleton.setup_logging"><code class="docutils literal notranslate"><span class="pre">setup_logging()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-dolomite_base.stage_data_frame">dolomite_base.stage_data_frame module</a><ul>

@@ -36,14 +36,6 @@ dolomite\_base.load\_object module
    :undoc-members:
    :show-inheritance:
 
-dolomite\_base.skeleton module
-------------------------------
-
-.. automodule:: dolomite_base.skeleton
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 dolomite\_base.stage\_data\_frame module
 ----------------------------------------
 
