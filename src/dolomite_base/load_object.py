@@ -49,11 +49,7 @@ def custom_load_object_helper(meta: dict, project: Any, locations: list, memory:
                     command = res_meta["python"]
 
         if command is None:
-            # TODO: replace these in the schemas themselves, once everything has settled down.
-            if schema == "csv_data_frame/v1.json":
-                command = "dolomite_base.load_csv_data_frame"
-            else:
-                raise NotImplementedError("could not find a Python context to restore '" + schema + "'")
+            raise NotImplementedError("could not find a Python context to restore '" + schema + "'")
 
         first_period = command.find(".")
         mod = import_module(command[:first_period])
