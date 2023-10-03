@@ -224,8 +224,7 @@ void* load_list_json(const char* path, int32_t n) {
 
 //[[export]]
 void validate_list_json(const char* path, int32_t n) {
-    auto parsed = uzuki2::json::validate_file(path, n)
-    return new uzuki2::ParsedList(std::move(parsed));
+    uzuki2::json::validate_file(path, n);
 }
 
 //[[export]]
@@ -235,7 +234,7 @@ void uzuki2_free_list(void* ptr) {
 
 //[[export]]
 void* uzuki2_get_parent_node(void * ptr) {
-    return reinterpret_cast<uzuki2::ParsedList*>(ptr).get();
+    return reinterpret_cast<uzuki2::ParsedList*>(ptr)->get();
 }
 
 //[[export]]
@@ -281,8 +280,8 @@ void uzuki2_get_integer_vector(void* ptr, int32_t* contents /** numpy */) {
 }
 
 //[[export]]
-int32_t uzuki2_get_numeric_vector_length(void* ptr) {
-    auto casted = reinterpret_cast<DefaultNumericVector*>(ptr);
+int32_t uzuki2_get_number_vector_length(void* ptr) {
+    auto casted = reinterpret_cast<DefaultNumberVector*>(ptr);
     if (casted->base.scalar) {
         return -1;
     } else {
@@ -291,8 +290,8 @@ int32_t uzuki2_get_numeric_vector_length(void* ptr) {
 }
 
 //[[export]]
-void uzuki2_get_numeric_vector(void* ptr, int32_t* contents /** numpy */) {
-    auto casted = reinterpret_cast<DefaultNumericVector*>(ptr);
+void uzuki2_get_number_vector(void* ptr, int32_t* contents /** numpy */) {
+    auto casted = reinterpret_cast<DefaultNumberVector*>(ptr);
     const auto& vals = casted->base.values;
     std::copy(vals.begin(), vals.end(), contents);
 }
@@ -368,7 +367,7 @@ uint64_t uzuki2_get_list_names_lengths(void* ptr, int32_t* lengths) {
 }
 
 //[[export]]
-void uzuki2_get_list_names_contents(void* ptr, int32_t* lengths) {
+void uzuki2_get_list_names_contents(void* ptr, char* contents) {
     const auto& names = reinterpret_cast<DefaultList*>(ptr)->names;
     for (const auto& x : names) {
         std::copy(x.begin(), x.end(), contents);
@@ -378,21 +377,11 @@ void uzuki2_get_list_names_contents(void* ptr, int32_t* lengths) {
 }
 
 //[[export]]
-void uzuki2_get_list_element(void* ptr, int32_t i) {
-    return reinterpret_cast<DefaultList*>(ptr)->values[i].get();
-}
-
-//[[export]]
-void uzuki2_get_list_length(void* ptr) {
-    return reinterpret_cast<DefaultList*>(ptr)->size(); 
-}
-
-//[[export]]
-void uzuki2_get_list_element(void* ptr, int32_t i) {
+void* uzuki2_get_list_element(void* ptr, int32_t i) {
     return reinterpret_cast<DefaultList*>(ptr)->values[i].get();
 }
 
 //[[export]]
 int32_t uzuki2_get_external_index(void* ptr) {
-    return static_cast<uintptr_t>(reinterpret_cast<DefaultExternal*>(ptr)->ptr);
+    return reinterpret_cast<uintptr_t>(reinterpret_cast<DefaultExternal*>(ptr)->ptr);
 }

@@ -2,9 +2,8 @@
 
 import os
 import ctypes as ct
-import numpy as np
 
-def _catch_errors(f):
+def catch_errors(f):
     def wrapper(*args):
         errcode = ct.c_int32(0)
         errmsg = ct.c_char_p(0)
@@ -30,7 +29,8 @@ if lib is None:
 
 lib.free_error_message.argtypes = [ ct.POINTER(ct.c_char_p) ]
 
-def _np2ct(x, expected, contiguous=True):
+import numpy as np
+def np2ct(x, expected, contiguous=True):
     if not isinstance(x, np.ndarray):
         raise ValueError('expected a NumPy array')
     if x.dtype != expected:
@@ -120,6 +120,148 @@ lib.py_load_csv.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
+lib.py_load_list_json.restype = ct.c_void_p
+lib.py_load_list_json.argtypes = [
+    ct.c_char_p,
+    ct.c_int32,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_free_list.restype = None
+lib.py_uzuki2_free_list.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_boolean_vector.restype = None
+lib.py_uzuki2_get_boolean_vector.argtypes = [
+    ct.c_void_p,
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_boolean_vector_length.restype = ct.c_int32
+lib.py_uzuki2_get_boolean_vector_length.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_external_index.restype = ct.c_int32
+lib.py_uzuki2_get_external_index.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_integer_vector.restype = None
+lib.py_uzuki2_get_integer_vector.argtypes = [
+    ct.c_void_p,
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_integer_vector_length.restype = ct.c_int32
+lib.py_uzuki2_get_integer_vector_length.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_list_element.restype = None
+lib.py_uzuki2_get_list_element.argtypes = [
+    ct.c_void_p,
+    ct.c_int32,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_list_length.restype = None
+lib.py_uzuki2_get_list_length.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_list_named.restype = ct.c_uint8
+lib.py_uzuki2_get_list_named.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_list_names_contents.restype = None
+lib.py_uzuki2_get_list_names_contents.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_list_names_lengths.restype = ct.c_uint64
+lib.py_uzuki2_get_list_names_lengths.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_node_type.restype = ct.c_int32
+lib.py_uzuki2_get_node_type.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_numeric_vector.restype = None
+lib.py_uzuki2_get_numeric_vector.argtypes = [
+    ct.c_void_p,
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_numeric_vector_length.restype = ct.c_int32
+lib.py_uzuki2_get_numeric_vector_length.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_parent_node.restype = ct.c_void_p
+lib.py_uzuki2_get_parent_node.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_string_vector_contents.restype = None
+lib.py_uzuki2_get_string_vector_contents.argtypes = [
+    ct.c_void_p,
+    ct.c_char_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_string_vector_length.restype = ct.c_int32
+lib.py_uzuki2_get_string_vector_length.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_string_vector_lengths.restype = ct.c_uint64
+lib.py_uzuki2_get_string_vector_lengths.argtypes = [
+    ct.c_void_p,
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
 lib.py_validate_csv.restype = None
 lib.py_validate_csv.argtypes = [
     ct.c_char_p,
@@ -127,32 +269,100 @@ lib.py_validate_csv.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
+lib.py_validate_list_json.restype = None
+lib.py_validate_list_json.argtypes = [
+    ct.c_char_p,
+    ct.c_int32,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
 def fetch_csv_booleans(ptr, column, contents, pop):
-    return _catch_errors(lib.py_fetch_csv_booleans)(ptr, column, _np2ct(contents, np.uint8), pop)
+    return catch_errors(lib.py_fetch_csv_booleans)(ptr, column, np2ct(contents, np.uint8), pop)
 
 def fetch_csv_numbers(ptr, column, contents, mask, pop):
-    return _catch_errors(lib.py_fetch_csv_numbers)(ptr, column, _np2ct(contents, np.float64), _np2ct(mask, np.uint8), pop)
+    return catch_errors(lib.py_fetch_csv_numbers)(ptr, column, np2ct(contents, np.float64), np2ct(mask, np.uint8), pop)
 
 def fetch_csv_strings(ptr, column, contents, pop):
-    return _catch_errors(lib.py_fetch_csv_strings)(ptr, column, contents, pop)
+    return catch_errors(lib.py_fetch_csv_strings)(ptr, column, contents, pop)
 
 def free_csv(ptr):
-    return _catch_errors(lib.py_free_csv)(ptr)
+    return catch_errors(lib.py_free_csv)(ptr)
 
 def get_csv_column_stats(ptr, column, type, size, loaded):
-    return _catch_errors(lib.py_get_csv_column_stats)(ptr, column, type, size, loaded)
+    return catch_errors(lib.py_get_csv_column_stats)(ptr, column, type, size, loaded)
 
 def get_csv_num_fields(ptr):
-    return _catch_errors(lib.py_get_csv_num_fields)(ptr)
+    return catch_errors(lib.py_get_csv_num_fields)(ptr)
 
 def get_csv_num_records(ptr):
-    return _catch_errors(lib.py_get_csv_num_records)(ptr)
+    return catch_errors(lib.py_get_csv_num_records)(ptr)
 
 def get_csv_string_stats(ptr, column, lengths, mask):
-    return _catch_errors(lib.py_get_csv_string_stats)(ptr, column, _np2ct(lengths, np.int32), _np2ct(mask, np.uint8))
+    return catch_errors(lib.py_get_csv_string_stats)(ptr, column, np2ct(lengths, np.int32), np2ct(mask, np.uint8))
 
 def load_csv(path):
-    return _catch_errors(lib.py_load_csv)(path)
+    return catch_errors(lib.py_load_csv)(path)
+
+def load_list_json(path, n):
+    return catch_errors(lib.py_load_list_json)(path, n)
+
+def uzuki2_free_list(ptr):
+    return catch_errors(lib.py_uzuki2_free_list)(ptr)
+
+def uzuki2_get_boolean_vector(ptr, contents):
+    return catch_errors(lib.py_uzuki2_get_boolean_vector)(ptr, np2ct(contents, np.uint8))
+
+def uzuki2_get_boolean_vector_length(ptr):
+    return catch_errors(lib.py_uzuki2_get_boolean_vector_length)(ptr)
+
+def uzuki2_get_external_index(ptr):
+    return catch_errors(lib.py_uzuki2_get_external_index)(ptr)
+
+def uzuki2_get_integer_vector(ptr, contents):
+    return catch_errors(lib.py_uzuki2_get_integer_vector)(ptr, np2ct(contents, np.int32))
+
+def uzuki2_get_integer_vector_length(ptr):
+    return catch_errors(lib.py_uzuki2_get_integer_vector_length)(ptr)
+
+def uzuki2_get_list_element(ptr, i):
+    return catch_errors(lib.py_uzuki2_get_list_element)(ptr, i)
+
+def uzuki2_get_list_length(ptr):
+    return catch_errors(lib.py_uzuki2_get_list_length)(ptr)
+
+def uzuki2_get_list_named(ptr):
+    return catch_errors(lib.py_uzuki2_get_list_named)(ptr)
+
+def uzuki2_get_list_names_contents(ptr, lengths):
+    return catch_errors(lib.py_uzuki2_get_list_names_contents)(ptr, lengths)
+
+def uzuki2_get_list_names_lengths(ptr, lengths):
+    return catch_errors(lib.py_uzuki2_get_list_names_lengths)(ptr, lengths)
+
+def uzuki2_get_node_type(ptr):
+    return catch_errors(lib.py_uzuki2_get_node_type)(ptr)
+
+def uzuki2_get_numeric_vector(ptr, contents):
+    return catch_errors(lib.py_uzuki2_get_numeric_vector)(ptr, np2ct(contents, np.int32))
+
+def uzuki2_get_numeric_vector_length(ptr):
+    return catch_errors(lib.py_uzuki2_get_numeric_vector_length)(ptr)
+
+def uzuki2_get_parent_node(ptr):
+    return catch_errors(lib.py_uzuki2_get_parent_node)(ptr)
+
+def uzuki2_get_string_vector_contents(ptr, contents):
+    return catch_errors(lib.py_uzuki2_get_string_vector_contents)(ptr, contents)
+
+def uzuki2_get_string_vector_length(ptr):
+    return catch_errors(lib.py_uzuki2_get_string_vector_length)(ptr)
+
+def uzuki2_get_string_vector_lengths(ptr, lengths):
+    return catch_errors(lib.py_uzuki2_get_string_vector_lengths)(ptr, np2ct(lengths, np.int32))
 
 def validate_csv(path):
-    return _catch_errors(lib.py_validate_csv)(path)
+    return catch_errors(lib.py_validate_csv)(path)
+
+def validate_list_json(path, n):
+    return catch_errors(lib.py_validate_list_json)(path, n)

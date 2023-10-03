@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Union
 from numpy import ndarray
 import os
 import json
@@ -11,19 +11,49 @@ from . import _cpphelpers as lib
 
 
 @stage_object.register
-def stage_simple_list(x: list, dir: str, path: str, is_child: bool = False, mode: Literal["hdf5", "json"] = "json", **kwargs) -> dict[str, Any]:
+def stage_simple_list(
+    x: Union[dict, list], 
+    dir: str, 
+    path: str, 
+    is_child: bool = False, 
+    mode: Optional[Literal["hdf5", "json"]] = None,
+    **kwargs
+) -> dict[str, Any]:
+    """Method for saving list or dictionaries (Python analogues to
+    R-style lists) to the corresponding file representations, see
+    :py:meth:`~dolomite_base.stage_object.stage_object` for details.
+
+    Args:
+        x: Object to be staged.
+
+        dir: Staging directory.
+
+        path: Relative path inside ``dir`` to save the object.
+
+        is_child: Is ``x`` a child of another object?
+
+        mode: Whether to save in HDF5 or JSON mode.
+            If None, defaults to JSON.
+
+        kwargs: Further arguments, ignored.
+
+    Returns:
+        Metadata that can be edited by calling methods and then saved with 
+        :py:meth:`~dolomite_base.write_metadata.write_metadata`.
+    """
     externals = []
     os.mkdir(os.path.join(dir, path))
     components = {}
 
-    if mode == "json":
+    if mode is None or mode == "json":
         transformed = _stage_simple_list_json(x, externals)
         transformed["version"] = "1.1"
+
         newpath = path + "/list.json.gz"
         opath = os.path.join(dir, newpath)
         with gzip.open(opath, "wb") as handle:
             json.dump(transformed, handle)
-        lib.validate_list_json(opath)
+        lib.validate_list_json(opath.encode("ASCII"))
 
         components["$schema"] = "json_simple_list/v1.json"
         components["path"] = newpath
