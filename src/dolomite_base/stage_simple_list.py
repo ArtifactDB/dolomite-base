@@ -179,11 +179,11 @@ def _stage_simple_list_json(x, externals):
         elif len(x.shape) == 0:
             if np.ma.is_masked(x):
                 if issubdtype(x.dtype, integer):
-                    return { "type": "integer", "values": None if np.ma.is_masked(y) else int(y) }
+                    return { "type": "integer", "values": None if np.ma.is_masked(x) else int(x) }
                 elif issubdtype(x.dtype, floating):
-                    return { "type": "number", "values": None if np.ma.is_masked(y) else float(y) }
+                    return { "type": "number", "values": None if np.ma.is_masked(x) else float(x) }
                 elif x.dtype == bool_:
-                    return { "type": "boolean", "values": None if np.ma.is_masked(y) else bool(y) }
+                    return { "type": "boolean", "values": None if np.ma.is_masked(x) else bool(x) }
                 else:
                     raise NotImplementedError("no staging method for 0-d NumPy arrays of " + str(x.dtype))
             else:
@@ -205,7 +205,6 @@ def _stage_simple_list_json(x, externals):
             return { "type": "boolean", "values": bool(x) }
         else:
             raise NotImplementedError("no staging method for NumPy array scalars of " + str(x.dtype))
-
 
     elif x == None:
         return { "type": "nothing" }

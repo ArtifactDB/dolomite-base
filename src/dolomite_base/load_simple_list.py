@@ -34,6 +34,8 @@ def extract_list_contents(ptr, externals):
             mask = np.zeros(actual, dtype=np.uint8)
             lib.uzuki2_get_integer_vector_mask(ptr, mask)
             output = np.ma.array(output, mask=mask)
+            if n == -1 and np.ma.is_masked(output[0]):
+                return output[0]
 
         if n == -1:
             return int(output[0])
@@ -50,6 +52,8 @@ def extract_list_contents(ptr, externals):
             mask = np.zeros(actual, dtype=np.uint8)
             lib.uzuki2_get_number_vector_mask(ptr, mask)
             output = np.ma.array(output, mask=mask)
+            if n == -1 and np.ma.is_masked(output[0]):
+                return output[0]
 
         if n == -1:
             return float(output[0])
@@ -66,6 +70,8 @@ def extract_list_contents(ptr, externals):
             mask = np.zeros(actual, dtype=np.uint8)
             lib.uzuki2_get_boolean_vector_mask(ptr, mask)
             output = np.ma.array(output, mask=mask)
+            if n == -1 and np.ma.is_masked(output[0]):
+                return output[0]
 
         if n == -1:
             return bool(output[0])

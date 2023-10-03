@@ -84,3 +84,23 @@ def test_json_simple_list_numpy_scalars():
     assert roundtrip["int2"] == -10
     assert isinstance(roundtrip["bool"], bool)
     assert roundtrip["bool2"] == True 
+
+
+def test_json_simple_list_masked_scalars():
+    everything = {
+        "float": np.ma.array(np.array(-9.9, dtype=np.float64), mask=[True]),
+        "int": np.ma.array(np.array(-10, dtype=np.int16), mask=[True]),
+        "bool": np.ma.array(np.array(True, dtype=np.bool_), mask=[True]),
+        "masked": np.ma.masked
+    }
+
+    dir = mkdtemp()
+    meta = dl.stage_object(everything, dir, "foo")
+    dl.write_metadata(meta, dir)
+
+    # Type is kind of lost with the scalar... oh well.
+    roundtrip = dl.load_json_simple_list(meta, dir)
+    assert np.ma.is_masked(roundtrip["float"])
+    assert np.ma.is_masked(roundtrip["int"])
+    assert np.ma.is_masked(roundtrip["bool"])
+    assert np.ma.is_masked(roundtrip["masked"])
