@@ -396,6 +396,40 @@ by <a class="reference internal" href="#dolomite_base.acquire_file.acquire_file"
 </dd></dl>
 
 </section>
+<section id="module-dolomite_base.load_simple_list">
+<span id="dolomite-base-load-simple-list-module"></span><h2>dolomite_base.load_simple_list module<a class="headerlink" href="#module-dolomite_base.load_simple_list" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.load_simple_list.extract_list_contents">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.load_simple_list.</span></span><span class="sig-name descname"><span class="pre">extract_list_contents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ptr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">externals</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/load_simple_list.html#extract_list_contents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.load_simple_list.extract_list_contents" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.load_simple_list.load_json_simple_list">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.load_simple_list.</span></span><span class="sig-name descname"><span class="pre">load_json_simple_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/load_simple_list.html#load_json_simple_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.load_simple_list.load_json_simple_list" title="Link to this definition">#</a></dt>
+<dd><p>Load an R-style list from a (possibly Gzip-compressed) JSON file in the
+<strong>uzuki2</strong> format. In general, this function should not be called directly
+but instead via <a class="reference internal" href="#dolomite_base.load_object.load_object" title="dolomite_base.load_object.load_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_object()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]) – Metadata for this JSON list.</p></li>
+<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>) – Value specifying the project of interest. This is most
+typically a string containing a file path to a staging directory
+but may also be an application-specific object that works with
+<a class="reference internal" href="#dolomite_base.acquire_file.acquire_file" title="dolomite_base.acquire_file.acquire_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">acquire_file()</span></code></a>.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, passed to nested objects.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A data frame.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="module-dolomite_base.stage_data_frame">
 <span id="dolomite-base-stage-data-frame-module"></span><h2>dolomite_base.stage_data_frame module<a class="headerlink" href="#module-dolomite_base.stage_data_frame" title="Link to this heading">#</a></h2>
 <dl class="py function">
@@ -451,6 +485,65 @@ saved with <a class="reference internal" href="#dolomite_base.write_metadata.wri
 This should contain at least a <code class="docutils literal notranslate"><span class="pre">$schema</span></code> property, specifying the
 schema to use for validation of the metadata; and a <code class="docutils literal notranslate"><span class="pre">path</span></code> property,
 specifying the relative path to the file representation of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-dolomite_base.stage_simple_list">
+<span id="dolomite-base-stage-simple-list-module"></span><h2>dolomite_base.stage_simple_list module<a class="headerlink" href="#module-dolomite_base.stage_simple_list" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.stage_simple_list.stage_simple_dict">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.stage_simple_list.</span></span><span class="sig-name descname"><span class="pre">stage_simple_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_child</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/stage_simple_list.html#stage_simple_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.stage_simple_list.stage_simple_dict" title="Link to this definition">#</a></dt>
+<dd><p>Method for saving dictionaries (Python analogues to R-style named lists)
+to the corresponding file representations, see
+<a class="reference internal" href="#dolomite_base.stage_object.stage_object" title="dolomite_base.stage_object.stage_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stage_object()</span></code></a> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – Object to be staged.</p></li>
+<li><p><strong>dir</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Staging directory.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Relative path inside <code class="docutils literal notranslate"><span class="pre">dir</span></code> to save the object.</p></li>
+<li><p><strong>is_child</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Is <code class="docutils literal notranslate"><span class="pre">x</span></code> a child of another object?</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Literal" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'hdf5'</span></code>, <code class="docutils literal notranslate"><span class="pre">'json'</span></code>]]) – Whether to save in HDF5 or JSON mode.
+If None, defaults to JSON.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Metadata that can be edited by calling methods and then saved with
+<a class="reference internal" href="#dolomite_base.write_metadata.write_metadata" title="dolomite_base.write_metadata.write_metadata"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write_metadata()</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.stage_simple_list.stage_simple_list">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.stage_simple_list.</span></span><span class="sig-name descname"><span class="pre">stage_simple_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_child</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/stage_simple_list.html#stage_simple_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.stage_simple_list.stage_simple_list" title="Link to this definition">#</a></dt>
+<dd><p>Method for saving lists (Python analogues to R-style unnamed lists) to
+the corresponding file representations, see
+<a class="reference internal" href="#dolomite_base.stage_object.stage_object" title="dolomite_base.stage_object.stage_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stage_object()</span></code></a> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>) – Object to be staged.</p></li>
+<li><p><strong>dir</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Staging directory.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Relative path inside <code class="docutils literal notranslate"><span class="pre">dir</span></code> to save the object.</p></li>
+<li><p><strong>is_child</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Is <code class="docutils literal notranslate"><span class="pre">x</span></code> a child of another object?</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Literal" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'hdf5'</span></code>, <code class="docutils literal notranslate"><span class="pre">'json'</span></code>]]) – Whether to save in HDF5 or JSON mode.
+If None, defaults to JSON.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Metadata that can be edited by calling methods and then saved with
+<a class="reference internal" href="#dolomite_base.write_metadata.write_metadata" title="dolomite_base.write_metadata.write_metadata"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write_metadata()</span></code></a>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -568,12 +661,22 @@ metadata itself is written to a JSON file at a path derived from
 <li><a class="reference internal" href="#dolomite_base.load_object.load_object"><code class="docutils literal notranslate"><span class="pre">load_object()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-dolomite_base.load_simple_list">dolomite_base.load_simple_list module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.load_simple_list.extract_list_contents"><code class="docutils literal notranslate"><span class="pre">extract_list_contents()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.load_simple_list.load_json_simple_list"><code class="docutils literal notranslate"><span class="pre">load_json_simple_list()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-dolomite_base.stage_data_frame">dolomite_base.stage_data_frame module</a><ul>
 <li><a class="reference internal" href="#dolomite_base.stage_data_frame.stage_data_frame"><code class="docutils literal notranslate"><span class="pre">stage_data_frame()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-dolomite_base.stage_object">dolomite_base.stage_object module</a><ul>
 <li><a class="reference internal" href="#dolomite_base.stage_object.stage_object"><code class="docutils literal notranslate"><span class="pre">stage_object()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.stage_simple_list">dolomite_base.stage_simple_list module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.stage_simple_list.stage_simple_dict"><code class="docutils literal notranslate"><span class="pre">stage_simple_dict()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.stage_simple_list.stage_simple_list"><code class="docutils literal notranslate"><span class="pre">stage_simple_list()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-dolomite_base.write_metadata">dolomite_base.write_metadata module</a><ul>

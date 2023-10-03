@@ -36,6 +36,14 @@ dolomite\_base.load\_object module
    :undoc-members:
    :show-inheritance:
 
+dolomite\_base.load\_simple\_list module
+----------------------------------------
+
+.. automodule:: dolomite_base.load_simple_list
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dolomite\_base.stage\_data\_frame module
 ----------------------------------------
 
@@ -48,6 +56,14 @@ dolomite\_base.stage\_object module
 -----------------------------------
 
 .. automodule:: dolomite_base.stage_object
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.stage\_simple\_list module
+-----------------------------------------
+
+.. automodule:: dolomite_base.stage_simple_list
    :members:
    :undoc-members:
    :show-inheritance:
