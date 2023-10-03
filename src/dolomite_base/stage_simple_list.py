@@ -1,4 +1,5 @@
 from typing import Any, Union, Optional, Literal
+import numpy as np
 from numpy import ndarray, issubdtype, integer, floating, bool_
 import os
 import json
@@ -154,15 +155,57 @@ def _stage_simple_list_json(x, externals):
     elif isinstance(x, float):
         return { "type": "number", "values": x }
 
-    elif isinstance(x, ndarray) and len(x.shape) == 1:
-        if issubdtype(x.dtype, integer):
-            return { "type": "integer", "values": [int(y) for y in x] }
-        elif issubdtype(x.dtype, floating):
-            return { "type": "number", "values": [float(y) for y in x] }
-        elif x.dtype == bool_:
-            return { "type": "boolean", "values": [bool(y) for y in x] }
+    elif isinstance(x, ndarray):
+        if len(x.shape) == 1:
+            if np.ma.is_masked(x):
+                if issubdtype(x.dtype, integer):
+                    return { "type": "integer", "values": [None if np.ma.is_masked(y) else int(y) for y in x] }
+                elif issubdtype(x.dtype, floating):
+                    return { "type": "number", "values": [None if np.ma.is_masked(y) else float(y) for y in x] }
+                elif x.dtype == bool_:
+                    return { "type": "boolean", "values": [None if np.ma.is_masked(y) else bool(y) for y in x] }
+                else:
+                    raise NotImplementedError("no staging method for 1D NumPy masked arrays of " + str(x.dtype))
+            else:
+                if issubdtype(x.dtype, integer):
+                    return { "type": "integer", "values": [int(y) for y in x] }
+                elif issubdtype(x.dtype, floating):
+                    return { "type": "number", "values": [float(y) for y in x] }
+                elif x.dtype == bool_:
+                    return { "type": "boolean", "values": [bool(y) for y in x] }
+                else:
+                    raise NotImplementedError("no staging method for 1D NumPy arrays of " + str(x.dtype))
+
+        elif len(x.shape) == 0:
+            if np.ma.is_masked(x):
+                if issubdtype(x.dtype, integer):
+                    return { "type": "integer", "values": None if np.ma.is_masked(y) else int(y) }
+                elif issubdtype(x.dtype, floating):
+                    return { "type": "number", "values": None if np.ma.is_masked(y) else float(y) }
+                elif x.dtype == bool_:
+                    return { "type": "boolean", "values": None if np.ma.is_masked(y) else bool(y) }
+                else:
+                    raise NotImplementedError("no staging method for 0-d NumPy arrays of " + str(x.dtype))
+            else:
+                if issubdtype(x.dtype, integer):
+                    return { "type": "integer", "values": int(x) } 
+                elif issubdtype(x.dtype, floating):
+                    return { "type": "number", "values": float(x) }
+                elif x.dtype == bool_:
+                    return { "type": "boolean", "values": bool(x) }
+                else:
+                    raise NotImplementedError("no staging method for 0-d NumPy arrays of " + str(x.dtype))
+
+    elif isinstance(x, np.generic):
+        if isinstance(x, integer):
+            return { "type": "integer", "values": int(x) }
+        elif isinstance(x, floating):
+            return { "type": "number", "values": float(x) }
+        elif isinstance(x, bool_):
+            return { "type": "boolean", "values": bool(x) }
         else:
-            raise NotImplementedError("no staging method for NumPy arrays of " + str(x.dtype))
+            raise NotImplementedError("no staging method for NumPy array scalars of " + str(x.dtype))
+
 
     elif x == None:
         return { "type": "nothing" }

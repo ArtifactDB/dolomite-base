@@ -381,6 +381,14 @@ uint8_t uzuki2_get_string_vector_contents(void* ptr, char* contents) {
     return !(casted->base.missing.empty());
 }
 
+//[[export]]
+void uzuki2_get_string_vector_mask(void* ptr, uint8_t* mask /** numpy */) {
+    auto casted = reinterpret_cast<DefaultStringVector*>(ptr);
+    for (auto i : casted->base.missing) {
+        mask[i] = 1;
+    }
+}
+
 /* List handlers */
 
 //[[export]]

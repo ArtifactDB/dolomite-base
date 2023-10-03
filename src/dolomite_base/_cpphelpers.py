@@ -286,6 +286,14 @@ lib.py_uzuki2_get_string_vector_lengths.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
+lib.py_uzuki2_get_string_vector_mask.restype = None
+lib.py_uzuki2_get_string_vector_mask.argtypes = [
+    ct.c_void_p,
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
 lib.py_validate_csv.restype = None
 lib.py_validate_csv.argtypes = [
     ct.c_char_p,
@@ -393,6 +401,9 @@ def uzuki2_get_string_vector_length(ptr):
 
 def uzuki2_get_string_vector_lengths(ptr, lengths):
     return catch_errors(lib.py_uzuki2_get_string_vector_lengths)(ptr, np2ct(lengths, np.int32))
+
+def uzuki2_get_string_vector_mask(ptr, mask):
+    return catch_errors(lib.py_uzuki2_get_string_vector_mask)(ptr, np2ct(mask, np.uint8))
 
 def validate_csv(path):
     return catch_errors(lib.py_validate_csv)(path)

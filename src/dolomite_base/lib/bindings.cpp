@@ -79,6 +79,8 @@ int32_t uzuki2_get_string_vector_length(void*);
 
 uint64_t uzuki2_get_string_vector_lengths(void*, int32_t*);
 
+void uzuki2_get_string_vector_mask(void*, uint8_t*);
+
 void validate_csv(const char*);
 
 void validate_list_json(const char*, int32_t);
@@ -505,6 +507,18 @@ PYAPI uint64_t py_uzuki2_get_string_vector_lengths(void* ptr, int32_t* lengths, 
         *errmsg = copy_error_message("unknown C++ exception");
     }
     return output;
+}
+
+PYAPI void py_uzuki2_get_string_vector_mask(void* ptr, uint8_t* mask, int32_t* errcode, char** errmsg) {
+    try {
+        uzuki2_get_string_vector_mask(ptr, mask);
+    } catch(std::exception& e) {
+        *errcode = 1;
+        *errmsg = copy_error_message(e.what());
+    } catch(...) {
+        *errcode = 1;
+        *errmsg = copy_error_message("unknown C++ exception");
+    }
 }
 
 PYAPI void py_validate_csv(const char* path, int32_t* errcode, char** errmsg) {
