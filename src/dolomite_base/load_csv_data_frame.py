@@ -8,7 +8,7 @@ from . import _cpphelpers as lib
 from .acquire_file import acquire_file
 from .acquire_metadata import acquire_metadata
 from .load_object import load_object
-
+from ._utils import _fragment_string_contents, _mask_strings
 
 class _LoadedCsvHolder:
     def __init__(self, ptr):
@@ -50,17 +50,8 @@ class _LoadedCsvHolder:
             concatenated = ct.create_string_buffer(total_len)
             lib.fetch_csv_strings(self.ptr, i, concatenated, pop)
 
-            sofar = 0
-            collected = []
-            buffer = concatenated.raw
-            for i, x in enumerate(strlengths):
-                endpoint = sofar + x 
-                collected.append(buffer[sofar:endpoint].decode("ASCII"))
-                sofar = endpoint
-
-            for i, x in enumerate(mask):
-                if x:
-                    collected[i] = None
+            collected = _fragment_string_contents(strlengths, concatenated.raw)
+            _mask_strings(collected, mask)
             return collected
 
         elif col_type.value == 1:

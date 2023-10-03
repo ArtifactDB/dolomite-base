@@ -135,16 +135,24 @@ lib.py_uzuki2_free_list.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
-lib.py_uzuki2_get_boolean_vector.restype = None
-lib.py_uzuki2_get_boolean_vector.argtypes = [
+lib.py_uzuki2_get_boolean_vector_length.restype = ct.c_int32
+lib.py_uzuki2_get_boolean_vector_length.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_boolean_vector_mask.restype = None
+lib.py_uzuki2_get_boolean_vector_mask.argtypes = [
     ct.c_void_p,
     ct.c_void_p,
     ct.POINTER(ct.c_int32),
     ct.POINTER(ct.c_char_p)
 ]
 
-lib.py_uzuki2_get_boolean_vector_length.restype = ct.c_int32
-lib.py_uzuki2_get_boolean_vector_length.argtypes = [
+lib.py_uzuki2_get_boolean_vector_values.restype = ct.c_uint8
+lib.py_uzuki2_get_boolean_vector_values.argtypes = [
+    ct.c_void_p,
     ct.c_void_p,
     ct.POINTER(ct.c_int32),
     ct.POINTER(ct.c_char_p)
@@ -157,14 +165,6 @@ lib.py_uzuki2_get_external_index.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
-lib.py_uzuki2_get_integer_vector.restype = None
-lib.py_uzuki2_get_integer_vector.argtypes = [
-    ct.c_void_p,
-    ct.c_void_p,
-    ct.POINTER(ct.c_int32),
-    ct.POINTER(ct.c_char_p)
-]
-
 lib.py_uzuki2_get_integer_vector_length.restype = ct.c_int32
 lib.py_uzuki2_get_integer_vector_length.argtypes = [
     ct.c_void_p,
@@ -172,7 +172,23 @@ lib.py_uzuki2_get_integer_vector_length.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
-lib.py_uzuki2_get_list_element.restype = None
+lib.py_uzuki2_get_integer_vector_mask.restype = None
+lib.py_uzuki2_get_integer_vector_mask.argtypes = [
+    ct.c_void_p,
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_integer_vector_values.restype = ct.c_uint8
+lib.py_uzuki2_get_integer_vector_values.argtypes = [
+    ct.c_void_p,
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_list_element.restype = ct.c_void_p
 lib.py_uzuki2_get_list_element.argtypes = [
     ct.c_void_p,
     ct.c_int32,
@@ -180,7 +196,7 @@ lib.py_uzuki2_get_list_element.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
-lib.py_uzuki2_get_list_length.restype = None
+lib.py_uzuki2_get_list_length.restype = ct.c_int32
 lib.py_uzuki2_get_list_length.argtypes = [
     ct.c_void_p,
     ct.POINTER(ct.c_int32),
@@ -197,7 +213,7 @@ lib.py_uzuki2_get_list_named.argtypes = [
 lib.py_uzuki2_get_list_names_contents.restype = None
 lib.py_uzuki2_get_list_names_contents.argtypes = [
     ct.c_void_p,
-    ct.POINTER(ct.c_int32),
+    ct.c_char_p,
     ct.POINTER(ct.c_int32),
     ct.POINTER(ct.c_char_p)
 ]
@@ -205,7 +221,7 @@ lib.py_uzuki2_get_list_names_contents.argtypes = [
 lib.py_uzuki2_get_list_names_lengths.restype = ct.c_uint64
 lib.py_uzuki2_get_list_names_lengths.argtypes = [
     ct.c_void_p,
-    ct.POINTER(ct.c_int32),
+    ct.c_void_p,
     ct.POINTER(ct.c_int32),
     ct.POINTER(ct.c_char_p)
 ]
@@ -217,16 +233,24 @@ lib.py_uzuki2_get_node_type.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
-lib.py_uzuki2_get_numeric_vector.restype = None
-lib.py_uzuki2_get_numeric_vector.argtypes = [
+lib.py_uzuki2_get_number_vector_length.restype = ct.c_int32
+lib.py_uzuki2_get_number_vector_length.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_uzuki2_get_number_vector_mask.restype = None
+lib.py_uzuki2_get_number_vector_mask.argtypes = [
     ct.c_void_p,
     ct.c_void_p,
     ct.POINTER(ct.c_int32),
     ct.POINTER(ct.c_char_p)
 ]
 
-lib.py_uzuki2_get_numeric_vector_length.restype = ct.c_int32
-lib.py_uzuki2_get_numeric_vector_length.argtypes = [
+lib.py_uzuki2_get_number_vector_values.restype = ct.c_uint8
+lib.py_uzuki2_get_number_vector_values.argtypes = [
+    ct.c_void_p,
     ct.c_void_p,
     ct.POINTER(ct.c_int32),
     ct.POINTER(ct.c_char_p)
@@ -239,7 +263,7 @@ lib.py_uzuki2_get_parent_node.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
-lib.py_uzuki2_get_string_vector_contents.restype = None
+lib.py_uzuki2_get_string_vector_contents.restype = ct.c_uint8
 lib.py_uzuki2_get_string_vector_contents.argtypes = [
     ct.c_void_p,
     ct.c_char_p,
@@ -310,20 +334,26 @@ def load_list_json(path, n):
 def uzuki2_free_list(ptr):
     return catch_errors(lib.py_uzuki2_free_list)(ptr)
 
-def uzuki2_get_boolean_vector(ptr, contents):
-    return catch_errors(lib.py_uzuki2_get_boolean_vector)(ptr, np2ct(contents, np.uint8))
-
 def uzuki2_get_boolean_vector_length(ptr):
     return catch_errors(lib.py_uzuki2_get_boolean_vector_length)(ptr)
+
+def uzuki2_get_boolean_vector_mask(ptr, mask):
+    return catch_errors(lib.py_uzuki2_get_boolean_vector_mask)(ptr, np2ct(mask, np.uint8))
+
+def uzuki2_get_boolean_vector_values(ptr, contents):
+    return catch_errors(lib.py_uzuki2_get_boolean_vector_values)(ptr, np2ct(contents, np.uint8))
 
 def uzuki2_get_external_index(ptr):
     return catch_errors(lib.py_uzuki2_get_external_index)(ptr)
 
-def uzuki2_get_integer_vector(ptr, contents):
-    return catch_errors(lib.py_uzuki2_get_integer_vector)(ptr, np2ct(contents, np.int32))
-
 def uzuki2_get_integer_vector_length(ptr):
     return catch_errors(lib.py_uzuki2_get_integer_vector_length)(ptr)
+
+def uzuki2_get_integer_vector_mask(ptr, mask):
+    return catch_errors(lib.py_uzuki2_get_integer_vector_mask)(ptr, np2ct(mask, np.uint8))
+
+def uzuki2_get_integer_vector_values(ptr, contents):
+    return catch_errors(lib.py_uzuki2_get_integer_vector_values)(ptr, np2ct(contents, np.int32))
 
 def uzuki2_get_list_element(ptr, i):
     return catch_errors(lib.py_uzuki2_get_list_element)(ptr, i)
@@ -334,20 +364,23 @@ def uzuki2_get_list_length(ptr):
 def uzuki2_get_list_named(ptr):
     return catch_errors(lib.py_uzuki2_get_list_named)(ptr)
 
-def uzuki2_get_list_names_contents(ptr, lengths):
-    return catch_errors(lib.py_uzuki2_get_list_names_contents)(ptr, lengths)
+def uzuki2_get_list_names_contents(ptr, contents):
+    return catch_errors(lib.py_uzuki2_get_list_names_contents)(ptr, contents)
 
 def uzuki2_get_list_names_lengths(ptr, lengths):
-    return catch_errors(lib.py_uzuki2_get_list_names_lengths)(ptr, lengths)
+    return catch_errors(lib.py_uzuki2_get_list_names_lengths)(ptr, np2ct(lengths, np.int32))
 
 def uzuki2_get_node_type(ptr):
     return catch_errors(lib.py_uzuki2_get_node_type)(ptr)
 
-def uzuki2_get_numeric_vector(ptr, contents):
-    return catch_errors(lib.py_uzuki2_get_numeric_vector)(ptr, np2ct(contents, np.int32))
+def uzuki2_get_number_vector_length(ptr):
+    return catch_errors(lib.py_uzuki2_get_number_vector_length)(ptr)
 
-def uzuki2_get_numeric_vector_length(ptr):
-    return catch_errors(lib.py_uzuki2_get_numeric_vector_length)(ptr)
+def uzuki2_get_number_vector_mask(ptr, mask):
+    return catch_errors(lib.py_uzuki2_get_number_vector_mask)(ptr, np2ct(mask, np.uint8))
+
+def uzuki2_get_number_vector_values(ptr, contents):
+    return catch_errors(lib.py_uzuki2_get_number_vector_values)(ptr, np2ct(contents, np.float64))
 
 def uzuki2_get_parent_node(ptr):
     return catch_errors(lib.py_uzuki2_get_parent_node)(ptr)

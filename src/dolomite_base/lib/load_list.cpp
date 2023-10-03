@@ -262,6 +262,8 @@ int32_t uzuki2_get_node_type(void* ptr) {
     return -1;
 }
 
+/* Integer vector handlers */
+
 //[[export]]
 int32_t uzuki2_get_integer_vector_length(void* ptr) {
     auto casted = reinterpret_cast<DefaultIntegerVector*>(ptr);
@@ -273,11 +275,22 @@ int32_t uzuki2_get_integer_vector_length(void* ptr) {
 }
 
 //[[export]]
-void uzuki2_get_integer_vector(void* ptr, int32_t* contents /** numpy */) {
+uint8_t uzuki2_get_integer_vector_values(void* ptr, int32_t* contents /** numpy */) {
     auto casted = reinterpret_cast<DefaultIntegerVector*>(ptr);
     const auto& vals = casted->base.values;
     std::copy(vals.begin(), vals.end(), contents);
+    return !(casted->base.missing.empty());
 }
+
+//[[export]]
+void uzuki2_get_integer_vector_mask(void* ptr, uint8_t* mask /** numpy */) {
+    auto casted = reinterpret_cast<DefaultIntegerVector*>(ptr);
+    for (auto i : casted->base.missing) {
+        mask[i] = 1;
+    }
+}
+
+/* Number vector handlers */
 
 //[[export]]
 int32_t uzuki2_get_number_vector_length(void* ptr) {
@@ -290,11 +303,22 @@ int32_t uzuki2_get_number_vector_length(void* ptr) {
 }
 
 //[[export]]
-void uzuki2_get_number_vector(void* ptr, int32_t* contents /** numpy */) {
+uint8_t uzuki2_get_number_vector_values(void* ptr, double* contents /** numpy */) {
     auto casted = reinterpret_cast<DefaultNumberVector*>(ptr);
     const auto& vals = casted->base.values;
     std::copy(vals.begin(), vals.end(), contents);
+    return !(casted->base.missing.empty());
 }
+
+//[[export]]
+void uzuki2_get_number_vector_mask(void* ptr, uint8_t* mask /** numpy */) {
+    auto casted = reinterpret_cast<DefaultNumberVector*>(ptr);
+    for (auto i : casted->base.missing) {
+        mask[i] = 1;
+    }
+}
+
+/* Boolean vector handlers */
 
 //[[export]]
 int32_t uzuki2_get_boolean_vector_length(void* ptr) {
@@ -307,11 +331,22 @@ int32_t uzuki2_get_boolean_vector_length(void* ptr) {
 }
 
 //[[export]]
-void uzuki2_get_boolean_vector(void* ptr, uint8_t* contents /** numpy */) {
+uint8_t uzuki2_get_boolean_vector_values(void* ptr, uint8_t* contents /** numpy */) {
     auto casted = reinterpret_cast<DefaultBooleanVector*>(ptr);
     const auto& vals = casted->base.values;
     std::copy(vals.begin(), vals.end(), contents);
+    return !(casted->base.missing.empty());
 }
+
+//[[export]]
+void uzuki2_get_boolean_vector_mask(void* ptr, uint8_t* mask /** numpy */) {
+    auto casted = reinterpret_cast<DefaultBooleanVector*>(ptr);
+    for (auto i : casted->base.missing) {
+        mask[i] = 1;
+    }
+}
+
+/* String vector handlers */
 
 //[[export]]
 int32_t uzuki2_get_string_vector_length(void* ptr) {
@@ -336,13 +371,17 @@ uint64_t uzuki2_get_string_vector_lengths(void* ptr, int32_t* lengths /** numpy 
 }
 
 //[[export]]
-void uzuki2_get_string_vector_contents(void* ptr, char* contents) {
-    const auto& vals = reinterpret_cast<DefaultStringVector*>(ptr)->base.values;
+uint8_t uzuki2_get_string_vector_contents(void* ptr, char* contents) {
+    auto casted = reinterpret_cast<DefaultStringVector*>(ptr);
+    const auto& vals = casted->base.values;
     for (const auto& x : vals) {
         std::copy(x.begin(), x.end(), contents);
         contents += x.size();
     }
+    return !(casted->base.missing.empty());
 }
+
+/* List handlers */
 
 //[[export]]
 int32_t uzuki2_get_list_length(void* ptr) {
@@ -355,7 +394,7 @@ uint8_t uzuki2_get_list_named(void* ptr) {
 }
 
 //[[export]]
-uint64_t uzuki2_get_list_names_lengths(void* ptr, int32_t* lengths) {
+uint64_t uzuki2_get_list_names_lengths(void* ptr, int32_t* lengths /** numpy */) {
     const auto& names = reinterpret_cast<DefaultList*>(ptr)->names;
     uint64_t total = 0;
     for (const auto& x : names) {
@@ -380,6 +419,8 @@ void uzuki2_get_list_names_contents(void* ptr, char* contents) {
 void* uzuki2_get_list_element(void* ptr, int32_t i) {
     return reinterpret_cast<DefaultList*>(ptr)->values[i].get();
 }
+
+/* External handlers */
 
 //[[export]]
 int32_t uzuki2_get_external_index(void* ptr) {

@@ -1,5 +1,5 @@
-from typing import Any, Union
-from numpy import ndarray
+from typing import Any, Union, Optional, Literal
+from numpy import ndarray, issubdtype, integer, floating, bool_
 import os
 import json
 import gzip
@@ -11,16 +11,16 @@ from . import _cpphelpers as lib
 
 
 @stage_object.register
-def stage_simple_list(
-    x: Union[dict, list], 
+def stage_simple_dict(
+    x: dict,
     dir: str, 
     path: str, 
     is_child: bool = False, 
     mode: Optional[Literal["hdf5", "json"]] = None,
     **kwargs
 ) -> dict[str, Any]:
-    """Method for saving list or dictionaries (Python analogues to
-    R-style lists) to the corresponding file representations, see
+    """Method for saving dictionaries (Python analogues to R-style named lists)
+    to the corresponding file representations, see
     :py:meth:`~dolomite_base.stage_object.stage_object` for details.
 
     Args:
@@ -41,6 +41,52 @@ def stage_simple_list(
         Metadata that can be edited by calling methods and then saved with 
         :py:meth:`~dolomite_base.write_metadata.write_metadata`.
     """
+    return _stage_simple_list_internal(x, dir, path, is_child, mode, **kwargs)
+
+
+@stage_object.register
+def stage_simple_list(
+    x: list,
+    dir: str, 
+    path: str, 
+    is_child: bool = False, 
+    mode: Optional[Literal["hdf5", "json"]] = None,
+    **kwargs
+) -> dict[str, Any]:
+    """Method for saving lists (Python analogues to R-style unnamed lists) to
+    the corresponding file representations, see
+    :py:meth:`~dolomite_base.stage_object.stage_object` for details.
+
+    Args:
+        x: Object to be staged.
+
+        dir: Staging directory.
+
+        path: Relative path inside ``dir`` to save the object.
+
+        is_child: Is ``x`` a child of another object?
+
+        mode: Whether to save in HDF5 or JSON mode.
+            If None, defaults to JSON.
+
+        kwargs: Further arguments, ignored.
+
+    Returns:
+        Metadata that can be edited by calling methods and then saved with 
+        :py:meth:`~dolomite_base.write_metadata.write_metadata`.
+    """
+    return _stage_simple_list_internal(x, dir, path, is_child, mode, **kwargs)
+
+
+def _stage_simple_list_internal(
+    x: Union[dict, list],
+    dir: str, 
+    path: str, 
+    is_child: bool = False, 
+    mode: Optional[Literal["hdf5", "json"]] = None,
+    **kwargs
+) -> dict[str, Any]:
+
     externals = []
     os.mkdir(os.path.join(dir, path))
     components = {}
@@ -51,9 +97,10 @@ def stage_simple_list(
 
         newpath = path + "/list.json.gz"
         opath = os.path.join(dir, newpath)
-        with gzip.open(opath, "wb") as handle:
+        with gzip.open(opath, "wt") as handle:
             json.dump(transformed, handle)
-        lib.validate_list_json(opath.encode("ASCII"))
+
+        lib.validate_list_json(opath.encode("UTF8"), len(externals))
 
         components["$schema"] = "json_simple_list/v1.json"
         components["path"] = newpath
@@ -71,16 +118,19 @@ def stage_simple_list(
 
 def _stage_simple_list_json(x, externals):
     if isinstance(x, list):
-        typecheck = set([ type(y) for y in x ])
-        curtype = "list"
+        typecheck = set()
+        for y in x:
+            if y is not None:
+                typecheck.add(type(y))
+
         if len(typecheck) == 1:
             if str in typecheck:
-                curtype = "string"
+                return { "type": "string", "values": x }
 
         vals = []
-        collected = { "type": curtype, "values": vals }
+        collected = { "type": "list", "values": vals }
         for i, y in enumerate(x):
-            vals.append(_stage_simple_list_json(y, transformed, externals))
+            vals.append(_stage_simple_list_json(y, externals))
         return collected
 
     elif isinstance(x, dict):
@@ -89,8 +139,11 @@ def _stage_simple_list_json(x, externals):
         collected = { "type": "list", "values": vals, "names": names }
         for k, v in x.items():
             names.append(k)
-            vals.append(v)
+            vals.append(_stage_simple_list_json(v, externals))
         return collected
+
+    elif isinstance(x, bool): # bools are ints, so put this before the int check.
+        return { "type": "boolean", "values": x }
 
     elif isinstance(x, int):
         return { "type": "integer", "values": x }
@@ -101,16 +154,13 @@ def _stage_simple_list_json(x, externals):
     elif isinstance(x, float):
         return { "type": "number", "values": x }
 
-    elif isinstance(x, bool):
-        return { "type": "boolean", "values": x }
-
     elif isinstance(x, ndarray) and len(x.shape) == 1:
         if issubdtype(x.dtype, integer):
-            return { "type": "integer", "values": list(x) }
+            return { "type": "integer", "values": [int(y) for y in x] }
         elif issubdtype(x.dtype, floating):
-            return { "type": "number", "values": list(x) }
+            return { "type": "number", "values": [float(y) for y in x] }
         elif x.dtype == bool_:
-            return { "type": "boolean", "values": list(x) }
+            return { "type": "boolean", "values": [bool(y) for y in x] }
         else:
             raise NotImplementedError("no staging method for NumPy arrays of " + str(x.dtype))
 

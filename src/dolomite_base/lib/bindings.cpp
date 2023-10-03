@@ -39,35 +39,41 @@ void* load_list_json(const char*, int32_t);
 
 void uzuki2_free_list(void*);
 
-void uzuki2_get_boolean_vector(void*, uint8_t*);
-
 int32_t uzuki2_get_boolean_vector_length(void*);
+
+void uzuki2_get_boolean_vector_mask(void*, uint8_t*);
+
+uint8_t uzuki2_get_boolean_vector_values(void*, uint8_t*);
 
 int32_t uzuki2_get_external_index(void*);
 
-void uzuki2_get_integer_vector(void*, int32_t*);
-
 int32_t uzuki2_get_integer_vector_length(void*);
 
-void uzuki2_get_list_element(void*, int32_t);
+void uzuki2_get_integer_vector_mask(void*, uint8_t*);
 
-void uzuki2_get_list_length(void*);
+uint8_t uzuki2_get_integer_vector_values(void*, int32_t*);
+
+void* uzuki2_get_list_element(void*, int32_t);
+
+int32_t uzuki2_get_list_length(void*);
 
 uint8_t uzuki2_get_list_named(void*);
 
-void uzuki2_get_list_names_contents(void*, int32_t*);
+void uzuki2_get_list_names_contents(void*, char*);
 
 uint64_t uzuki2_get_list_names_lengths(void*, int32_t*);
 
 int32_t uzuki2_get_node_type(void*);
 
-void uzuki2_get_numeric_vector(void*, int32_t*);
+int32_t uzuki2_get_number_vector_length(void*);
 
-int32_t uzuki2_get_numeric_vector_length(void*);
+void uzuki2_get_number_vector_mask(void*, uint8_t*);
+
+uint8_t uzuki2_get_number_vector_values(void*, double*);
 
 void* uzuki2_get_parent_node(void*);
 
-void uzuki2_get_string_vector_contents(void*, char*);
+uint8_t uzuki2_get_string_vector_contents(void*, char*);
 
 int32_t uzuki2_get_string_vector_length(void*);
 
@@ -229,9 +235,23 @@ PYAPI void py_uzuki2_free_list(void* ptr, int32_t* errcode, char** errmsg) {
     }
 }
 
-PYAPI void py_uzuki2_get_boolean_vector(void* ptr, uint8_t* contents, int32_t* errcode, char** errmsg) {
+PYAPI int32_t py_uzuki2_get_boolean_vector_length(void* ptr, int32_t* errcode, char** errmsg) {
+    int32_t output = 0;
     try {
-        uzuki2_get_boolean_vector(ptr, contents);
+        output = uzuki2_get_boolean_vector_length(ptr);
+    } catch(std::exception& e) {
+        *errcode = 1;
+        *errmsg = copy_error_message(e.what());
+    } catch(...) {
+        *errcode = 1;
+        *errmsg = copy_error_message("unknown C++ exception");
+    }
+    return output;
+}
+
+PYAPI void py_uzuki2_get_boolean_vector_mask(void* ptr, uint8_t* mask, int32_t* errcode, char** errmsg) {
+    try {
+        uzuki2_get_boolean_vector_mask(ptr, mask);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -241,10 +261,10 @@ PYAPI void py_uzuki2_get_boolean_vector(void* ptr, uint8_t* contents, int32_t* e
     }
 }
 
-PYAPI int32_t py_uzuki2_get_boolean_vector_length(void* ptr, int32_t* errcode, char** errmsg) {
-    int32_t output = 0;
+PYAPI uint8_t py_uzuki2_get_boolean_vector_values(void* ptr, uint8_t* contents, int32_t* errcode, char** errmsg) {
+    uint8_t output = 0;
     try {
-        output = uzuki2_get_boolean_vector_length(ptr);
+        output = uzuki2_get_boolean_vector_values(ptr, contents);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -269,18 +289,6 @@ PYAPI int32_t py_uzuki2_get_external_index(void* ptr, int32_t* errcode, char** e
     return output;
 }
 
-PYAPI void py_uzuki2_get_integer_vector(void* ptr, int32_t* contents, int32_t* errcode, char** errmsg) {
-    try {
-        uzuki2_get_integer_vector(ptr, contents);
-    } catch(std::exception& e) {
-        *errcode = 1;
-        *errmsg = copy_error_message(e.what());
-    } catch(...) {
-        *errcode = 1;
-        *errmsg = copy_error_message("unknown C++ exception");
-    }
-}
-
 PYAPI int32_t py_uzuki2_get_integer_vector_length(void* ptr, int32_t* errcode, char** errmsg) {
     int32_t output = 0;
     try {
@@ -295,9 +303,9 @@ PYAPI int32_t py_uzuki2_get_integer_vector_length(void* ptr, int32_t* errcode, c
     return output;
 }
 
-PYAPI void py_uzuki2_get_list_element(void* ptr, int32_t i, int32_t* errcode, char** errmsg) {
+PYAPI void py_uzuki2_get_integer_vector_mask(void* ptr, uint8_t* mask, int32_t* errcode, char** errmsg) {
     try {
-        uzuki2_get_list_element(ptr, i);
+        uzuki2_get_integer_vector_mask(ptr, mask);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -307,9 +315,10 @@ PYAPI void py_uzuki2_get_list_element(void* ptr, int32_t i, int32_t* errcode, ch
     }
 }
 
-PYAPI void py_uzuki2_get_list_length(void* ptr, int32_t* errcode, char** errmsg) {
+PYAPI uint8_t py_uzuki2_get_integer_vector_values(void* ptr, int32_t* contents, int32_t* errcode, char** errmsg) {
+    uint8_t output = 0;
     try {
-        uzuki2_get_list_length(ptr);
+        output = uzuki2_get_integer_vector_values(ptr, contents);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -317,6 +326,35 @@ PYAPI void py_uzuki2_get_list_length(void* ptr, int32_t* errcode, char** errmsg)
         *errcode = 1;
         *errmsg = copy_error_message("unknown C++ exception");
     }
+    return output;
+}
+
+PYAPI void* py_uzuki2_get_list_element(void* ptr, int32_t i, int32_t* errcode, char** errmsg) {
+    void* output = NULL;
+    try {
+        output = uzuki2_get_list_element(ptr, i);
+    } catch(std::exception& e) {
+        *errcode = 1;
+        *errmsg = copy_error_message(e.what());
+    } catch(...) {
+        *errcode = 1;
+        *errmsg = copy_error_message("unknown C++ exception");
+    }
+    return output;
+}
+
+PYAPI int32_t py_uzuki2_get_list_length(void* ptr, int32_t* errcode, char** errmsg) {
+    int32_t output = 0;
+    try {
+        output = uzuki2_get_list_length(ptr);
+    } catch(std::exception& e) {
+        *errcode = 1;
+        *errmsg = copy_error_message(e.what());
+    } catch(...) {
+        *errcode = 1;
+        *errmsg = copy_error_message("unknown C++ exception");
+    }
+    return output;
 }
 
 PYAPI uint8_t py_uzuki2_get_list_named(void* ptr, int32_t* errcode, char** errmsg) {
@@ -333,9 +371,9 @@ PYAPI uint8_t py_uzuki2_get_list_named(void* ptr, int32_t* errcode, char** errms
     return output;
 }
 
-PYAPI void py_uzuki2_get_list_names_contents(void* ptr, int32_t* lengths, int32_t* errcode, char** errmsg) {
+PYAPI void py_uzuki2_get_list_names_contents(void* ptr, char* contents, int32_t* errcode, char** errmsg) {
     try {
-        uzuki2_get_list_names_contents(ptr, lengths);
+        uzuki2_get_list_names_contents(ptr, contents);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -373,9 +411,23 @@ PYAPI int32_t py_uzuki2_get_node_type(void* ptr, int32_t* errcode, char** errmsg
     return output;
 }
 
-PYAPI void py_uzuki2_get_numeric_vector(void* ptr, int32_t* contents, int32_t* errcode, char** errmsg) {
+PYAPI int32_t py_uzuki2_get_number_vector_length(void* ptr, int32_t* errcode, char** errmsg) {
+    int32_t output = 0;
     try {
-        uzuki2_get_numeric_vector(ptr, contents);
+        output = uzuki2_get_number_vector_length(ptr);
+    } catch(std::exception& e) {
+        *errcode = 1;
+        *errmsg = copy_error_message(e.what());
+    } catch(...) {
+        *errcode = 1;
+        *errmsg = copy_error_message("unknown C++ exception");
+    }
+    return output;
+}
+
+PYAPI void py_uzuki2_get_number_vector_mask(void* ptr, uint8_t* mask, int32_t* errcode, char** errmsg) {
+    try {
+        uzuki2_get_number_vector_mask(ptr, mask);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -385,10 +437,10 @@ PYAPI void py_uzuki2_get_numeric_vector(void* ptr, int32_t* contents, int32_t* e
     }
 }
 
-PYAPI int32_t py_uzuki2_get_numeric_vector_length(void* ptr, int32_t* errcode, char** errmsg) {
-    int32_t output = 0;
+PYAPI uint8_t py_uzuki2_get_number_vector_values(void* ptr, double* contents, int32_t* errcode, char** errmsg) {
+    uint8_t output = 0;
     try {
-        output = uzuki2_get_numeric_vector_length(ptr);
+        output = uzuki2_get_number_vector_values(ptr, contents);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -413,9 +465,10 @@ PYAPI void* py_uzuki2_get_parent_node(void* ptr, int32_t* errcode, char** errmsg
     return output;
 }
 
-PYAPI void py_uzuki2_get_string_vector_contents(void* ptr, char* contents, int32_t* errcode, char** errmsg) {
+PYAPI uint8_t py_uzuki2_get_string_vector_contents(void* ptr, char* contents, int32_t* errcode, char** errmsg) {
+    uint8_t output = 0;
     try {
-        uzuki2_get_string_vector_contents(ptr, contents);
+        output = uzuki2_get_string_vector_contents(ptr, contents);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -423,6 +476,7 @@ PYAPI void py_uzuki2_get_string_vector_contents(void* ptr, char* contents, int32
         *errcode = 1;
         *errmsg = copy_error_message("unknown C++ exception");
     }
+    return output;
 }
 
 PYAPI int32_t py_uzuki2_get_string_vector_length(void* ptr, int32_t* errcode, char** errmsg) {
