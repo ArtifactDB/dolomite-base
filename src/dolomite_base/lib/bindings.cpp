@@ -37,6 +37,8 @@ void* load_csv(const char*);
 
 void validate_csv(const char*);
 
+void validate_list_json(const char*, int32_t);
+
 extern "C" {
 
 PYAPI void free_error_message(char** msg) {
@@ -166,6 +168,18 @@ PYAPI void* py_load_csv(const char* path, int32_t* errcode, char** errmsg) {
 PYAPI void py_validate_csv(const char* path, int32_t* errcode, char** errmsg) {
     try {
         validate_csv(path);
+    } catch(std::exception& e) {
+        *errcode = 1;
+        *errmsg = copy_error_message(e.what());
+    } catch(...) {
+        *errcode = 1;
+        *errmsg = copy_error_message("unknown C++ exception");
+    }
+}
+
+PYAPI void py_validate_list_json(const char* path, int32_t n, int32_t* errcode, char** errmsg) {
+    try {
+        validate_list_json(path, n);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());

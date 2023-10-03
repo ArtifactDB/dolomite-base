@@ -35,5 +35,8 @@ fetch_simple() {
 fetch_simple comservatory https://github.com/ArtifactDB/comservatory v1.0.0
 transplant_headers comservatory/include/comservatory
 
-fetch_simple uzuki2 https://github.com/ArtifactDB/uzuki2 v1.1.0
+fetch_simple millijson https://github.com/LTLA/millijson v1.0.0
+transplant_headers millijson/include/millijson
+
+fetch_simple uzuki2 https://github.com/ArtifactDB/uzuki2 v1.1.1
 transplant_headers uzuki2/include/uzuki2

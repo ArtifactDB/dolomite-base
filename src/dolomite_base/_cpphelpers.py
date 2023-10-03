@@ -127,6 +127,14 @@ lib.py_validate_csv.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
+lib.py_validate_list_json.restype = None
+lib.py_validate_list_json.argtypes = [
+    ct.c_char_p,
+    ct.c_int32,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
 def fetch_csv_booleans(ptr, column, contents, pop):
     return _catch_errors(lib.py_fetch_csv_booleans)(ptr, column, _np2ct(contents, np.uint8), pop)
 
@@ -156,3 +164,6 @@ def load_csv(path):
 
 def validate_csv(path):
     return _catch_errors(lib.py_validate_csv)(path)
+
+def validate_list_json(path, n):
+    return _catch_errors(lib.py_validate_list_json)(path, n)
