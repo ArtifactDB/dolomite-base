@@ -38,7 +38,7 @@ jobs:
           wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.2/bin/unix/hdf5-1.12.2-Std-centos7_64-8.3.0.tar.gz -O bundle.tar.gz
           tar -xvf bundle.tar.gz
           cd hdf
-          ./HDF5-1.12.2-Linux.sh
+          ./HDF5-1.12.2-Linux.sh --skip-license
 
       - name: Configure CMake
         run: cmake -S lib -B build_temp -DCMAKE_BUILD_TYPE=Release -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$(pwd)/src/dolomite_base -DHDF5_USE_STATIC_LIBRARIES=ON
