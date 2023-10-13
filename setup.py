@@ -8,6 +8,7 @@
 """
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext as build_ext_orig
+from setuptools.command.install import install as install_orig
 from glob import glob
 import pathlib
 import os
@@ -42,6 +43,11 @@ class build_ext(build_ext_orig):
 
         os.chdir(str(cwd))
 
+# Make sure everything is copied in.
+class install(install_orig):
+    def run(self):
+        self.run_command("build_ext")
+        return install_orig.run(self)
 
 if __name__ == "__main__":
     import os
@@ -49,7 +55,10 @@ if __name__ == "__main__":
         setup(
             use_scm_version={"version_scheme": "no-guess-dev"},
             ext_modules=[CMakeExtension("lib")],
-            cmdclass={'build_ext': build_ext}
+            cmdclass={
+                'build_ext': build_ext,
+                'install': install,
+            }
         )
     except:  # noqa
         print(
