@@ -55,3 +55,4 @@ MANIFEST
 
 # Other stuff
 lib/build/
+src/dolomite_base/_core.*

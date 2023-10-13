@@ -22,14 +22,13 @@ class build_ext(build_ext_orig):
     def run(self):
         for ext in self.extensions:
             self.build_cmake(ext)
-        super().run()
 
     def build_cmake(self, ext):
         cwd = pathlib.Path().absolute()
         os.chdir(ext.name)
         if not os.path.exists("build"):
             self.spawn([
-                'cmake'
+                'cmake',
                 "-S", ".",
                 "-B", "build",
                 "-DCMAKE_BUILD_TYPE=Release"
