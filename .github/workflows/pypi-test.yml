@@ -62,7 +62,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-11] # at some point get this to work on windows-2019
+        os: [ubuntu-latest, macos-latest] # at some point get this to work on windows
 
     steps:
       - uses: actions/checkout@v3
@@ -70,7 +70,7 @@ jobs:
           submodules: true
 
       - name: Set up HDF5
-        if: matrix.os == 'macos-11'
+        if: matrix.os == 'macos-latest'
         run: brew install hdf5
 
       - name: Build wheels
@@ -79,7 +79,7 @@ jobs:
           CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_ARCHS_LINUX: x86_64 # remove this later so we build for all linux archs
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
-          CIBW_BEFORE_BUILD_LINUX: "sudo yum install hdf5-devel"
+          CIBW_BEFORE_BUILD_LINUX: "yum install hdf5-devel"
 
       - uses: actions/upload-artifact@v3
         with:
