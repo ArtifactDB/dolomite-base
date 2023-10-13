@@ -25,7 +25,7 @@ FetchContent_MakeAvailable(byteme)
 FetchContent_Declare(
   uzuki2
   GIT_REPOSITORY https://github.com/ArtifactDB/uzuki2
-  GIT_TAG v1.1.0
+  GIT_TAG v1.1.3
 )
 FetchContent_MakeAvailable(uzuki2)
 

@@ -214,7 +214,7 @@ struct DefaultExternals {
     size_t number;
 };
 
-/** Inspector methods. **/
+/** General methods. **/
 
 //[[export]]
 void* load_list_json(const char* path, int32_t n) {
@@ -225,6 +225,17 @@ void* load_list_json(const char* path, int32_t n) {
 //[[export]]
 void validate_list_json(const char* path, int32_t n) {
     uzuki2::json::validate_file(path, n);
+}
+
+//[[export]]
+void* load_list_hdf5(const char* path, const char* name, int32_t n) {
+    auto parsed = uzuki2::hdf5::parse<DefaultProvisioner>(path, name, DefaultExternals(n));
+    return new uzuki2::ParsedList(std::move(parsed));
+}
+
+//[[export]]
+void validate_list_hdf5(const char* path, const char* name, int32_t n) {
+    uzuki2::hdf5::validate(path, name, n);
 }
 
 //[[export]]
