@@ -35,7 +35,7 @@ jobs:
 
       - name: Set up HDF5
         run: | 
-          wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.2/bin/unix/hdf5-1.12.2-Std-centos7_64-8.3.0.tar.gz -o bundle.tar.gz
+          wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.2/bin/unix/hdf5-1.12.2-Std-centos7_64-8.3.0.tar.gz -O bundle.tar.gz
           tar -xvf bundle.tar.gz
           cd hdf
           ./HDF5-1.12.2-Linux.sh
