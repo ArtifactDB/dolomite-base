@@ -53,3 +53,9 @@ set_target_properties(dolomite_base PROPERTIES
     OUTPUT_NAME _core 
     PREFIX ""
 )
+
+if (HDF5_USE_STATIC_LIBRARIES)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+    find_library(SZIP NAMES sz szip)
+    target_link_libraries(${TARGET} ${SZIP})
+endif()

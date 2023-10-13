@@ -26,13 +26,12 @@ class build_ext(build_ext_orig):
     def build_cmake(self, ext):
         cwd = pathlib.Path().absolute()
         os.chdir(ext.name)
+
         if not os.path.exists("build"):
-            self.spawn([
-                'cmake',
-                "-S", ".",
-                "-B", "build",
-                "-DCMAKE_BUILD_TYPE=Release"
-            ])
+            cmd = [ "cmake", "-S", ".", "-B", "build", "-DCMAKE_BUILD_TYPE=Release" ]
+            if "BINARY_BUILD" in os.environ and os.environ["BINARY_BUILD"] == "1":
+                cmd.append("-DHDF5_USE_STATIC_LIBRARIES=ON")
+            self.spawn(cmd)
 
         if not self.dry_run:
             self.spawn(['cmake', '--build', 'build'])
