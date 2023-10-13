@@ -8,7 +8,6 @@
 """
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext as build_ext_orig
-from setuptools.command.build_py import build_py as build_py_orig 
 from glob import glob
 import pathlib
 import os
@@ -26,38 +25,26 @@ class build_ext(build_ext_orig):
 
     def build_cmake(self, ext):
         cwd = pathlib.Path().absolute()
-        os.chdir(ext.name)
+        build_temp = pathlib.Path(self.build_temp)
+        build_lib = pathlib.Path(self.build_lib)
 
-        if not os.path.exists("build"):
-            cmd = [ "cmake", "-S", ".", "-B", "build", "-DCMAKE_BUILD_TYPE=Release" ]
+        if not os.path.exists(build_temp):
+            cmd = [ "cmake", "-S", os.path.join(cwd, "lib"), "-B", build_temp, "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + os.path.join(build_lib.absolute(), ext.name) ]
             if "BINARY_BUILD" in os.environ and os.environ["BINARY_BUILD"] == "1":
                 cmd.append("-DHDF5_USE_STATIC_LIBRARIES=ON")
             self.spawn(cmd)
 
         if not self.dry_run:
-            self.spawn(['cmake', '--build', 'build'])
-            for x in os.listdir("build"):
-                if x.startswith('_core'):
-                    shutil.copyfile(os.path.join("build", x), os.path.join(cwd, "src/dolomite_base", x))
-                    break
-
-        os.chdir(str(cwd))
-
-# Make sure everything is copied in.
-class build_py(build_py_orig):
-    def run(self):
-        self.run_command("build_ext")
-        return build_py_orig.run(self)
+            self.spawn(['cmake', '--build', build_temp])
 
 if __name__ == "__main__":
     import os
     try:
         setup(
             use_scm_version={"version_scheme": "no-guess-dev"},
-            ext_modules=[CMakeExtension("lib")],
+            ext_modules=[CMakeExtension("dolomite_base")],
             cmdclass={
-                'build_ext': build_ext,
-                'build_py': build_py,
+                'build_ext': build_ext
             }
         )
     except:  # noqa
