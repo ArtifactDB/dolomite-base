@@ -7,8 +7,42 @@
     Learn more under: https://pyscaffold.org/
 """
 from setuptools import setup, Extension
-import assorthead
+from setuptools.command.build_ext import build_ext as build_ext_orig
 from glob import glob
+import pathlib
+import os
+import shutil
+
+## Adapted from https://stackoverflow.com/questions/42585210/extending-setuptools-extension-to-use-cmake-in-setup-py.
+class CMakeExtension(Extension):
+    def __init__(self, name):
+        super().__init__(name, sources=[])
+
+class build_ext(build_ext_orig):
+    def run(self):
+        for ext in self.extensions:
+            self.build_cmake(ext)
+        super().run()
+
+    def build_cmake(self, ext):
+        cwd = pathlib.Path().absolute()
+        os.chdir(ext.name)
+        if not os.path.exists("build"):
+            self.spawn([
+                'cmake'
+                "-S", ".",
+                "-B", "build",
+                "-DCMAKE_BUILD_TYPE=Release"
+            ])
+
+        if not self.dry_run:
+            self.spawn(['cmake', '--build', 'build'])
+            for x in os.listdir("build"):
+                if x.startswith('_core'):
+                    shutil.copyfile(os.path.join("build", x), os.path.join(cwd, "src/dolomite_base", x))
+                    break
+
+        os.chdir(str(cwd))
 
 
 if __name__ == "__main__":
@@ -16,23 +50,8 @@ if __name__ == "__main__":
     try:
         setup(
             use_scm_version={"version_scheme": "no-guess-dev"},
-            ext_modules=[
-                Extension(
-                    "dolomite_base._core",
-                    sorted(glob("src/dolomite_base/lib/*.cpp")),
-                    include_dirs=[
-                        assorthead.includes(),
-                        "src/dolomite_base/include"
-                    ],
-                    language="c++",
-                    extra_compile_args=[
-                        "-std=c++17",
-                    ],
-                    extra_link_args=[
-                        "-lz"
-                    ],
-                )
-            ]
+            ext_modules=[CMakeExtension("lib")],
+            cmdclass={'build_ext': build_ext}
         )
     except:  # noqa
         print(
