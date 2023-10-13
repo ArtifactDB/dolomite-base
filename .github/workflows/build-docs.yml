@@ -21,9 +21,6 @@ jobs:
           python-version: 3.9
           cache: 'pip'
 
-      - name: Set up CMake
-        uses: lukka/get-cmake@latest
-
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
 
