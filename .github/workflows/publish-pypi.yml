@@ -9,7 +9,7 @@ on:
   pull_request:
 
 jobs:
-  build_wheels_linux:
+  build_linux_wheels:
     name: Build Linux wheels
     #if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
@@ -71,7 +71,7 @@ jobs:
           path: dist/*.tar.gz
 
   upload_pypi:
-    needs: [build_wheels, build_sdist]
+    needs: [build_linux_wheels, build_sdist]
     runs-on: ubuntu-latest
     # upload to PyPI on every tag starting with 'v'
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
