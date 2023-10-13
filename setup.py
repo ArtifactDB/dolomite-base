@@ -29,7 +29,13 @@ class build_ext(build_ext_orig):
         build_lib = pathlib.Path(self.build_lib)
 
         if not os.path.exists(build_temp):
-            cmd = [ "cmake", "-S", os.path.join(cwd, "lib"), "-B", build_temp, "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + os.path.join(build_lib.absolute(), ext.name) ]
+            cmd = [ 
+                "cmake", 
+                "-S", os.path.join(cwd, "lib"), 
+                "-B", build_temp, 
+                "-DCMAKE_BUILD_TYPE=Release", 
+                "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + os.path.join(build_lib.absolute(), ext.name) 
+            ]
             if "BINARY_BUILD" in os.environ and os.environ["BINARY_BUILD"] == "1":
                 cmd.append("-DHDF5_USE_STATIC_LIBRARIES=ON")
             self.spawn(cmd)

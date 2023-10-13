@@ -69,7 +69,7 @@ jobs:
         with:
           submodules: true
 
-      - name: Set up HDF5
+      - name: Set up HDF5 (for MacOS)
         if: matrix.os == 'macos-latest'
         run: brew install hdf5
 
@@ -80,6 +80,7 @@ jobs:
           CIBW_ARCHS_LINUX: x86_64 # remove this later so we build for all linux archs
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
           CIBW_BEFORE_BUILD_LINUX: "yum install hdf5-devel"
+          CIBW_ENVIRONMENT: "BINARY_BUILD=1"
 
       - uses: actions/upload-artifact@v3
         with:
