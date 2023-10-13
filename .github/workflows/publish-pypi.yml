@@ -33,11 +33,6 @@ jobs:
       - name: Set up CMake
         uses: lukka/get-cmake@latest
 
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-        with:
-          key: pypi-linuxbuild-${{ matrix.arch }}
-
       - name: Configure CMake
         run: cmake -S lib -B build_temp -DCMAKE_BUILD_TYPE=Release -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$(pwd)/src/dolomite_base -DHDF5_USE_STATIC_LIBRARIES=ON
 
