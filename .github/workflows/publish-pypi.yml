@@ -9,8 +9,8 @@ on:
   pull_request:
 
 jobs:
-  build_manylinux_x86_64:
-    name: Build manylinux (x86_64)
+  build_lib_manylinux_x86_64:
+    name: Build library for manylinux (x86_64)
     runs-on: ubuntu-latest
     container:
       image: quay.io/pypa/manylinux2014_x86_64
@@ -36,10 +36,28 @@ jobs:
                 -DCMAKE_BUILD_TYPE=Release \
                 -DHDF5_USE_STATIC_LIBRARIES=ON \
                 -DCMAKE_PREFIX_PATH=$(pwd)/manylinux_x86_64/HDF_Group/HDF5/1.12.2 \
-                -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$(pwd)/src/dolomite_base
+                -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$(pwd)
 
       - name: Run CMake
         run: cmake --build build_temp
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: manylinux_x86_64
+          path: _core.*
+
+  build_wheel_manylinux_x86_64:
+    name: Build wheel for manylinux (x86_64)
+    needs: [ build_lib_manylinux_x86_64 ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: manylinux_x86_64
+          path: src/dolomite_base/
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
@@ -68,7 +86,7 @@ jobs:
           path: dist/*.tar.gz
 
   upload_pypi:
-    needs: [build_manylinux_x86_64, build_sdist]
+    needs: [build_wheel_manylinux_x86_64, build_sdist]
     runs-on: ubuntu-latest
     # upload to PyPI on every tag starting with 'v'
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
