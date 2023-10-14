@@ -9,19 +9,11 @@ on:
   pull_request:
 
 jobs:
-  build_linux_wheels:
-    name: Build Linux wheels
-    #if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+  build_manylinux_x86_64:
+    name: Build manylinux (x86_64)
     runs-on: ubuntu-latest
     container:
-      image: ${{ matrix.image }}
-    strategy:
-      matrix:
-        include:
-          - image: quay.io/pypa/manylinux2014_x86_64
-            arch: "x86_64"
-#          - image: quay.io/pypa/manylinux2014_aarch64
-#            arch: "arm64"
+      image: quay.io/pypa/manylinux2014_x86_64
 
     steps:
       - name: Check out repository
@@ -33,15 +25,18 @@ jobs:
       - name: Install wget
         run: yum install -y wget
 
-      - name: Set up HDF5
-        run: | 
-          wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.2/bin/unix/hdf5-1.12.2-Std-centos7_64-8.3.0.tar.gz -O bundle.tar.gz
-          tar -xvf bundle.tar.gz
-          cd hdf
-          ./HDF5-1.12.2-Linux.sh --skip-license
+      - name: Download HDF5
+        run: |
+            wget https://github.com/ArtifactDB/prebuilt-hdf5/releases/download/0.0.1/manylinux_x86_64.tar.gz
+            tar -xvf manylinux_x86_64.tar.gz
 
       - name: Configure CMake
-        run: cmake -S lib -B build_temp -DCMAKE_BUILD_TYPE=Release -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$(pwd)/src/dolomite_base -DHDF5_USE_STATIC_LIBRARIES=ON
+        run: |
+            cmake -S lib -B build_temp \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DHDF5_USE_STATIC_LIBRARIES=ON \
+                -DCMAKE_PREFIX_PATH=$(pwd)/manylinux_x86_64/HDF_Group/HDF5/1.12.2 \
+                -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=$(pwd)/src/dolomite_base
 
       - name: Run CMake
         run: cmake --build build_temp
@@ -49,7 +44,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.12.1
         env:
-          CIBW_ARCHS_LINUX: ${{ matrix.arch }}
+          CIBW_BUILD: "*-manylinux_x86_64"
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
           CIBW_ENVIRONMENT: "PREBUILT_LIBRARY=1"
 
@@ -73,7 +68,7 @@ jobs:
           path: dist/*.tar.gz
 
   upload_pypi:
-    needs: [build_linux_wheels, build_sdist]
+    needs: [build_manylinux_x86_64, build_sdist]
     runs-on: ubuntu-latest
     # upload to PyPI on every tag starting with 'v'
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
