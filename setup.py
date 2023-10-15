@@ -26,20 +26,19 @@ class build_ext(build_ext_orig):
     def build_cmake(self, ext):
         build_temp = pathlib.Path(self.build_temp)
 
-        if "PREBUILT_LIBRARY" not in os.environ:
-            if not os.path.exists(build_temp):
-                build_lib = pathlib.Path(self.build_lib)
-                cmd = [ 
-                    "cmake", 
-                    "-S", "lib",
-                    "-B", build_temp, 
-                    "-DCMAKE_BUILD_TYPE=Release", 
-                    "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + os.path.join(build_lib.absolute(), ext.name) 
-                ]
-                self.spawn(cmd)
+        if not os.path.exists(build_temp):
+            build_lib = pathlib.Path(self.build_lib)
+            cmd = [ 
+                "cmake", 
+                "-S", "lib",
+                "-B", build_temp, 
+                "-DCMAKE_BUILD_TYPE=Release", 
+                "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + os.path.join(build_lib.absolute(), ext.name) 
+            ]
+            self.spawn(cmd)
 
-            if not self.dry_run:
-                self.spawn(['cmake', '--build', build_temp])
+        if not self.dry_run:
+            self.spawn(['cmake', '--build', build_temp])
 
 if __name__ == "__main__":
     import os

@@ -49,7 +49,7 @@ set_property(TARGET ${TARGET} PROPERTY CXX_STANDARD 17)
 
 target_link_libraries(${TARGET} uzuki2 comservatory)
 
-set_target_properties(dolomite_base PROPERTIES 
+set_target_properties(${TARGET} PROPERTIES 
     OUTPUT_NAME _core 
     PREFIX ""
 )
