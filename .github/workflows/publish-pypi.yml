@@ -52,29 +52,29 @@ jobs:
         with:
           path: ./wheelhouse/*.whl
 
-#  build_macosx_arm64:
-#    name: Build wheels for macosx arm64
-#    runs-on: macos-13
-#    steps:
-#      - name: Check out repository
-#        uses: actions/checkout@v3
-#
-#      - name: Grab prebuilt dependencies
-#        run: |
-#            curl -L https://github.com/ArtifactDB/prebuilt-hdf5/releases/download/0.0.4-manual/macosx_arm64.tar.gz > bundle.tar.gz
-#            tar -xvf bundle.tar.gz
-#
-#      - name: Build wheels
-#        uses: pypa/cibuildwheel@v2.16.2
-#        env:
-#          CIBW_ARCHS: arm64
-#          CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
-#          CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed -DCMAKE_OSX_ARCHITECTURES=arm64\""
-#          CIBW_BUILD_VERBOSITY: 3
-#
-#      - uses: actions/upload-artifact@v3
-#        with:
-#          path: ./wheelhouse/*.whl
+  build_macosx_arm64:
+    name: Build wheels for macosx arm64
+    runs-on: macos-13
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Grab prebuilt dependencies
+        run: |
+            curl -L https://github.com/ArtifactDB/prebuilt-hdf5/releases/download/0.0.4-manual/macosx_arm64.tar.gz > bundle.tar.gz
+            tar -xvf bundle.tar.gz
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.16.2
+        env:
+          CIBW_ARCHS: arm64
+          CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
+          CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed -DCMAKE_OSX_ARCHITECTURES=arm64\""
+          CIBW_BUILD_VERBOSITY: 3
+
+      - uses: actions/upload-artifact@v3
+        with:
+          path: ./wheelhouse/*.whl
 
 #  build_windows_x86_64:
 #    name: Build wheels for windows x86_64
