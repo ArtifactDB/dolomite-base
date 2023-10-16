@@ -45,7 +45,8 @@ jobs:
         env:
           CIBW_ARCHS: x86_64
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
-          CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed\""
+          CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed -DCMAKE_OSX_ARCHITECTURES=x86_64\""
+          CIBW_BUILD_VERBOSITY: 3
 
       - uses: actions/upload-artifact@v3
         with:
@@ -68,7 +69,8 @@ jobs:
         env:
           CIBW_ARCHS: arm64
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
-          CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed\""
+          CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed -DCMAKE_OSX_ARCHITECTURES=arm64\""
+          CIBW_BUILD_VERBOSITY: 3
 
       - uses: actions/upload-artifact@v3
         with:
