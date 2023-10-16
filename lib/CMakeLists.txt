@@ -53,3 +53,7 @@ set_target_properties(${TARGET} PROPERTIES
     OUTPUT_NAME _core 
     PREFIX ""
 )
+
+if(MSVC)
+    target_compile_definitions(${TARGET} PRIVATE H5_BUILT_AS_DYNAMIC_LIB=1)
+endif()
