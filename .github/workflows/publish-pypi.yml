@@ -23,6 +23,8 @@ jobs:
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
           CIBW_MANYLINUX_X86_64_IMAGE: ghcr.io/artifactdb/prebuilt-hdf5/manylinux_x86_64:0.0.4
           CIBW_MUSLLINUX_X86_64_IMAGE: ghcr.io/artifactdb/prebuilt-hdf5/musllinux_x86_64:0.0.4
+          CIBW_TEST_EXTRAS: testing
+          CIBW_TEST_COMMAND: "pytest {package}/tests"
 
       - uses: actions/upload-artifact@v3
         with:
@@ -46,6 +48,8 @@ jobs:
           CIBW_ARCHS: x86_64
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
           CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed\""
+          CIBW_TEST_EXTRAS: testing
+          CIBW_TEST_COMMAND: "pytest {package}/tests"
 
       - uses: actions/upload-artifact@v3
         with:
@@ -78,6 +82,8 @@ jobs:
           CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}\""
           CIBW_BEFORE_BUILD_WINDOWS: "pip install delvewheel"
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel}"
+          CIBW_TEST_EXTRAS: testing
+          CIBW_TEST_COMMAND: "pytest {package}/tests"
 
       - uses: actions/upload-artifact@v3
         with:
