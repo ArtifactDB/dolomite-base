@@ -49,7 +49,8 @@ class build_ext(build_ext_orig):
             self.spawn(cmd)
             if os.name == "nt": 
                 # Gave up trying to get MSVC to respect the output directory.
-                shutil.copy(os.path.join(build_temp, "Release", "_core.dll"), outpath)
+                # Delvewheel also needs it to have a 'pyd' suffix... whatever.
+                shutil.copyfile(os.path.join(build_temp, "Release", "_core.dll"), os.path.join(outpath, "_core.pyd"))
 
 if __name__ == "__main__":
     import os
