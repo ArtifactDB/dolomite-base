@@ -32,10 +32,6 @@ jobs:
           DOCDEPENDENCIES=$(python -c 'with open("docs/requirements.txt") as a: available = list(a); print(" ".join(map(lambda x : x.strip(), filter(lambda x : not x.startswith("#"), available))))')
           pip install ${DOCDEPENDENCIES}
 
-      # Oops, need to pull down headers
-      - name: Pull down headers
-        run: cd extern && ./fetch.sh
-
       # Note that doc building requires the inplace shared library.
       - name: Build docs
         run: |

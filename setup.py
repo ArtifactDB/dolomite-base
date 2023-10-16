@@ -7,32 +7,60 @@
     Learn more under: https://pyscaffold.org/
 """
 from setuptools import setup, Extension
-import assorthead
+from setuptools.command.build_ext import build_ext as build_ext_orig
 from glob import glob
+import pathlib
+import os
+import shutil
 
+## Adapted from https://stackoverflow.com/questions/42585210/extending-setuptools-extension-to-use-cmake-in-setup-py.
+class CMakeExtension(Extension):
+    def __init__(self, name):
+        super().__init__(name, sources=[])
+
+class build_ext(build_ext_orig):
+    def run(self):
+        for ext in self.extensions:
+            self.build_cmake(ext)
+
+    def build_cmake(self, ext):
+        build_temp = pathlib.Path(self.build_temp)
+        build_lib = pathlib.Path(self.build_lib)
+        outpath = os.path.join(build_lib.absolute(), ext.name) 
+
+        if not os.path.exists(build_temp):
+            cmd = [ 
+                "cmake", 
+                "-S", "lib",
+                "-B", build_temp
+            ]
+            if os.name != "nt":
+                cmd.append("-DCMAKE_BUILD_TYPE=Release")
+                cmd.append("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + outpath)
+
+            if "MORE_CMAKE_OPTIONS" in os.environ:
+                cmd += os.environ["MORE_CMAKE_OPTIONS"].split()
+            self.spawn(cmd)
+
+        if not self.dry_run:
+            cmd = ['cmake', '--build', build_temp]
+            if os.name == "nt":
+                cmd += ["--config", "Release"]
+            self.spawn(cmd)
+            if os.name == "nt": 
+                # Gave up trying to get MSVC to respect the output directory.
+                # Delvewheel also needs it to have a 'pyd' suffix... whatever.
+                shutil.copyfile(os.path.join(build_temp, "Release", "_core.dll"), os.path.join(outpath, "_core.pyd"))
 
 if __name__ == "__main__":
     import os
     try:
         setup(
             use_scm_version={"version_scheme": "no-guess-dev"},
-            ext_modules=[
-                Extension(
-                    "dolomite_base._core",
-                    sorted(glob("src/dolomite_base/lib/*.cpp")),
-                    include_dirs=[
-                        assorthead.includes(),
-                        "src/dolomite_base/include"
-                    ],
-                    language="c++",
-                    extra_compile_args=[
-                        "-std=c++17",
-                    ],
-                    extra_link_args=[
-                        "-lz"
-                    ],
-                )
-            ]
+            ext_modules=[CMakeExtension("dolomite_base")],
+            cmdclass={
+                'build_ext': build_ext
+            }
         )
     except:  # noqa
         print(
