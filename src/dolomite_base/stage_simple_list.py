@@ -308,7 +308,7 @@ def _stage_simple_list_recursive(x, externals, handle):
                     if handle is None:
                         return { "type": "boolean", "values": None if np.ma.is_masked(x) else bool(x) }
                     else:
-                        missing_placeholder = ut._choose_float_missing_placeholder()
+                        missing_placeholder = ut._choose_boolean_missing_placeholder()
                         _stage_scalar_hdf5(handle, x=missing_placeholder, dtype=bool, missing_placeholder=missing_placeholder)
                         return
                 else:

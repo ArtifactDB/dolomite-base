@@ -54,19 +54,19 @@ def _choose_integer_missing_placeholder(x: Sequence) -> Union[numpy.int32, None]
 
 
 def _fill_integer_missing_placeholder(x : numpy.ma.array, placeholder: numpy.int32) -> numpy.ndarray:
-    copy = y.astype(np.int32)
+    copy = x.astype(numpy.int32)
     copy.fill_value = placeholder
     return copy.data
 
 
-def _choose_float_missing_placeholder(x: Sequence) -> numpy.float64:
-    store = numpy.ndarray(1, dtypes=numpy.float64)
-    lib.extract_r_missing(store)
+def _choose_float_missing_placeholder() -> numpy.float64:
+    store = numpy.ndarray(1, dtype=numpy.float64)
+    lib.extract_r_missing_double(store)
     return store[0]
 
 
 def _fill_float_missing_placeholder(x: numpy.ma.array, placeholder: numpy.float64) -> numpy.ndarray:
-    copy = y.astype(np.float64)
+    copy = x.astype(numpy.float64)
     copy.fill_value = placeholder
     return copy.data
 
@@ -76,6 +76,6 @@ def _choose_boolean_missing_placeholder() -> numpy.int8:
 
 
 def _fill_boolean_missing_placeholder(x : numpy.ma.array, placeholder: numpy.int8) -> numpy.ndarray:
-    copy = y.astype(np.int8)
+    copy = x.astype(numpy.int8)
     copy.fill_value = _choose_boolean_missing_placeholder()
     return copy.data
