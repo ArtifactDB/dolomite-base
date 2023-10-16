@@ -47,9 +47,9 @@ class build_ext(build_ext_orig):
             if os.name == "nt":
                 cmd += ["--config", "Release"]
             self.spawn(cmd)
-            if os.name == "nt": 
+            if os.name == "nt" and "LIBRARY_OUTPUT_DIR" in os.environ:
                 # Gave up trying to get MSVC to respect the output directory.
-                shutil.copy(os.path.join(build_temp, "Release", "_core.dll"), outpath)
+                shutil.copy(os.path.join(build_temp, "Release", "_core.dll"), os.environ["LIBRARY_OUTPUT_DIR"])
 
 if __name__ == "__main__":
     import os
