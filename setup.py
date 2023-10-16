@@ -41,9 +41,11 @@ class build_ext(build_ext_orig):
                 cmd.append("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + outpath)
             else:
                 cmd.append("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE=" + outpath)
+                cmd.append("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG=" + outpath)
 
             if "MORE_CMAKE_OPTIONS" in os.environ:
                 cmd += os.environ["MORE_CMAKE_OPTIONS"].split()
+            print(["YAY"] + cmd)
             self.spawn(cmd)
 
         if not self.dry_run:
