@@ -54,7 +54,7 @@ jobs:
 
   build_macosx_arm64:
     name: Build wheels for macosx arm64
-    runs-on: macos-11
+    runs-on: macos-13
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
