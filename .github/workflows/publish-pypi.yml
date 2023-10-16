@@ -67,7 +67,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.2
         env:
-          CIBW_ARCHS: x86_64
+          CIBW_ARCHS: AMD64
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
           CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed\""
 
