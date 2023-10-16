@@ -49,7 +49,7 @@ class build_ext(build_ext_orig):
             self.spawn(cmd)
             if os.name == "nt": 
                 # Gave up trying to get MSVC to respect the output directory.
-                shutil.copyfile(os.path.join(build_temp, "Release", "_core.dll"), outpath)
+                shutil.copy(os.path.join(build_temp, "Release", "_core.dll"), outpath)
 
 if __name__ == "__main__":
     import os
