@@ -25,6 +25,8 @@ class build_ext(build_ext_orig):
 
     def build_cmake(self, ext):
         build_temp = pathlib.Path(self.build_temp)
+        build_lib = pathlib.Path(self.build_lib)
+        outpath = os.path.join(build_lib.absolute(), ext.name) 
 
         if not os.path.exists(build_temp):
             cmd = [ 
@@ -34,18 +36,10 @@ class build_ext(build_ext_orig):
             ]
             if os.name != "nt":
                 cmd.append("-DCMAKE_BUILD_TYPE=Release")
-
-            build_lib = pathlib.Path(self.build_lib)
-            outpath = os.path.join(build_lib.absolute(), ext.name) 
-            if os.name != "nt":
                 cmd.append("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + outpath)
-            else:
-                cmd.append("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE=" + outpath)
-                cmd.append("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG=" + outpath)
 
             if "MORE_CMAKE_OPTIONS" in os.environ:
                 cmd += os.environ["MORE_CMAKE_OPTIONS"].split()
-            print(["YAY"] + cmd)
             self.spawn(cmd)
 
         if not self.dry_run:
@@ -53,6 +47,9 @@ class build_ext(build_ext_orig):
             if os.name == "nt":
                 cmd += ["--config", "Release"]
             self.spawn(cmd)
+            if os.name == "nt": 
+                # Gave up trying to get MSVC to respect the output directory.
+                shutil.copyfile(os.path.join(build_temp, "Release", "_core.dll"), outpath)
 
 if __name__ == "__main__":
     import os
