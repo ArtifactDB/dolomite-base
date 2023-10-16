@@ -32,13 +32,19 @@ class build_ext(build_ext_orig):
                 "cmake", 
                 "-S", "lib",
                 "-B", build_temp, 
-                "-DCMAKE_BUILD_TYPE=Release", 
                 "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + os.path.join(build_lib.absolute(), ext.name) 
             ]
+            if os.name != "nt":
+                cmd.append("-DCMAKE_BUILD_TYPE=Release")
+            if "MORE_CMAKE_OPTIONS" in os.environ:
+                cmd += os.environ["MORE_CMAKE_OPTIONS"].split()
             self.spawn(cmd)
 
         if not self.dry_run:
-            self.spawn(['cmake', '--build', build_temp])
+            cmd = ['cmake', '--build', build_temp]
+            if os.name == "nt":
+                cmd += ["--config", "Release"]
+            self.spawn(cmd)
 
 if __name__ == "__main__":
     import os
