@@ -78,7 +78,7 @@ jobs:
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
           CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}\" VERBOSE=1 LIBRARY_OUTPUT_DIR=${WORK_DIR}"
           CIBW_BEFORE_BUILD_WINDOWS: "pip install delvewheel"
-          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel} --add-dll D:/a/dolomite-base/dolomite-base/_core.dll"
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "delvewheel repair -w {dest_dir} {wheel} --add-dll=${WORK_DIR}/_core.dll"
           CIBW_BUILD_VERBOSITY: 3
 
       - uses: actions/upload-artifact@v3
