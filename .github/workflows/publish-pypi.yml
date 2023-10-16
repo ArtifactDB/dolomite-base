@@ -21,8 +21,8 @@ jobs:
         env:
           CIBW_ARCHS: x86_64
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
-          CIBW_MANYLINUX_X86_64_IMAGE: ghcr.io/artifactdb/prebuilt-hdf5/manylinux_x86_64:0.0.2
-          CIBW_MUSLLINUX_X86_64_IMAGE: ghcr.io/artifactdb/prebuilt-hdf5/musllinux_x86_64:0.0.2
+          CIBW_MANYLINUX_X86_64_IMAGE: ghcr.io/artifactdb/prebuilt-hdf5/manylinux_x86_64:0.0.4
+          CIBW_MUSLLINUX_X86_64_IMAGE: ghcr.io/artifactdb/prebuilt-hdf5/musllinux_x86_64:0.0.4
 
       - uses: actions/upload-artifact@v3
         with:
