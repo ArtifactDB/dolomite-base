@@ -17,6 +17,8 @@ static char* copy_error_message(const char* original) {
     return copy;
 }
 
+void extract_r_missing_double(double*);
+
 uint8_t fetch_csv_booleans(void*, int32_t, uint8_t*);
 
 uint8_t fetch_csv_numbers(void*, int32_t, double*, uint8_t*);
@@ -93,6 +95,18 @@ extern "C" {
 
 PYAPI void free_error_message(char** msg) {
     delete [] *msg;
+}
+
+PYAPI void py_extract_r_missing_double(double* buffer, int32_t* errcode, char** errmsg) {
+    try {
+        extract_r_missing_double(buffer);
+    } catch(std::exception& e) {
+        *errcode = 1;
+        *errmsg = copy_error_message(e.what());
+    } catch(...) {
+        *errcode = 1;
+        *errmsg = copy_error_message("unknown C++ exception");
+    }
 }
 
 PYAPI uint8_t py_fetch_csv_booleans(void* ptr, int32_t column, uint8_t* contents, int32_t* errcode, char** errmsg) {
