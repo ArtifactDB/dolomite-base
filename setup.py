@@ -27,15 +27,21 @@ class build_ext(build_ext_orig):
         build_temp = pathlib.Path(self.build_temp)
 
         if not os.path.exists(build_temp):
-            build_lib = pathlib.Path(self.build_lib)
             cmd = [ 
                 "cmake", 
                 "-S", "lib",
-                "-B", build_temp, 
-                "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + os.path.join(build_lib.absolute(), ext.name) 
+                "-B", build_temp
             ]
             if os.name != "nt":
                 cmd.append("-DCMAKE_BUILD_TYPE=Release")
+
+            build_lib = pathlib.Path(self.build_lib)
+            outpath = os.path.join(build_lib.absolute(), ext.name) 
+            if os.name != "nt":
+                cmd.append("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + outpath)
+            else:
+                cmd.append("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE=" + outpath)
+
             if "MORE_CMAKE_OPTIONS" in os.environ:
                 cmd += os.environ["MORE_CMAKE_OPTIONS"].split()
             self.spawn(cmd)
