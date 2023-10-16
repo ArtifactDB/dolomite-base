@@ -64,12 +64,18 @@ jobs:
             tar -xvf bundle.tar.gz
         shell: bash
 
+      - name: Store path
+        run: |
+            $wd = pwd
+            echo "INSTALL_DIR=$wd\\installed" >> $env:GITHUB_ENV
+        shell: powershell
+
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.2
         env:
           CIBW_ARCHS: AMD64
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
-          CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed\""
+          CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}\""
 
       - uses: actions/upload-artifact@v3
         with:
