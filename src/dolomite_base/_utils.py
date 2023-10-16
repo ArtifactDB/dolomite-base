@@ -28,18 +28,21 @@ def _choose_string_missing_placeholder(x: Sequence[str]) -> str:
     return base
 
 
+LIMIT32 = 2**31
+
+
 def _is_integer_scalar_within_limit(x) -> bool:
-    return x >= 2**-31 and x < 2**31:
+    return x >= -LIMIT32 and x < LIMIT32
 
 
-def _is_integer_vector_within_limit(x) -> bool:
+def _is_integer_vector_within_limit(x: Sequence[int]) -> bool:
     for y in x:
-        if not _is_integer_scalar_within_limit(x):
+        if not _is_integer_scalar_within_limit(y):
             return False
     return True
 
 
-def _fetch_integer_missing_placeholder(x: Sequence) -> Union[numpy.int32, None]:
+def _choose_integer_missing_placeholder(x: Sequence) -> Union[numpy.int32, None]:
     in_use = set(x)
     candidate = -2**31
     maxval = 2**31
@@ -56,7 +59,7 @@ def _fill_integer_missing_placeholder(x : numpy.ma.array, placeholder: numpy.int
     return copy.data
 
 
-def _fetch_float_missing_placeholder(x: Sequence) -> numpy.float64:
+def _choose_float_missing_placeholder(x: Sequence) -> numpy.float64:
     store = numpy.ndarray(1, dtypes=numpy.float64)
     lib.extract_r_missing(store)
     return store[0]
@@ -68,11 +71,11 @@ def _fill_float_missing_placeholder(x: numpy.ma.array, placeholder: numpy.float6
     return copy.data
 
 
-def _fetch_boolean_missing_placeholder() -> numpy.int8:
+def _choose_boolean_missing_placeholder() -> numpy.int8:
     return numpy.int8(-1)
 
 
 def _fill_boolean_missing_placeholder(x : numpy.ma.array, placeholder: numpy.int8) -> numpy.ndarray:
     copy = y.astype(np.int8)
-    copy.fill_value = _fetch_boolean_missing_placeholder()
+    copy.fill_value = _choose_boolean_missing_placeholder()
     return copy.data

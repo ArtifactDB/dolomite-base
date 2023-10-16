@@ -3,7 +3,7 @@ import numpy as np
 from tempfile import mkdtemp
 
 
-def test_json_simple_list_basic():
+def test_simple_list_basic():
     everything = {
         "i_am_a_string": "foo",
         "i_am_a_number": 1.23,
@@ -20,6 +20,8 @@ def test_json_simple_list_basic():
     }
 
     dir = mkdtemp()
+
+    # Stage as JSON.
     meta = dl.stage_object(everything, dir, "foo")
     dl.write_metadata(meta, dir)
 
@@ -36,8 +38,25 @@ def test_json_simple_list_basic():
     assert (everything["i_am_a_dict"]["int"] == roundtrip["i_am_a_dict"]["int"]).all()
     assert (everything["i_am_a_dict"]["bool"] == roundtrip["i_am_a_dict"]["bool"]).all()
 
+    # Stage as HDF5.
+    meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
+    dl.write_metadata(meta, dir)
 
-def test_json_simple_list_masking():
+    roundtrip = dl.load_hdf5_simple_list(meta, dir)
+    assert everything["i_am_a_string"] == roundtrip["i_am_a_string"]
+    assert everything["i_am_a_number"] == roundtrip["i_am_a_number"]
+    assert everything["i_am_a_integer"] == roundtrip["i_am_a_integer"]
+    assert everything["i_am_a_boolean"] == roundtrip["i_am_a_boolean"]
+    assert everything["i_am_a_list"] == roundtrip["i_am_a_list"]
+    assert everything["i_am_nothing"] == roundtrip["i_am_nothing"]
+
+    assert everything["i_am_a_dict"]["string"] == roundtrip["i_am_a_dict"]["string"]
+    assert np.allclose(everything["i_am_a_dict"]["float"], roundtrip["i_am_a_dict"]["float"])
+    assert (everything["i_am_a_dict"]["int"] == roundtrip["i_am_a_dict"]["int"]).all()
+    assert (everything["i_am_a_dict"]["bool"] == roundtrip["i_am_a_dict"]["bool"]).all()
+
+
+def test_simple_list_masking():
     everything = {
         "string": [ None, "b", "c", "d" "e" ],
         "float": np.ma.array(np.random.rand(5), mask=np.array([False, True, False, False, False])),
@@ -56,7 +75,7 @@ def test_json_simple_list_masking():
     assert (everything["bool"] == roundtrip["bool"]).all()
 
 
-def test_json_simple_list_numpy_scalars():
+def test_simple_list_numpy_scalars():
     everything = {
         "float": np.float64(9.9),
         "int": np.int8(10),
@@ -86,7 +105,7 @@ def test_json_simple_list_numpy_scalars():
     assert roundtrip["bool2"] == True 
 
 
-def test_json_simple_list_masked_scalars():
+def test_simple_list_masked_scalars():
     everything = {
         "float": np.ma.array(np.array(-9.9, dtype=np.float64), mask=[True]),
         "int": np.ma.array(np.array(-10, dtype=np.int16), mask=[True]),
