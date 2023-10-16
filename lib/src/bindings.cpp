@@ -17,11 +17,11 @@ static char* copy_error_message(const char* original) {
     return copy;
 }
 
-uint8_t fetch_csv_booleans(void*, int32_t, uint8_t*, uint8_t);
+uint8_t fetch_csv_booleans(void*, int32_t, uint8_t*);
 
-uint8_t fetch_csv_numbers(void*, int32_t, double*, uint8_t*, uint8_t);
+uint8_t fetch_csv_numbers(void*, int32_t, double*, uint8_t*);
 
-void fetch_csv_strings(void*, int32_t, char*, uint8_t);
+void fetch_csv_strings(void*, int32_t, char*);
 
 void free_csv(void*);
 
@@ -34,6 +34,8 @@ int32_t get_csv_num_records(void*);
 uint8_t get_csv_string_stats(void*, int32_t, int32_t*, uint8_t*);
 
 void* load_csv(const char*);
+
+void* load_list_hdf5(const char*, const char*, int32_t);
 
 void* load_list_json(const char*, int32_t);
 
@@ -83,6 +85,8 @@ void uzuki2_get_string_vector_mask(void*, uint8_t*);
 
 void validate_csv(const char*);
 
+void validate_list_hdf5(const char*, const char*, int32_t);
+
 void validate_list_json(const char*, int32_t);
 
 extern "C" {
@@ -91,10 +95,10 @@ PYAPI void free_error_message(char** msg) {
     delete [] *msg;
 }
 
-PYAPI uint8_t py_fetch_csv_booleans(void* ptr, int32_t column, uint8_t* contents, uint8_t pop, int32_t* errcode, char** errmsg) {
+PYAPI uint8_t py_fetch_csv_booleans(void* ptr, int32_t column, uint8_t* contents, int32_t* errcode, char** errmsg) {
     uint8_t output = 0;
     try {
-        output = fetch_csv_booleans(ptr, column, contents, pop);
+        output = fetch_csv_booleans(ptr, column, contents);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -105,10 +109,10 @@ PYAPI uint8_t py_fetch_csv_booleans(void* ptr, int32_t column, uint8_t* contents
     return output;
 }
 
-PYAPI uint8_t py_fetch_csv_numbers(void* ptr, int32_t column, double* contents, uint8_t* mask, uint8_t pop, int32_t* errcode, char** errmsg) {
+PYAPI uint8_t py_fetch_csv_numbers(void* ptr, int32_t column, double* contents, uint8_t* mask, int32_t* errcode, char** errmsg) {
     uint8_t output = 0;
     try {
-        output = fetch_csv_numbers(ptr, column, contents, mask, pop);
+        output = fetch_csv_numbers(ptr, column, contents, mask);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -119,9 +123,9 @@ PYAPI uint8_t py_fetch_csv_numbers(void* ptr, int32_t column, double* contents, 
     return output;
 }
 
-PYAPI void py_fetch_csv_strings(void* ptr, int32_t column, char* contents, uint8_t pop, int32_t* errcode, char** errmsg) {
+PYAPI void py_fetch_csv_strings(void* ptr, int32_t column, char* contents, int32_t* errcode, char** errmsg) {
     try {
-        fetch_csv_strings(ptr, column, contents, pop);
+        fetch_csv_strings(ptr, column, contents);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -201,6 +205,20 @@ PYAPI void* py_load_csv(const char* path, int32_t* errcode, char** errmsg) {
     void* output = NULL;
     try {
         output = load_csv(path);
+    } catch(std::exception& e) {
+        *errcode = 1;
+        *errmsg = copy_error_message(e.what());
+    } catch(...) {
+        *errcode = 1;
+        *errmsg = copy_error_message("unknown C++ exception");
+    }
+    return output;
+}
+
+PYAPI void* py_load_list_hdf5(const char* path, const char* name, int32_t n, int32_t* errcode, char** errmsg) {
+    void* output = NULL;
+    try {
+        output = load_list_hdf5(path, name, n);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
@@ -524,6 +542,18 @@ PYAPI void py_uzuki2_get_string_vector_mask(void* ptr, uint8_t* mask, int32_t* e
 PYAPI void py_validate_csv(const char* path, int32_t* errcode, char** errmsg) {
     try {
         validate_csv(path);
+    } catch(std::exception& e) {
+        *errcode = 1;
+        *errmsg = copy_error_message(e.what());
+    } catch(...) {
+        *errcode = 1;
+        *errmsg = copy_error_message("unknown C++ exception");
+    }
+}
+
+PYAPI void py_validate_list_hdf5(const char* path, const char* name, int32_t n, int32_t* errcode, char** errmsg) {
+    try {
+        validate_list_hdf5(path, name, n);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());

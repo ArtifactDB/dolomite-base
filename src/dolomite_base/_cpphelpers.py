@@ -45,7 +45,6 @@ lib.py_fetch_csv_booleans.argtypes = [
     ct.c_void_p,
     ct.c_int32,
     ct.c_void_p,
-    ct.c_uint8,
     ct.POINTER(ct.c_int32),
     ct.POINTER(ct.c_char_p)
 ]
@@ -56,7 +55,6 @@ lib.py_fetch_csv_numbers.argtypes = [
     ct.c_int32,
     ct.c_void_p,
     ct.c_void_p,
-    ct.c_uint8,
     ct.POINTER(ct.c_int32),
     ct.POINTER(ct.c_char_p)
 ]
@@ -66,7 +64,6 @@ lib.py_fetch_csv_strings.argtypes = [
     ct.c_void_p,
     ct.c_int32,
     ct.c_char_p,
-    ct.c_uint8,
     ct.POINTER(ct.c_int32),
     ct.POINTER(ct.c_char_p)
 ]
@@ -116,6 +113,15 @@ lib.py_get_csv_string_stats.argtypes = [
 lib.py_load_csv.restype = ct.c_void_p
 lib.py_load_csv.argtypes = [
     ct.c_char_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
+lib.py_load_list_hdf5.restype = ct.c_void_p
+lib.py_load_list_hdf5.argtypes = [
+    ct.c_char_p,
+    ct.c_char_p,
+    ct.c_int32,
     ct.POINTER(ct.c_int32),
     ct.POINTER(ct.c_char_p)
 ]
@@ -301,6 +307,15 @@ lib.py_validate_csv.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
+lib.py_validate_list_hdf5.restype = None
+lib.py_validate_list_hdf5.argtypes = [
+    ct.c_char_p,
+    ct.c_char_p,
+    ct.c_int32,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
 lib.py_validate_list_json.restype = None
 lib.py_validate_list_json.argtypes = [
     ct.c_char_p,
@@ -309,14 +324,14 @@ lib.py_validate_list_json.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
-def fetch_csv_booleans(ptr, column, contents, pop):
-    return catch_errors(lib.py_fetch_csv_booleans)(ptr, column, np2ct(contents, np.uint8), pop)
+def fetch_csv_booleans(ptr, column, contents):
+    return catch_errors(lib.py_fetch_csv_booleans)(ptr, column, np2ct(contents, np.uint8))
 
-def fetch_csv_numbers(ptr, column, contents, mask, pop):
-    return catch_errors(lib.py_fetch_csv_numbers)(ptr, column, np2ct(contents, np.float64), np2ct(mask, np.uint8), pop)
+def fetch_csv_numbers(ptr, column, contents, mask):
+    return catch_errors(lib.py_fetch_csv_numbers)(ptr, column, np2ct(contents, np.float64), np2ct(mask, np.uint8))
 
-def fetch_csv_strings(ptr, column, contents, pop):
-    return catch_errors(lib.py_fetch_csv_strings)(ptr, column, contents, pop)
+def fetch_csv_strings(ptr, column, contents):
+    return catch_errors(lib.py_fetch_csv_strings)(ptr, column, contents)
 
 def free_csv(ptr):
     return catch_errors(lib.py_free_csv)(ptr)
@@ -335,6 +350,9 @@ def get_csv_string_stats(ptr, column, lengths, mask):
 
 def load_csv(path):
     return catch_errors(lib.py_load_csv)(path)
+
+def load_list_hdf5(path, name, n):
+    return catch_errors(lib.py_load_list_hdf5)(path, name, n)
 
 def load_list_json(path, n):
     return catch_errors(lib.py_load_list_json)(path, n)
@@ -407,6 +425,9 @@ def uzuki2_get_string_vector_mask(ptr, mask):
 
 def validate_csv(path):
     return catch_errors(lib.py_validate_csv)(path)
+
+def validate_list_hdf5(path, name, n):
+    return catch_errors(lib.py_validate_list_hdf5)(path, name, n)
 
 def validate_list_json(path, n):
     return catch_errors(lib.py_validate_list_json)(path, n)

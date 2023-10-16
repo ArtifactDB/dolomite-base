@@ -29,7 +29,7 @@ class _LoadedCsvHolder:
             self._numr = lib.get_csv_num_records(self.ptr)
         return self._numr
 
-    def column(self, i: int, pop: bool = False):
+    def column(self, i: int):
         col_type = ct.c_int32(0)
         col_size = ct.c_int32(0)
         col_loaded = ct.c_int32(0)
@@ -48,7 +48,7 @@ class _LoadedCsvHolder:
 
             total_len = int(strlengths.sum())
             concatenated = ct.create_string_buffer(total_len)
-            lib.fetch_csv_strings(self.ptr, i, concatenated, pop)
+            lib.fetch_csv_strings(self.ptr, i, concatenated)
 
             collected = _fragment_string_contents(strlengths, concatenated.raw)
             _mask_strings(collected, mask)
@@ -57,7 +57,7 @@ class _LoadedCsvHolder:
         elif col_type.value == 1:
             values = np.ndarray(N, dtype=np.float64)
             mask = np.zeros(N, dtype=np.uint8)
-            masked = lib.fetch_csv_numbers(self.ptr, i, values, mask, pop)
+            masked = lib.fetch_csv_numbers(self.ptr, i, values, mask)
             if masked:
                 return np.ma.array(values, mask=mask)
             else:
@@ -65,7 +65,7 @@ class _LoadedCsvHolder:
 
         elif col_type.value == 3:
             values = np.ndarray(N, dtype=np.uint8)
-            masked = lib.fetch_csv_booleans(self.ptr, i, values, pop)
+            masked = lib.fetch_csv_booleans(self.ptr, i, values)
             if masked:
                 mask = values == 2
                 return np.ma.array(values.astype(dtype=np.bool_), mask=mask)
@@ -116,10 +116,7 @@ def load_csv_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFra
     contents = []
     row_names = None
     for f in range(observed_cols):
-        # Always popping columns from the C++ representation as soon as we're
-        # done, so as to free up memory. Not really sure whether this has much
-        # of an effect as the C++/Python heaps aren't the same.
-        current = handle.column(f, pop=True)
+        current = handle.column(f)
         if f == 0 and has_row_names:
             row_names = current
         else:
@@ -135,4 +132,5 @@ def load_csv_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFra
             c = c.astype(np.int32)
         output[curval["name"]] = c
    
+    del handle
     return output
