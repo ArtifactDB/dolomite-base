@@ -213,6 +213,93 @@ def test_data_frame_numpy():
     assert (roundtrip.column("athena") == df.column("athena")).all()
 
 
+def test_data_frame_large_integers():
+    df = BiocFrame({
+        "alicia": [ 2**31 - 1, 1, 2, 3 ],
+        "akira": [ 2**32, 1, 2, 3 ],
+        "alice": np.array([ -2**31, 4, 5, 6 ], dtype=np.int64),
+        "athena": np.array([ -2**32, 4, 5, 6 ], dtype=np.int64),
+    })
+
+    dir = mkdtemp()
+
+    # Test with CSV.
+    meta = dl.stage_object(df, dir, "foo")
+    assert meta["data_frame"]["columns"][0] == { "type": "integer", "name": "alicia" }
+    assert meta["data_frame"]["columns"][1] == { "type": "number", "name": "akira" }
+    assert meta["data_frame"]["columns"][2] == { "type": "integer", "name": "alice" }
+    assert meta["data_frame"]["columns"][3] == { "type": "number", "name": "athena" }
+    dl.write_metadata(meta, dir)
+
+    meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
+    roundtrip = dl.load_object(meta2, dir)
+    assert isinstance(roundtrip, BiocFrame)
+
+    assert (roundtrip.column("alicia") == df.column("alicia")).all()
+    assert roundtrip.column("alicia").dtype == np.int32
+    assert (roundtrip.column("akira") == df.column("akira")).all()
+    assert roundtrip.column("akira").dtype == np.float64
+    assert (roundtrip.column("alice") == df.column("alice")).all()
+    assert roundtrip.column("alice").dtype == np.int32
+    assert (roundtrip.column("athena") == df.column("athena")).all()
+    assert roundtrip.column("athena").dtype == np.float64
+
+    # Test with HDF5.
+    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
+    dl.write_metadata(meta2, dir)
+    roundtrip2 = dl.load_object(meta2, dir)
+
+    assert (roundtrip.column("alicia") == df.column("alicia")).all()
+    assert roundtrip.column("alicia").dtype == np.int32
+    assert (roundtrip.column("akira") == df.column("akira")).all()
+    assert roundtrip.column("akira").dtype == np.float64
+    assert (roundtrip.column("alice") == df.column("alice")).all()
+    assert roundtrip.column("alice").dtype == np.int32
+    assert (roundtrip.column("athena") == df.column("athena")).all()
+    assert roundtrip.column("athena").dtype == np.float64
+
+
+def test_data_frame_special_floats():
+    df = BiocFrame({
+        "sumire": [ np.NaN, np.Inf, -np.Inf ],
+        "kanon": np.array([ np.NaN, np.Inf, -np.Inf ]),
+        "chisato": np.ma.array([ np.NaN, 4, 5 ], mask=[0, 1, 1]) # distinguish NaN from missing.
+    })
+
+    def as_expected(x):
+        assert np.isnan(x[0])
+        assert x[1] == np.Inf
+        assert x[2] == -np.Inf
+
+    def as_expected_masked(x):
+        assert np.isnan(x[0])
+        assert np.ma.is_masked(x[1])
+        assert np.ma.is_masked(x[2])
+
+    dir = mkdtemp()
+
+    # Test with CSV.
+    meta = dl.stage_object(df, dir, "foo")
+    dl.write_metadata(meta, dir)
+
+    roundtrip = dl.load_object(meta, dir)
+    assert isinstance(roundtrip, BiocFrame)
+    as_expected(roundtrip.column("sumire"))
+    as_expected(roundtrip.column("kanon"))
+    as_expected_masked(roundtrip.column("chisato"))
+
+    # Test with HDF5.
+    meta = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    dl.write_metadata(meta, dir)
+
+    roundtrip = dl.load_object(meta, dir)
+    assert isinstance(roundtrip, BiocFrame)
+    as_expected(roundtrip.column("sumire"))
+    as_expected(roundtrip.column("kanon"))
+    as_expected_masked(roundtrip.column("chisato"))
+
+
 def test_data_frame_masked():
     df = BiocFrame({
         "alicia": np.ma.array(np.array([ 1, 2, 3, 4, 5 ]), mask=[0, 1, 0, 1, 0]),
@@ -342,3 +429,12 @@ def test_data_frame_nested():
     assert isinstance(bsb_df, BiocFrame)
     assert bsb_df.column("first") == df.column("bsb").column("first")
     assert bsb_df.column("last") == df.column("bsb").column("last")
+
+
+def test_data_frame_format():
+    assert dl.choose_data_frame_format() == "csv"
+    old = dl.choose_data_frame_format("hdf5") 
+    assert old == "csv"
+    assert dl.choose_data_frame_format() == "hdf5"
+    dl.choose_data_frame_format(old)
+    assert dl.choose_data_frame_format() == "csv"
