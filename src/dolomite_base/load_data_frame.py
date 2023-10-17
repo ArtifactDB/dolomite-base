@@ -122,15 +122,78 @@ def load_csv_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFra
         else:
             contents.append(current)
 
+    del handle
+    return _create_BiocFrame(expected_rows, row_names, columns, contents)
+
+
+def _create_BiocFrame(expected_rows: int, row_names: Optional[list], columns: list, contents: list) -> BiocFrame:
     output = BiocFrame({}, number_of_rows=expected_rows, row_names=row_names)
+
     for i, c in enumerate(contents):
         curval = columns[i]
         if curval["type"] == "other":
             child_meta = acquire_metadata(project, curval["resource"]["path"])
             c = load_object(child_meta, project, **kwargs)
+
         elif curval["type"] == "integer":
-            c = c.astype(np.int32)
+            if not np.issubdtype(c.dtype, np.integer):
+                c = c.astype(np.int32)
+
+        elif curval["type"] == "logical":
+            c = c.astype(np.bool_, copy=False)
+
         output[curval["name"]] = c
-   
-    del handle
+
     return output
+
+
+def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFrame:
+    """Load a data frame from a HDF5 file. In general, this function should not
+    be called directly but instead via :py:meth:`~dolomite_base.load_object.load_object`.
+
+    Args:
+        meta: Metadata for this HDF5 data frame.
+
+        project: Value specifying the project of interest. This is most
+            typically a string containing a file path to a staging directory
+            but may also be an application-specific object that works with
+            :py:meth:`~dolomite_base.acquire_file.acquire_file`.
+
+        kwargs: Further arguments, passed to nested objects.
+
+    Returns:
+        A data frame.
+    """
+    full_path = acquire_file(project, meta["path"])
+
+    has_row_names = "row_names" in meta["data_frame"] and meta["data_frame"]["row_names"]
+    columns = meta["data_frame"]["columns"]
+
+    contents = [None] * len(columns)
+    row_names = None
+    with h5py.File(full_path, "r") as handle:
+        ghandle = handle[meta["hdf5_data_frame"]["group"]]
+        if has_row_names:
+            row_names = ghandle["row_names"]
+
+        for i in range(len(columns)):
+            name = str(i)
+            if name not in ghandle:
+                continue
+            dhandle = ghandle[name]
+            values = dhandle.data
+
+            if "missing-value-placeholder" in dhandle.attrs:
+                placeholder = dhandle.attrs["missing-value-placeholder"]
+                if isinstance(placeholder, float) and numpy.isnan(placeholder): # need to handle NaNs with weird payloads.
+                    mask = numpy.ndarray(len(values), dtype=numpy.uint8)
+                    buffered = numpy.array(placeholder, dtype=values.dtype)
+                    lib.fill_nan_mask(values.ctypes.data, len(values), buffered.ctypes.data, values.dtype.itemsize, mask)
+                else:
+                    mask = (values == placeholder)
+                contents = numpy.ma.array(contents, mask=mask)
+
+            contents[i] = values 
+
+    expected_rows = meta["data_frame"]["dimensions"][0]
+    return _create_BiocFrame(expected_rows, row_names, columns, contents)

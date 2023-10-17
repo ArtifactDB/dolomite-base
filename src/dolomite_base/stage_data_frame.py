@@ -203,6 +203,10 @@ def _stage_hdf5_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) ->
     with h5py.File(full, "w") as handle:
         ghandle = handle.create_group("df")
         columns, otherable = _process_columns(x, ghandle)
+        ghandle.create_dataset("column_names", data=x.column_names, compression="gzip", chunks=True)
+        has_row_names = x.row_anmes is not None
+        if has_row_names:
+            ghandle.create_dataset("row_names", data=x.row_names, compression="gzip", chunks=True)
 
     metadata = {
         "$schema": "hdf5_data_frame/v1.json",
@@ -210,7 +214,7 @@ def _stage_hdf5_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) ->
         "is_child": is_child,
         "data_frame": {
             "columns": columns,
-            "row_names": x.row_names is not None,
+            "row_names": has_row_names,
             "dimensions": list(x.shape),
         },
         "hdf5_data_frame": {
