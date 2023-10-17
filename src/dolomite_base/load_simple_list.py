@@ -121,7 +121,7 @@ def extract_list_contents(ptr, externals):
         return None
 
     elif index == 6:
-        return externals[lib.get_external_index(ptr)]
+        return externals[lib.uzuki2_get_external_index(ptr)]
 
     else:
         raise NotImplementedError("unknown uzuki2 code " + str(index))
@@ -134,7 +134,7 @@ def _load_all_children(meta: dict[str, Any], project: Any) -> list:
         smeta = meta["simple_list"]
         if "children" in smeta:
             for cinfo in smeta["children"]:
-                cmeta = acquire_metadata(project, cmeta["resource"]["path"])
+                cmeta = acquire_metadata(project, cinfo["resource"]["path"])
                 collected.append(load_object(cmeta, project))
 
     return collected

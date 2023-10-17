@@ -155,8 +155,9 @@ def _stage_simple_list_internal(
         components["hdf5_simple_list"] = { "group": oname }
 
     children = []
-    for ex in externals:
-        children.append({ "resource": stage_object(ex) })
+    for i, ex in enumerate(externals):
+        child_meta = stage_object(ex, dir, path + "/" + str(i))
+        children.append({ "resource": write_metadata(child_meta, dir) })
     components["simple_list"] = { "children": children }
     components["is_child"] = is_child
     return components
@@ -414,7 +415,7 @@ def _stage_simple_list_recursive(x, externals, handle):
 
     externals.append(x)
     if handle is None:
-        return { "type": "other", "index": len(externals) - 1 }
+        return { "type": "external", "index": len(externals) - 1 }
     else:
         handle.attrs["uzuki_object"] = "external"
         handle.create_dataset("index", data=len(externals) - 1, dtype='i4')

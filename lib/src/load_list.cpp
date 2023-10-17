@@ -204,7 +204,7 @@ struct DefaultExternals {
     DefaultExternals(size_t n) : number(n) {}
 
     void* get(size_t i) {
-        return reinterpret_cast<void*>(static_cast<uintptr_t>(i + 1));
+        return reinterpret_cast<void*>(static_cast<uintptr_t>(i));
     }
 
     size_t size() const {

@@ -1,6 +1,7 @@
 import dolomite_base as dl
 import numpy as np
 from tempfile import mkdtemp
+from biocframe import BiocFrame
 
 
 def test_simple_list_basic():
@@ -191,8 +192,8 @@ def test_simple_list_large_integers():
         "b": 2**31,
         "c": np.array(-2**32, np.int64),
         "d": np.int64(-2**32),
-        "e": np.array([2**32, -2**32], dtype=np.uint64),
-        "f": np.ma.array([2**32, -2**32], dtype=np.uint64),
+        "e": np.array([2**32, -2**32], dtype=np.int64),
+        "f": np.ma.array([2**32, -2**32], dtype=np.int64),
     }
 
     dir = mkdtemp()
@@ -272,3 +273,32 @@ def test_simple_list_special_float():
     assert roundtrip["e"][0] == np.Inf
     assert np.isnan(roundtrip["e"][1])
     assert np.ma.is_masked(roundtrip["e"][2])
+
+
+def test_simple_list_external():
+    everything = {
+        "a": BiocFrame({ "a_1": [ 1, 2, 3 ], "a_2": [ "A", "B", "C" ] }),
+        "b": BiocFrame(number_of_rows=10),
+    }
+
+    dir = mkdtemp()
+
+    # Stage as JSON.
+    meta = dl.stage_object(everything, dir, "foo")
+    dl.write_metadata(meta, dir)
+
+    roundtrip = dl.load_json_simple_list(meta, dir)
+    assert roundtrip["a"].column_names == [ "a_1", "a_2" ]
+    assert roundtrip["a"].shape[0] == 3
+    assert roundtrip["b"].column_names == []
+    assert roundtrip["b"].shape[0] == 10
+
+    # Stage as HDF5.
+    meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
+    dl.write_metadata(meta, dir)
+
+    roundtrip = dl.load_hdf5_simple_list(meta, dir)
+    assert roundtrip["a"].column_names == [ "a_1", "a_2" ]
+    assert roundtrip["a"].shape[0] == 3
+    assert roundtrip["b"].column_names == []
+    assert roundtrip["b"].shape[0] == 10

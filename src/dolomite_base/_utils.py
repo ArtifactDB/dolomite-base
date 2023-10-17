@@ -49,8 +49,8 @@ def _choose_integer_missing_placeholder(x: Sequence) -> Union[numpy.int32, None]
     for y in x:
         if not numpy.ma.is_masked(y):
             in_use.add(y)
-    candidate = -2**31
-    maxval = 2**31
+    candidate = -LIMIT32
+    maxval = LIMIT32
     while candidate in in_use and candidate < maxval:
         candidate += 1
     if candidate == maxval:
