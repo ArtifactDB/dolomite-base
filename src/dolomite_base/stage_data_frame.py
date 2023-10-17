@@ -11,7 +11,14 @@ from . import _utils as ut
 
 
 @stage_object.register
-def stage_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool = False, **kwargs) -> dict[str, Any]:
+def stage_data_frame(
+    x: BiocFrame, 
+    dir: str, 
+    path: str, 
+    is_child: bool = False, 
+    mode: Optional[Literal["hdf5", "csv"]] = None,
+    **kwargs
+) -> dict[str, Any]:
     """Method for saving :py:class:`~biocframe.BiocFrame.BiocFrame`
     objects to the corresponding file representations, see
     :py:meth:`~dolomite_base.stage_object.stage_object` for details.
@@ -32,7 +39,13 @@ def stage_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool = False, 
         :py:meth:`~dolomite_base.write_metadata.write_metadata`.
     """
     os.mkdir(os.path.join(dir, path))
-    meta, other = _stage_csv_data_frame(x, dir, path, is_child=is_child)
+
+    if mode == None:
+        mode = choose_data_frame_format()
+    if mode == "csv":
+        meta, other = _stage_csv_data_frame(x, dir, path, is_child=is_child)
+    else:
+        meta, other = _stage_hdf5_data_frame(x, dir, path, is_child=is_child)
 
     for i in other:
         more_meta = stage_object(x.column(i), dir, path + "/child-" + str(i + 1), is_child = True)
@@ -40,6 +53,31 @@ def stage_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool = False, 
         meta["data_frame"]["columns"][i]["resource"] = resource_stub
 
     return meta
+
+
+DATA_FRAME_FORMAT = "csv"
+
+
+def choose_data_frame_format(format: Optional[Literal["hdf5", "csv"]] = None) -> str:
+    """Get or set the format to save a simple list.
+
+    Args:
+        format: Format to save a simple list, either in HDF5 or as a CSV.
+
+    Return:
+        If ``format`` is not provided, the current format choice is returned.
+        This defaults to `"csv"` if no other setting has been provided.
+
+        If ``format`` is provided, it is used to define the format choice,
+        and the previous choice is returned.
+    """
+    global DATA_FRAME_FORMAT
+    if format is None:
+        return DATA_FRAME_FORMAT
+    else:
+        old = DATA_FRAME_FORMAT
+        DATA_FRAME_FORMAT = format
+        return old
 
 
 #######################################################

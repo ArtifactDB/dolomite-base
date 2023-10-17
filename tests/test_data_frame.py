@@ -14,12 +14,37 @@ def test_data_frame_list():
     })
 
     dir = mkdtemp()
+
+    # Test with CSV.
     meta = dl.stage_object(df, dir, "foo")
     assert meta["data_frame"]["columns"][0] == { "type": "integer", "name": "akari" }
     assert meta["data_frame"]["columns"][1] == { "type": "string", "name": "aika" }
     assert meta["data_frame"]["columns"][2] == { "type": "boolean", "name": "alice" }
     assert meta["data_frame"]["columns"][3] == { "type": "number", "name": "ai" }
     assert meta["data_frame"]["columns"][4] == { "type": "number", "name": "alicia" }
+    dl.write_metadata(meta, dir)
+
+    meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
+    roundtrip = dl.load_object(meta2, dir)
+    assert isinstance(roundtrip, BiocFrame)
+
+    assert list(roundtrip.column("akari")) == df.column("akari")
+    assert roundtrip.column("akari").dtype.type == np.int32
+
+    assert roundtrip.column("aika") == df.column("aika")
+
+    assert list(roundtrip.column("alice")) == df.column("alice")
+    assert roundtrip.column("alice").dtype.type == np.bool_
+
+    assert list(roundtrip.column("ai")) == df.column("ai")
+    assert roundtrip.column("ai").dtype.type == np.float64
+
+    assert list(roundtrip.column("alicia")) == df.column("alicia")
+    assert roundtrip.column("alicia").dtype.type == np.float64
+
+    # Test with HDF5.
+    dir = mkdtemp()
+    meta = dl.stage_object(df, dir, "foo", mode="hdf5")
     dl.write_metadata(meta, dir)
 
     meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
