@@ -75,6 +75,17 @@ lib.py_fetch_csv_strings.argtypes = [
     ct.POINTER(ct.c_char_p)
 ]
 
+lib.py_fill_nan_mask.restype = None
+lib.py_fill_nan_mask.argtypes = [
+    ct.c_void_p,
+    ct.c_int32,
+    ct.c_void_p,
+    ct.c_int32,
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
 lib.py_free_csv.restype = None
 lib.py_free_csv.argtypes = [
     ct.c_void_p,
@@ -342,6 +353,9 @@ def fetch_csv_numbers(ptr, column, contents, mask):
 
 def fetch_csv_strings(ptr, column, contents):
     return catch_errors(lib.py_fetch_csv_strings)(ptr, column, contents)
+
+def fill_nan_mask(values, number, placeholder, size, mask):
+    return catch_errors(lib.py_fill_nan_mask)(values, number, placeholder, size, np2ct(mask, np.uint8))
 
 def free_csv(ptr):
     return catch_errors(lib.py_free_csv)(ptr)

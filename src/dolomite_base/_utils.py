@@ -32,7 +32,7 @@ LIMIT32 = 2**31
 
 
 def _is_integer_scalar_within_limit(x) -> bool:
-    if numpy.ma.is_masked(x):
+    if numpy.ma.is_masked(x) or x is None:
         return True
     return x >= -LIMIT32 and x < LIMIT32
 

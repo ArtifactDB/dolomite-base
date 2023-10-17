@@ -25,6 +25,8 @@ uint8_t fetch_csv_numbers(void*, int32_t, double*, uint8_t*);
 
 void fetch_csv_strings(void*, int32_t, char*);
 
+void fill_nan_mask(void*, int32_t, void*, int32_t, uint8_t*);
+
 void free_csv(void*);
 
 void get_csv_column_stats(void*, int32_t, int32_t*, int32_t*, int32_t*);
@@ -140,6 +142,18 @@ PYAPI uint8_t py_fetch_csv_numbers(void* ptr, int32_t column, double* contents, 
 PYAPI void py_fetch_csv_strings(void* ptr, int32_t column, char* contents, int32_t* errcode, char** errmsg) {
     try {
         fetch_csv_strings(ptr, column, contents);
+    } catch(std::exception& e) {
+        *errcode = 1;
+        *errmsg = copy_error_message(e.what());
+    } catch(...) {
+        *errcode = 1;
+        *errmsg = copy_error_message("unknown C++ exception");
+    }
+}
+
+PYAPI void py_fill_nan_mask(void* values, int32_t number, void* placeholder, int32_t size, uint8_t* mask, int32_t* errcode, char** errmsg) {
+    try {
+        fill_nan_mask(values, number, placeholder, size, mask);
     } catch(std::exception& e) {
         *errcode = 1;
         *errmsg = copy_error_message(e.what());
