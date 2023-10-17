@@ -19,8 +19,8 @@ from .stage_object import stage_object
 from .stage_data_frame import stage_data_frame
 from .write_metadata import write_metadata
 from .load_object import *
-from .stage_simple_list import stage_simple_list
+from .stage_simple_list import stage_simple_list, choose_simple_list_format
 from .load_csv_data_frame import load_csv_data_frame
-from .load_simple_list import load_json_simple_list
+from .load_simple_list import load_json_simple_list, load_hdf5_simple_list
 from .acquire_metadata import acquire_metadata
 from .acquire_file import acquire_file

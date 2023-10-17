@@ -121,7 +121,7 @@ def extract_list_contents(ptr, externals):
         return None
 
     elif index == 6:
-        return externals[lib.get_external_index(ptr)]
+        return externals[lib.uzuki2_get_external_index(ptr)]
 
     else:
         raise NotImplementedError("unknown uzuki2 code " + str(index))
@@ -134,7 +134,7 @@ def _load_all_children(meta: dict[str, Any], project: Any) -> list:
         smeta = meta["simple_list"]
         if "children" in smeta:
             for cinfo in smeta["children"]:
-                cmeta = acquire_metadata(project, cmeta["resource"]["path"])
+                cmeta = acquire_metadata(project, cinfo["resource"]["path"])
                 collected.append(load_object(cmeta, project))
 
     return collected
@@ -163,3 +163,27 @@ def load_json_simple_list(meta: dict[str, Any], project: Any, **kwargs) -> Union
     handle = _ParsedList(lib.load_list_json(full_path.encode("UTF8"), len(children)))
     return extract_list_contents(handle.entrypoint, children)
 
+
+def load_hdf5_simple_list(meta: dict[str, Any], project: Any, **kwargs) -> Union[list, dict]:
+    """Load an R-style list from a HDF5 file in the **uzuki2** format. In
+    general, this function should not be called directly but instead via
+    :py:meth:`~dolomite_base.load_object.load_object`.
+
+    Args:
+        meta: Metadata for this HDF5 list.
+
+        project: Value specifying the project of interest. This is most
+            typically a string containing a file path to a staging directory
+            but may also be an application-specific object that works with
+            :py:meth:`~dolomite_base.acquire_file.acquire_file`.
+
+        kwargs: Further arguments, passed to nested objects.
+
+    Returns:
+        A data frame.
+    """
+    full_path = acquire_file(project, meta["path"])
+    children = _load_all_children(meta, project)
+    group_name = meta["hdf5_simple_list"]["group"]
+    handle = _ParsedList(lib.load_list_hdf5(full_path.encode("UTF8"), group_name.encode("UTF8"), len(children)))
+    return extract_list_contents(handle.entrypoint, children)

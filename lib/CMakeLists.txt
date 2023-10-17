@@ -43,6 +43,7 @@ add_library(${TARGET} SHARED
     src/bindings.cpp
     src/load_csv.cpp
     src/load_list.cpp
+    src/misc.cpp
 )
 
 set_property(TARGET ${TARGET} PROPERTY CXX_STANDARD 17)

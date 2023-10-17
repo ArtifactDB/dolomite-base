@@ -40,6 +40,13 @@ def np2ct(x, expected, contiguous=True):
             raise ValueError('only contiguous NumPy arrays are supported')
     return x.ctypes.data
 
+lib.py_extract_r_missing_double.restype = None
+lib.py_extract_r_missing_double.argtypes = [
+    ct.c_void_p,
+    ct.POINTER(ct.c_int32),
+    ct.POINTER(ct.c_char_p)
+]
+
 lib.py_fetch_csv_booleans.restype = ct.c_uint8
 lib.py_fetch_csv_booleans.argtypes = [
     ct.c_void_p,
@@ -323,6 +330,9 @@ lib.py_validate_list_json.argtypes = [
     ct.POINTER(ct.c_int32),
     ct.POINTER(ct.c_char_p)
 ]
+
+def extract_r_missing_double(buffer):
+    return catch_errors(lib.py_extract_r_missing_double)(np2ct(buffer, np.float64))
 
 def fetch_csv_booleans(ptr, column, contents):
     return catch_errors(lib.py_fetch_csv_booleans)(ptr, column, np2ct(contents, np.uint8))
