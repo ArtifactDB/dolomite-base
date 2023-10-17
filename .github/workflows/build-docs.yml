@@ -21,6 +21,11 @@ jobs:
           python-version: 3.9
           cache: 'pip'
 
+      - name: Set up HDF5
+        run: |
+          sudo apt-get update
+          sudo apt-get install libhdf5-dev
+
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
 
