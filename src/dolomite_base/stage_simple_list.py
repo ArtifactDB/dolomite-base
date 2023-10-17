@@ -36,7 +36,7 @@ def stage_simple_dict(
         is_child: Is ``x`` a child of another object?
 
         mode: Whether to save in HDF5 or JSON mode.
-            If None, defaults to JSON.
+            If None, defaults to :py:meth:`~choose_simple_list_format`.
 
         kwargs: Further arguments, ignored.
 
@@ -70,7 +70,7 @@ def stage_simple_list(
         is_child: Is ``x`` a child of another object?
 
         mode: Whether to save in HDF5 or JSON mode.
-            If None, defaults to JSON.
+            If None, defaults to :py:meth:`~choose_simple_list_format`.
 
         kwargs: Further arguments, ignored.
 
@@ -79,6 +79,31 @@ def stage_simple_list(
         :py:meth:`~dolomite_base.write_metadata.write_metadata`.
     """
     return _stage_simple_list_internal(x, dir, path, is_child, mode, **kwargs)
+
+
+SAVE_LIST_FORMAT = "json"
+
+
+def choose_simple_list_format(format: Optional[Literal["hdf5", "json"]] = None) -> str:
+    """Get or set the format to save a simple list.
+
+    Args:
+        format: Format to save a simple list, either in HDF5 or JSON.
+
+    Return:
+        If ``format`` is not provided, the current format choice is returned.
+        This defaults to `"json"` if no other setting has been provided.
+
+        If ``format`` is provided, it is used to define the format choice,
+        and the previous choice is returned.
+    """
+    global SAVE_LIST_FORMAT
+    if format is None:
+        return SAVE_LIST_FORMAT
+    else:
+        old = SAVE_LIST_FORMAT
+        SAVE_LIST_FORMAT = format
+        return old
 
 
 ##########################################################################
@@ -97,7 +122,10 @@ def _stage_simple_list_internal(
     os.mkdir(os.path.join(dir, path))
     components = {}
 
-    if mode is None or mode == "json":
+    if mode == None:
+        mode = choose_simple_list_format()
+
+    if mode == "json":
         transformed = _stage_simple_list_recursive(x, externals, None)
         transformed["version"] = "1.1"
 
