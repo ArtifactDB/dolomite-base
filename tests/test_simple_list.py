@@ -168,3 +168,12 @@ def test_simple_list_masked_scalars():
     assert np.ma.is_masked(roundtrip["int"])
     assert np.ma.is_masked(roundtrip["bool"])
     assert np.ma.is_masked(roundtrip["masked"])
+
+
+def test_simple_list_format():
+    assert dl.choose_simple_list_format() == "json"
+    old = dl.choose_simple_list_format("hdf5") 
+    assert old == "json"
+    assert dl.choose_simple_list_format() == "hdf5"
+    dl.choose_simple_list_format(old)
+    assert dl.choose_simple_list_format() == "json"
