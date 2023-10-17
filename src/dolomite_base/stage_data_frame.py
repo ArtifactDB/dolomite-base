@@ -261,10 +261,11 @@ def _stage_hdf5_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) ->
             "columns": columns,
             "row_names": has_row_names,
             "dimensions": list(x.shape),
+            "version": 2,
         },
         "hdf5_data_frame": {
             "group": "df",
-#            "version": 2
+            "version": 2
         }
     }
 
@@ -345,6 +346,7 @@ def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> 
             "columns": columns,
             "row_names": has_row_names,
             "dimensions": list(x.shape),
+            "version": 2,
         },
         "csv_data_frame": {
             "compression": "gzip",
