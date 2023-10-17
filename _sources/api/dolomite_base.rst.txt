@@ -20,10 +20,10 @@ dolomite\_base.acquire\_metadata module
    :undoc-members:
    :show-inheritance:
 
-dolomite\_base.load\_csv\_data\_frame module
---------------------------------------------
+dolomite\_base.load\_data\_frame module
+---------------------------------------
 
-.. automodule:: dolomite_base.load_csv_data_frame
+.. automodule:: dolomite_base.load_data_frame
    :members:
    :undoc-members:
    :show-inheritance:
