@@ -48,7 +48,7 @@ def test_data_frame_list():
     dl.write_metadata(meta2, dir)
 
     meta2 = dl.acquire_metadata(dir, "foo2/simple.h5")
-    roundtrip2 = dl.load_hdf5_data_frame(meta2, dir)
+    roundtrip2 = dl.load_object(meta2, dir)
     assert isinstance(roundtrip2, BiocFrame)
 
     assert list(roundtrip2.column("akari")) == df.column("akari")
@@ -88,7 +88,7 @@ def test_data_frame_row_names():
     dl.write_metadata(meta2, dir)
 
     meta2 = dl.acquire_metadata(dir, "foo2/simple.h5")
-    roundtrip2 = dl.load_hdf5_data_frame(meta2, dir)
+    roundtrip2 = dl.load_object(meta2, dir)
     assert df.row_names == roundtrip2.row_names
 
 
@@ -116,7 +116,7 @@ def test_data_frame_wild_strings():
     dl.write_metadata(meta2, dir)
 
     meta2 = dl.acquire_metadata(dir, "foo2/simple.h5")
-    roundtrip2 = dl.load_hdf5_data_frame(meta2, dir)
+    roundtrip2 = dl.load_object(meta2, dir)
     assert df.row_names == roundtrip2.row_names
     assert df.column("lyrics") == roundtrip2.column("lyrics")
 
@@ -166,7 +166,7 @@ def test_data_frame_none():
     meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
     assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
     dl.write_metadata(meta2, dir)
-    roundtrip2 = dl.load_hdf5_data_frame(meta2, dir)
+    roundtrip2 = dl.load_object(meta2, dir)
 
     compare_masked_to_list(df.column("akari"), roundtrip2.column("akari"))
     assert roundtrip2.column("akari").dtype.type == np.int32
@@ -205,7 +205,7 @@ def test_data_frame_numpy():
     meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
     assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
     dl.write_metadata(meta2, dir)
-    roundtrip2 = dl.load_hdf5_data_frame(meta2, dir)
+    roundtrip2 = dl.load_object(meta2, dir)
 
     assert (roundtrip.column("alicia") == df.column("alicia")).all()
     assert roundtrip.column("alicia").dtype == np.int32
@@ -243,7 +243,7 @@ def test_data_frame_masked():
     meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
     dl.write_metadata(meta2, dir)
 
-    roundtrip2 = dl.load_hdf5_data_frame(meta2, dir)
+    roundtrip2 = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert (roundtrip.column("alicia") == df.column("alicia")).all()
     assert (roundtrip.column("alicia").mask == df.column("alicia").mask).all()
@@ -283,7 +283,7 @@ def test_data_frame_empty():
     dl.write_metadata(meta, dir)
 
     meta2 = dl.acquire_metadata(dir, "empty2/simple.h5")
-    roundtrip2 = dl.load_hdf5_data_frame(meta2, dir)
+    roundtrip2 = dl.load_object(meta2, dir)
     assert isinstance(roundtrip2, BiocFrame)
     assert df.shape == roundtrip2.shape
     assert roundtrip2.row_names is None
