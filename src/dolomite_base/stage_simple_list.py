@@ -234,11 +234,18 @@ def _stage_simple_list_recursive(x, externals, handle):
             return
 
     elif isinstance(x, int):
-        if handle is None:
-            return { "type": "integer", "values": x }
+        if ut._is_integer_scalar_within_limit(x):
+            if handle is None:
+                return { "type": "integer", "values": x }
+            else:
+                _stage_scalar_hdf5(handle, x=x, dtype=int)
+                return
         else:
-            _stage_scalar_hdf5(handle, x=x, dtype=int)
-            return
+            if handle is None:
+                return { "type": "number", "values": x }
+            else:
+                _stage_scalar_hdf5(handle, x=x, dtype=float)
+                return
 
     elif isinstance(x, str):
         if handle is None:
@@ -249,7 +256,7 @@ def _stage_simple_list_recursive(x, externals, handle):
 
     elif isinstance(x, float):
         if handle is None:
-            return { "type": "number", "values": x }
+            return { "type": "number", "values": _sanitize_float_json(x) }
         else:
             _stage_scalar_hdf5(handle, x=x, dtype=float)
             return
@@ -266,14 +273,14 @@ def _stage_simple_list_recursive(x, externals, handle):
                             # If there's no valid missing placeholder, we just save it as floating-point.
                             missing_placeholder = ut._choose_integer_missing_placeholder(x)
                             if missing_placeholder is not None:
-                                x = ut._fill_integer_missing_placeholder(x, missing_placeholder), 
+                                x = ut._fill_integer_missing_placeholder(x, missing_placeholder) 
                                 _stage_vector_hdf5(handle, x=x, dtype=int, missing_placeholder=missing_placeholder)
                                 return
                     as_float = True
 
                 if as_float or issubdtype(x.dtype, floating):
                     if handle is None:
-                        return { "type": "number", "values": [None if np.ma.is_masked(y) else float(y) for y in x] }
+                        return { "type": "number", "values": [_sanitize_masked_float_json(y) for y in x] }
                     else:
                         missing_placeholder = ut._choose_float_missing_placeholder()
                         x = ut._fill_float_missing_placeholder(x, missing_placeholder)
@@ -303,7 +310,7 @@ def _stage_simple_list_recursive(x, externals, handle):
 
                 if as_float or issubdtype(x.dtype, floating):
                     if handle is None:
-                        return { "type": "number", "values": [float(y) for y in x] }
+                        return { "type": "number", "values": [_sanitize_float_json(y) for y in x] }
                     else:
                         _stage_vector_hdf5(handle, x=x, dtype=float)
                         return
@@ -320,21 +327,21 @@ def _stage_simple_list_recursive(x, externals, handle):
             if np.ma.is_masked(x):
                 if issubdtype(x.dtype, integer):
                     if handle is None:
-                        return { "type": "integer", "values": None if np.ma.is_masked(x) else int(x) }
+                        return { "type": "integer", "values": None }
                     else:
                         missing_placeholder = ut._choose_integer_missing_placeholder([])
                         _stage_scalar_hdf5(handle, x=missing_placeholder, dtype=int, missing_placeholder=missing_placeholder)
                         return
                 elif issubdtype(x.dtype, floating):
                     if handle is None:
-                        return { "type": "number", "values": None if np.ma.is_masked(x) else float(x) }
+                        return { "type": "number", "values": None }
                     else:
                         missing_placeholder = ut._choose_float_missing_placeholder()
                         _stage_scalar_hdf5(handle, x=missing_placeholder, dtype=float, missing_placeholder=missing_placeholder)
                         return
                 elif x.dtype == bool_:
                     if handle is None:
-                        return { "type": "boolean", "values": None if np.ma.is_masked(x) else bool(x) }
+                        return { "type": "boolean", "values": None }
                     else:
                         missing_placeholder = ut._choose_boolean_missing_placeholder()
                         _stage_scalar_hdf5(handle, x=missing_placeholder, dtype=bool, missing_placeholder=missing_placeholder)
@@ -355,11 +362,10 @@ def _stage_simple_list_recursive(x, externals, handle):
                     as_float = True
 
                 if as_float or issubdtype(x.dtype, floating):
-                    y = float(x)
                     if handle is None:
-                        return { "type": "number", "values": y }
+                        return { "type": "number", "values": _sanitize_float_json(x) }
                     else:
-                        _stage_scalar_hdf5(handle, x=y, dtype=float)
+                        _stage_scalar_hdf5(handle, x=float(x), dtype=float)
                         return
                 elif x.dtype == bool_:
                     y = bool(x)
@@ -384,11 +390,10 @@ def _stage_simple_list_recursive(x, externals, handle):
             as_float = True
 
         if as_float or isinstance(x, floating):
-            y = float(x)
             if handle is None:
-                return { "type": "number", "values": y }
+                return { "type": "number", "values": _sanitize_float_json(x) }
             else:
-                _stage_scalar_hdf5(handle, x=y, dtype=float)
+                _stage_scalar_hdf5(handle, x=float(x), dtype=float)
                 return
         elif isinstance(x, bool_):
             y = bool(x)
@@ -415,7 +420,28 @@ def _stage_simple_list_recursive(x, externals, handle):
         handle.create_dataset("index", data=len(externals) - 1, dtype='i4')
         return
 
+
 ##########################################################################
+
+
+def _sanitize_float_json(x):
+    if np.isnan(x):
+        return "NaN"
+    elif x == np.Inf:
+        return "Inf"
+    elif x == -np.Inf:
+        return "-Inf"
+    return float(x)
+
+
+def _sanitize_masked_float_json(x):
+    if np.ma.is_masked(x):
+        return None
+    return _sanitize_float_json(x)
+
+
+##########################################################################
+
 
 def _stage_scalar_hdf5(handle, x, dtype, missing_placeholder = None):
     handle.attrs["uzuki_object"] = "vector"

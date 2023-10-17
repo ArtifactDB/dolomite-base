@@ -32,6 +32,8 @@ LIMIT32 = 2**31
 
 
 def _is_integer_scalar_within_limit(x) -> bool:
+    if numpy.ma.is_masked(x):
+        return True
     return x >= -LIMIT32 and x < LIMIT32
 
 
@@ -43,7 +45,10 @@ def _is_integer_vector_within_limit(x: Sequence[int]) -> bool:
 
 
 def _choose_integer_missing_placeholder(x: Sequence) -> Union[numpy.int32, None]:
-    in_use = set(x)
+    in_use = set()
+    for y in x:
+        if not numpy.ma.is_masked(y):
+            in_use.add(y)
     candidate = -2**31
     maxval = 2**31
     while candidate in in_use and candidate < maxval:
@@ -54,8 +59,7 @@ def _choose_integer_missing_placeholder(x: Sequence) -> Union[numpy.int32, None]
 
 
 def _fill_integer_missing_placeholder(x : numpy.ma.array, placeholder: numpy.int32) -> numpy.ndarray:
-    copy = x.astype(numpy.int32)
-    copy.fill_value = placeholder
+    copy = x.astype(numpy.int32).filled(placeholder)
     return copy.data
 
 
@@ -66,8 +70,7 @@ def _choose_float_missing_placeholder() -> numpy.float64:
 
 
 def _fill_float_missing_placeholder(x: numpy.ma.array, placeholder: numpy.float64) -> numpy.ndarray:
-    copy = x.astype(numpy.float64)
-    copy.fill_value = placeholder
+    copy = x.astype(numpy.float64).filled(placeholder)
     return copy.data
 
 
@@ -76,6 +79,5 @@ def _choose_boolean_missing_placeholder() -> numpy.int8:
 
 
 def _fill_boolean_missing_placeholder(x : numpy.ma.array, placeholder: numpy.int8) -> numpy.ndarray:
-    copy = x.astype(numpy.int8)
-    copy.fill_value = _choose_boolean_missing_placeholder()
+    copy = x.astype(numpy.int8).filled(placeholder)
     return copy.data

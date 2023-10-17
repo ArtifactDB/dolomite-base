@@ -73,8 +73,11 @@ def test_simple_list_masking():
     roundtrip = dl.load_json_simple_list(meta, dir)
     assert everything["string"] == roundtrip["string"]
     assert np.allclose(everything["float"], roundtrip["float"])
+    assert (everything["float"].mask == roundtrip["float"].mask).all()
     assert (everything["int"] == roundtrip["int"]).all()
+    assert (everything["int"].mask == roundtrip["int"].mask).all()
     assert (everything["bool"] == roundtrip["bool"]).all()
+    assert (everything["bool"].mask == roundtrip["bool"].mask).all()
 
     # Stage as HDF5.
     meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
@@ -82,9 +85,12 @@ def test_simple_list_masking():
 
     roundtrip = dl.load_hdf5_simple_list(meta, dir)
     assert everything["string"] == roundtrip["string"]
-    assert np.allclose(everything["float"], roundtrip["float"])
+    assert (everything["float"] == roundtrip["float"]).all()
+    assert (everything["float"].mask == roundtrip["float"].mask).all()
     assert (everything["int"] == roundtrip["int"]).all()
+    assert (everything["int"].mask == roundtrip["int"].mask).all()
     assert (everything["bool"] == roundtrip["bool"]).all()
+    assert (everything["bool"].mask == roundtrip["bool"].mask).all()
 
 
 def test_simple_list_numpy_scalars():
@@ -177,3 +183,92 @@ def test_simple_list_format():
     assert dl.choose_simple_list_format() == "hdf5"
     dl.choose_simple_list_format(old)
     assert dl.choose_simple_list_format() == "json"
+
+
+def test_simple_list_large_integers():
+    everything = {
+        "a": 2**31 - 1,
+        "b": 2**31,
+        "c": np.array(-2**32, np.int64),
+        "d": np.int64(-2**32),
+        "e": np.array([2**32, -2**32], dtype=np.uint64),
+        "f": np.ma.array([2**32, -2**32], dtype=np.uint64),
+    }
+
+    dir = mkdtemp()
+
+    # Stage as JSON.
+    meta = dl.stage_object(everything, dir, "foo")
+    dl.write_metadata(meta, dir)
+
+    roundtrip = dl.load_json_simple_list(meta, dir)
+    assert everything["a"] == roundtrip["a"]
+    assert isinstance(roundtrip["a"], int)
+    assert everything["b"] == roundtrip["b"]
+    assert isinstance(roundtrip["b"], float)
+    assert (everything["c"] == roundtrip["c"]).all()
+    assert isinstance(roundtrip["c"], float)
+    assert (everything["d"] == roundtrip["d"]).all()
+    assert isinstance(roundtrip["d"], float)
+    assert (everything["e"] == roundtrip["e"]).all()
+    assert roundtrip["e"].dtype == np.float64
+    assert (everything["f"] == roundtrip["f"]).all()
+    assert roundtrip["f"].dtype == np.float64
+
+    # Stage as HDF5.
+    meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
+    dl.write_metadata(meta, dir)
+
+    roundtrip = dl.load_hdf5_simple_list(meta, dir)
+    assert everything["a"] == roundtrip["a"]
+    assert isinstance(roundtrip["a"], int)
+    assert everything["b"] == roundtrip["b"]
+    assert isinstance(roundtrip["b"], float)
+    assert (everything["c"] == roundtrip["c"]).all()
+    assert isinstance(roundtrip["c"], float)
+    assert (everything["d"] == roundtrip["d"]).all()
+    assert isinstance(roundtrip["d"], float)
+    assert (everything["e"] == roundtrip["e"]).all()
+    assert roundtrip["e"].dtype == np.float64
+    assert (everything["f"] == roundtrip["f"]).all()
+    assert roundtrip["f"].dtype == np.float64
+
+
+def test_simple_list_special_float():
+    everything = {
+        "a": np.NaN,
+        "b": np.array(np.Inf, np.float64),
+        "c": np.float64(-np.Inf),
+        "d": np.array([np.Inf, np.NaN]),
+        "e": np.ma.array([np.Inf, np.NaN, 2], mask=[0,0,1])
+    }
+
+    dir = mkdtemp()
+
+    # Stage as JSON.
+    meta = dl.stage_object(everything, dir, "foo")
+    dl.write_metadata(meta, dir)
+
+    roundtrip = dl.load_json_simple_list(meta, dir)
+    assert np.isnan(roundtrip["a"])
+    assert roundtrip["b"] == np.Inf
+    assert roundtrip["c"] == -np.Inf
+    assert roundtrip["d"][0] == np.Inf
+    assert np.isnan(roundtrip["d"][1])
+    assert roundtrip["e"][0] == np.Inf
+    assert np.isnan(roundtrip["e"][1])
+    assert np.ma.is_masked(roundtrip["e"][2])
+
+    # Stage as HDF5.
+    meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
+    dl.write_metadata(meta, dir)
+
+    roundtrip = dl.load_hdf5_simple_list(meta, dir)
+    assert np.isnan(roundtrip["a"])
+    assert roundtrip["b"] == np.Inf
+    assert roundtrip["c"] == -np.Inf
+    assert roundtrip["d"][0] == np.Inf
+    assert np.isnan(roundtrip["d"][1])
+    assert roundtrip["e"][0] == np.Inf
+    assert np.isnan(roundtrip["e"][1])
+    assert np.ma.is_masked(roundtrip["e"][2])
