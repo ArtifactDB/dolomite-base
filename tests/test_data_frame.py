@@ -4,7 +4,7 @@ import numpy as np
 from tempfile import mkdtemp
 
 
-def test_csv_data_frame_list():
+def test_data_frame_list():
     df = BiocFrame({
         "akari": [ 1, 2, 3, 4, 5 ],
         "aika": [ "sydney", "melbourne", "", "perth", "adelaide" ],
@@ -41,7 +41,7 @@ def test_csv_data_frame_list():
     assert roundtrip.column("alicia").dtype.type == np.float64
 
 
-def test_csv_data_frame_row_names():
+def test_data_frame_row_names():
     df = BiocFrame({
         "akari": [ 1, 2, 3, 4, 5 ],
         "aika": [ "sydney", "melbourne", "", "perth", "adelaide" ],
@@ -60,7 +60,7 @@ def test_csv_data_frame_row_names():
     assert df.row_names == roundtrip.row_names
 
 
-def test_csv_data_frame_wild_strings():
+def test_data_frame_wild_strings():
     df = BiocFrame({
         "lyrics": [ "Ochite\niku\tsunadokei\nbakari\tmiteru\tyo", "foo\"asdasd", "multie\"foo\"asdas" ],
     }, row_names = [ "nagisa\"", "\"fuko\"", "okazaki\nasdasd" ])
@@ -77,7 +77,7 @@ def test_csv_data_frame_wild_strings():
     assert df.column("lyrics") == roundtrip.column("lyrics")
 
 
-def test_csv_data_frame_none():
+def test_data_frame_none():
     df = BiocFrame({
         "akari": [ 1, 2, None, 4, 5 ],
         "aika": [ "sydney", None, "", "perth", "adelaide" ],
@@ -117,7 +117,7 @@ def test_csv_data_frame_none():
     assert roundtrip.column("ai").dtype.type == np.float64
 
 
-def test_csv_data_frame_numpy():
+def test_data_frame_numpy():
     df = BiocFrame({
         "alicia": np.array([ 1, 2, 3, 4, 5 ]),
         "akira": np.array([ True, True, False, False, True ]),
@@ -140,7 +140,7 @@ def test_csv_data_frame_numpy():
     assert (roundtrip.column("athena") == df.column("athena")).all()
 
 
-def test_csv_data_frame_masked():
+def test_data_frame_masked():
     df = BiocFrame({
         "alicia": np.ma.array(np.array([ 1, 2, 3, 4, 5 ]), mask=[0, 1, 0, 1, 0]),
         "akira": np.ma.array(np.array([ True, True, False, False, True ]), mask=[1, 1, 0, 0, 0]),
@@ -162,7 +162,7 @@ def test_csv_data_frame_masked():
     assert (roundtrip.column("athena") == df.column("athena")).all()
 
 
-def test_csv_data_frame_empty():
+def test_data_frame_empty():
     dir = mkdtemp()
 
     # Empty except for row names.
@@ -187,7 +187,7 @@ def test_csv_data_frame_empty():
     assert roundtrip.row_names is None
 
 
-def test_csv_data_frame_nested():
+def test_data_frame_nested():
     df = BiocFrame({
         "odd": [ 1, 3, 5, 7, 9 ],
         "liella": BiocFrame({ 

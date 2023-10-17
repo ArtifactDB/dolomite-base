@@ -7,6 +7,7 @@ import gzip
 from . import _cpphelpers as lib
 from .stage_object import stage_object
 from .write_metadata import write_metadata
+from . import _utils as ut
 
 
 @stage_object.register
@@ -187,7 +188,7 @@ def _select_hdf5_placeholder(current, dtype) -> Tuple:
         placeholder = ut._choose_integer_missing_placeholder(current)
         if placeholder is None: # fallback if no placeholder can be picked.
             return ut._choose_float_missing_placeholder(), float
-    elif dtype == set:
+    elif dtype == str:
         placeholder = ut._choose_string_missing_placeholder(current)
     elif dtype == bool:
         placeholder = ut._choose_boolean_missing_placeholder()
@@ -200,7 +201,8 @@ def _stage_hdf5_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) ->
     basename = "simple.h5"
     full = os.path.join(dir, path, basename)
     with h5py.File(full, "w") as handle:
-        columns, otherable = _process_columns(x, handle)
+        ghandle = handle.create_group("df")
+        columns, otherable = _process_columns(x, ghandle)
 
     metadata = {
         "$schema": "hdf5_data_frame/v1.json",
@@ -248,7 +250,7 @@ def _quotify_string_or_none(s):
 
 
 def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> Tuple:
-    columns, otherable, operations = _process_columns(x)
+    columns, otherable, operations = _process_columns(x, None)
     nr = x.shape[0]
 
     extracted_row_names = x.row_names
