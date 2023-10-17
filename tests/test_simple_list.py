@@ -24,6 +24,7 @@ def test_simple_list_basic():
 
     # Stage as JSON.
     meta = dl.stage_object(everything, dir, "foo")
+    assert meta["$schema"].startswith("json")
     dl.write_metadata(meta, dir)
 
     roundtrip = dl.load_json_simple_list(meta, dir)
@@ -41,9 +42,10 @@ def test_simple_list_basic():
 
     # Stage as HDF5.
     meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
+    assert meta["$schema"].startswith("hdf5")
     dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_hdf5_simple_list(meta, dir)
+    roundtrip = dl.load_object(meta, dir)
     assert everything["i_am_a_string"] == roundtrip["i_am_a_string"]
     assert everything["i_am_a_number"] == roundtrip["i_am_a_number"]
     assert everything["i_am_a_integer"] == roundtrip["i_am_a_integer"]
@@ -84,7 +86,7 @@ def test_simple_list_masking():
     meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
     dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_hdf5_simple_list(meta, dir)
+    roundtrip = dl.load_object(meta, dir)
     assert everything["string"] == roundtrip["string"]
     assert (everything["float"] == roundtrip["float"]).all()
     assert (everything["float"].mask == roundtrip["float"].mask).all()
@@ -129,7 +131,7 @@ def test_simple_list_numpy_scalars():
     meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
     dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_hdf5_simple_list(meta, dir)
+    roundtrip = dl.load_object(meta, dir)
     assert isinstance(roundtrip["float"], float)
     assert roundtrip["float"] == 9.9
     assert isinstance(roundtrip["int"], int)
@@ -170,7 +172,7 @@ def test_simple_list_masked_scalars():
     meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
     dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_hdf5_simple_list(meta, dir)
+    roundtrip = dl.load_object(meta, dir)
     assert np.ma.is_masked(roundtrip["float"])
     assert np.ma.is_masked(roundtrip["int"])
     assert np.ma.is_masked(roundtrip["bool"])
@@ -220,7 +222,7 @@ def test_simple_list_large_integers():
     meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
     dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_hdf5_simple_list(meta, dir)
+    roundtrip = dl.load_object(meta, dir)
     assert everything["a"] == roundtrip["a"]
     assert isinstance(roundtrip["a"], int)
     assert everything["b"] == roundtrip["b"]
@@ -264,7 +266,7 @@ def test_simple_list_special_float():
     meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
     dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_hdf5_simple_list(meta, dir)
+    roundtrip = dl.load_object(meta, dir)
     assert np.isnan(roundtrip["a"])
     assert roundtrip["b"] == np.Inf
     assert roundtrip["c"] == -np.Inf
@@ -297,7 +299,7 @@ def test_simple_list_external():
     meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
     dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_hdf5_simple_list(meta, dir)
+    roundtrip = dl.load_object(meta, dir)
     assert roundtrip["a"].column_names == [ "a_1", "a_2" ]
     assert roundtrip["a"].shape[0] == 3
     assert roundtrip["b"].column_names == []

@@ -448,7 +448,7 @@ def _stage_scalar_hdf5(handle, x, dtype, missing_placeholder = None):
 
     if dtype == bool:
         handle.attrs["uzuki_type"] = "boolean"
-        savetype = 'u1'
+        savetype = 'i1'
     elif dtype == int:
         handle.attrs["uzuki_type"] = "integer"
         savetype = 'i4'
@@ -471,7 +471,7 @@ def _stage_vector_hdf5(handle, x, dtype, missing_placeholder = None):
 
     if dtype == bool:
         handle.attrs["uzuki_type"] = "boolean"
-        savetype = "u1"
+        savetype = "i1"
     elif dtype == int:
         handle.attrs["uzuki_type"] = "integer"
         savetype = 'i4'
