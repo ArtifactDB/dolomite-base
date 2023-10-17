@@ -7,7 +7,6 @@ import gzip
 import h5py
 
 from .stage_object import stage_object
-from ._stage_csv_data_frame import _stage_csv_data_frame
 from .write_metadata import write_metadata
 from . import _cpphelpers as lib
 from . import _utils as ut
