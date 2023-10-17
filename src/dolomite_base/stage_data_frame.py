@@ -1,7 +1,8 @@
-from typing import Any, Tuple
+from typing import Any, Tuple, Optional, Literal
 import os
 from biocframe import BiocFrame
 import numpy as np
+import h5py
 import gzip
 
 from . import _cpphelpers as lib
@@ -240,9 +241,9 @@ def _stage_hdf5_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) ->
     full = os.path.join(dir, path, basename)
     with h5py.File(full, "w") as handle:
         ghandle = handle.create_group("df")
-        columns, otherable = _process_columns(x, ghandle)
+        columns, otherable, operations = _process_columns(x, ghandle)
         ghandle.create_dataset("column_names", data=x.column_names, compression="gzip", chunks=True)
-        has_row_names = x.row_anmes is not None
+        has_row_names = x.row_names is not None
         if has_row_names:
             ghandle.create_dataset("row_names", data=x.row_names, compression="gzip", chunks=True)
 
@@ -257,7 +258,7 @@ def _stage_hdf5_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) ->
         },
         "hdf5_data_frame": {
             "group": "df",
-            "version": 2
+#            "version": 2
         }
     }
 

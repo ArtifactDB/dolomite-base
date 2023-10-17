@@ -1,7 +1,8 @@
 import ctypes as ct
-from typing import Any
+from typing import Any, Optional
 from biocframe import BiocFrame
 import numpy as np
+import h5py
 import os
 
 from . import _cpphelpers as lib
@@ -123,10 +124,10 @@ def load_csv_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFra
             contents.append(current)
 
     del handle
-    return _create_BiocFrame(expected_rows, row_names, columns, contents)
+    return _create_BiocFrame(expected_rows, row_names, columns, contents, project, **kwargs)
 
 
-def _create_BiocFrame(expected_rows: int, row_names: Optional[list], columns: list, contents: list) -> BiocFrame:
+def _create_BiocFrame(expected_rows: int, row_names: Optional[list], columns: list, contents: list, project, **kwargs) -> BiocFrame:
     output = BiocFrame({}, number_of_rows=expected_rows, row_names=row_names)
 
     for i, c in enumerate(contents):
@@ -139,7 +140,7 @@ def _create_BiocFrame(expected_rows: int, row_names: Optional[list], columns: li
             if not np.issubdtype(c.dtype, np.integer):
                 c = c.astype(np.int32)
 
-        elif curval["type"] == "logical":
+        elif curval["type"] == "boolean":
             c = c.astype(np.bool_, copy=False)
 
         output[curval["name"]] = c
@@ -174,14 +175,18 @@ def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFr
     with h5py.File(full_path, "r") as handle:
         ghandle = handle[meta["hdf5_data_frame"]["group"]]
         if has_row_names:
-            row_names = ghandle["row_names"]
+            row_names = [v.decode("UTF8") for v in ghandle["row_names"]]
 
         for i in range(len(columns)):
             name = str(i)
             if name not in ghandle:
                 continue
             dhandle = ghandle[name]
-            values = dhandle.data
+            values = dhandle[:]
+
+            is_str = columns[i]["type"] == "string"
+            if is_str:
+                values = [v.decode('UTF8') for v in values]
 
             if "missing-value-placeholder" in dhandle.attrs:
                 placeholder = dhandle.attrs["missing-value-placeholder"]
@@ -196,4 +201,4 @@ def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFr
             contents[i] = values 
 
     expected_rows = meta["data_frame"]["dimensions"][0]
-    return _create_BiocFrame(expected_rows, row_names, columns, contents)
+    return _create_BiocFrame(expected_rows, row_names, columns, contents, project, **kwargs)

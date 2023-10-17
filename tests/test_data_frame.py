@@ -43,27 +43,23 @@ def test_data_frame_list():
     assert roundtrip.column("alicia").dtype.type == np.float64
 
     # Test with HDF5.
-    dir = mkdtemp()
-    meta = dl.stage_object(df, dir, "foo", mode="hdf5")
-    dl.write_metadata(meta, dir)
+    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
+    dl.write_metadata(meta2, dir)
 
-    meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
-    roundtrip = dl.load_object(meta2, dir)
-    assert isinstance(roundtrip, BiocFrame)
+    meta2 = dl.acquire_metadata(dir, "foo2/simple.h5")
+    roundtrip2 = dl.load_hdf5_data_frame(meta2, dir)
+    assert isinstance(roundtrip2, BiocFrame)
 
-    assert list(roundtrip.column("akari")) == df.column("akari")
-    assert roundtrip.column("akari").dtype.type == np.int32
-
-    assert roundtrip.column("aika") == df.column("aika")
-
-    assert list(roundtrip.column("alice")) == df.column("alice")
-    assert roundtrip.column("alice").dtype.type == np.bool_
-
-    assert list(roundtrip.column("ai")) == df.column("ai")
-    assert roundtrip.column("ai").dtype.type == np.float64
-
-    assert list(roundtrip.column("alicia")) == df.column("alicia")
-    assert roundtrip.column("alicia").dtype.type == np.float64
+    assert list(roundtrip2.column("akari")) == df.column("akari")
+    assert roundtrip2.column("akari").dtype.type == np.int32
+    assert roundtrip2.column("aika") == df.column("aika")
+    assert list(roundtrip2.column("alice")) == df.column("alice")
+    assert roundtrip2.column("alice").dtype.type == np.bool_
+    assert list(roundtrip2.column("ai")) == df.column("ai")
+    assert roundtrip2.column("ai").dtype.type == np.float64
+    assert list(roundtrip2.column("alicia")) == df.column("alicia")
+    assert roundtrip2.column("alicia").dtype.type == np.float64
 
 
 def test_data_frame_row_names():
@@ -75,6 +71,8 @@ def test_data_frame_row_names():
     }, row_names = [ "kaori", "chihaya", "fuyuki", "azusa", "iori" ])
 
     dir = mkdtemp()
+
+    # Test with CSV.
     meta = dl.stage_object(df, dir, "foo")
     assert meta["data_frame"]["row_names"]
     dl.write_metadata(meta, dir)
@@ -83,6 +81,16 @@ def test_data_frame_row_names():
     roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert df.row_names == roundtrip.row_names
+
+    # Test with HDF5.
+    print(dir)
+    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
+    dl.write_metadata(meta2, dir)
+
+    meta2 = dl.acquire_metadata(dir, "foo2/simple.h5")
+    roundtrip2 = dl.load_hdf5_data_frame(meta2, dir)
+    assert df.row_names == roundtrip2.row_names
 
 
 def test_data_frame_wild_strings():
