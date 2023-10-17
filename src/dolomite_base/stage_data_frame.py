@@ -117,40 +117,46 @@ def _process_columns(x: BiocFrame, handle) -> Tuple:
                 if not ut._is_integer_vector_within_limit(current):
                     final_type = float    
 
-            if has_none:
-                placeholder, final_type = _select_hdf5_placeholder(current, final_type)
-                copy = current[:]
-                for j, y in enumerate(copy):
-                    if y is None:
-                        copy[j] = placeholder 
-                current = copy
+            if not as_csv:
+                if has_none:
+                    placeholder, final_type = _select_hdf5_placeholder(current, final_type)
+                    copy = current[:]
+                    for j, y in enumerate(copy):
+                        if y is None:
+                            copy[j] = placeholder 
+                    current = copy
 
             if final_type == int:
                 columns.append({ "type": "integer", "name": col })
                 if as_csv:
                     operations.append(_list_element_to_string)
                 else:
-                    handle.create_dataset(str(i), data=current, dtype="i4", compression="gzip", chunks=True)
+                    savetype = 'i4'
             elif final_type == float:
                 columns.append({ "type": "number", "name": col })
                 if as_csv:
                     operations.append(_list_element_to_string)
                 else:
-                    handle.create_dataset(str(i), data=current, dtype="f8", compression="gzip", chunks=True)
+                    savetype = 'f8'
             elif final_type == str:
                 columns.append({ "type": "string", "name": col })
                 if as_csv:
                     operations.append(_quotify_string_or_none)
                 else:
-                    handle.create_dataset(str(i), data=current, compression="gzip", chunks=True)
+                    savetype = None
             elif final_type == bool:
                 columns.append({ "type": "boolean", "name": col })
                 if as_csv:
                     operations.append(_list_element_to_string)
                 else:
-                    handle.create_dataset(str(i), data=current, dtype="i1", compression="gzip", chunks=True)
+                    savetype = 'i1'
             else:
                 raise NotImplementedError("saving a list of " + str(list(all_types)[0]) + " is not supported yet")
+
+            if not as_csv:
+                dhandle = handle.create_dataset(str(i), data=current, dtype=savetype, compression="gzip", chunks=True)
+                if has_none:
+                    dhandle.attrs.create("missing-value-placeholder", data=placeholder, dtype=savetype)
 
         elif isinstance(current, np.ndarray):
             dt = current.dtype.type

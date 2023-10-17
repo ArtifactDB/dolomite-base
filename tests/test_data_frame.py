@@ -83,7 +83,6 @@ def test_data_frame_row_names():
     assert df.row_names == roundtrip.row_names
 
     # Test with HDF5.
-    print(dir)
     meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
     assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
     dl.write_metadata(meta2, dir)
@@ -99,6 +98,8 @@ def test_data_frame_wild_strings():
     }, row_names = [ "nagisa\"", "\"fuko\"", "okazaki\nasdasd" ])
 
     dir = mkdtemp()
+
+    # Test with CSV.
     meta = dl.stage_object(df, dir, "foo")
     assert meta["data_frame"]["row_names"]
     dl.write_metadata(meta, dir)
@@ -109,6 +110,16 @@ def test_data_frame_wild_strings():
     assert df.row_names == roundtrip.row_names
     assert df.column("lyrics") == roundtrip.column("lyrics")
 
+    # Test with HDF5.
+    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
+    dl.write_metadata(meta2, dir)
+
+    meta2 = dl.acquire_metadata(dir, "foo2/simple.h5")
+    roundtrip2 = dl.load_hdf5_data_frame(meta2, dir)
+    assert df.row_names == roundtrip2.row_names
+    assert df.column("lyrics") == roundtrip2.column("lyrics")
+
 
 def test_data_frame_none():
     df = BiocFrame({
@@ -118,14 +129,6 @@ def test_data_frame_none():
         "ai": [ 2.3, None, 5.2, None, -1.2 ],
     })
 
-    dir = mkdtemp()
-    meta = dl.stage_object(df, dir, "foo")
-    assert meta["data_frame"]["columns"][0] == { "type": "integer", "name": "akari" }
-    assert meta["data_frame"]["columns"][1] == { "type": "string", "name": "aika" }
-    assert meta["data_frame"]["columns"][2] == { "type": "boolean", "name": "alice" }
-    assert meta["data_frame"]["columns"][3] == { "type": "number", "name": "ai" }
-    dl.write_metadata(meta, dir)
-
     def compare_masked_to_list(l, m):
         assert len(l) == len(m)
         for i, x in enumerate(l):
@@ -133,6 +136,16 @@ def test_data_frame_none():
                 assert x == m[i]
             else:
                 assert np.ma.is_masked(m[i])
+
+    dir = mkdtemp()
+
+    # Test with CSV.
+    meta = dl.stage_object(df, dir, "foo")
+    assert meta["data_frame"]["columns"][0] == { "type": "integer", "name": "akari" }
+    assert meta["data_frame"]["columns"][1] == { "type": "string", "name": "aika" }
+    assert meta["data_frame"]["columns"][2] == { "type": "boolean", "name": "alice" }
+    assert meta["data_frame"]["columns"][3] == { "type": "number", "name": "ai" }
+    dl.write_metadata(meta, dir)
 
     meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
     roundtrip = dl.load_object(meta2, dir)
@@ -149,6 +162,20 @@ def test_data_frame_none():
     compare_masked_to_list(df.column("ai"), roundtrip.column("ai"))
     assert roundtrip.column("ai").dtype.type == np.float64
 
+    # Test with HDF5.
+    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
+    dl.write_metadata(meta2, dir)
+    roundtrip2 = dl.load_hdf5_data_frame(meta2, dir)
+
+    compare_masked_to_list(df.column("akari"), roundtrip2.column("akari"))
+    assert roundtrip2.column("akari").dtype.type == np.int32
+    assert roundtrip2.column("aika") == df.column("aika")
+    compare_masked_to_list(df.column("alice"), roundtrip2.column("alice"))
+    assert roundtrip2.column("alice").dtype.type == np.bool_
+    compare_masked_to_list(df.column("ai"), roundtrip2.column("ai"))
+    assert roundtrip2.column("ai").dtype.type == np.float64
+
 
 def test_data_frame_numpy():
     df = BiocFrame({
@@ -158,6 +185,8 @@ def test_data_frame_numpy():
     })
 
     dir = mkdtemp()
+
+    # Test with CSV.
     meta = dl.stage_object(df, dir, "foo")
     assert meta["data_frame"]["columns"][0] == { "type": "integer", "name": "alicia" }
     assert meta["data_frame"]["columns"][1] == { "type": "boolean", "name": "akira" }
@@ -172,6 +201,17 @@ def test_data_frame_numpy():
     assert (roundtrip.column("akira") == df.column("akira")).all()
     assert (roundtrip.column("athena") == df.column("athena")).all()
 
+    # Test with HDF5.
+    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
+    dl.write_metadata(meta2, dir)
+    roundtrip2 = dl.load_hdf5_data_frame(meta2, dir)
+
+    assert (roundtrip.column("alicia") == df.column("alicia")).all()
+    assert roundtrip.column("alicia").dtype == np.int32
+    assert (roundtrip.column("akira") == df.column("akira")).all()
+    assert (roundtrip.column("athena") == df.column("athena")).all()
+
 
 def test_data_frame_masked():
     df = BiocFrame({
@@ -181,6 +221,8 @@ def test_data_frame_masked():
     })
 
     dir = mkdtemp()
+
+    # Test with CSV.
     meta = dl.stage_object(df, dir, "foo")
     assert meta["data_frame"]["columns"][0] == { "type": "integer", "name": "alicia" }
     assert meta["data_frame"]["columns"][1] == { "type": "boolean", "name": "akira" }
@@ -191,8 +233,24 @@ def test_data_frame_masked():
     roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
     assert (roundtrip.column("alicia") == df.column("alicia")).all()
+    assert (roundtrip.column("alicia").mask == df.column("alicia").mask).all()
     assert (roundtrip.column("akira") == df.column("akira")).all()
+    assert (roundtrip.column("akira").mask == df.column("akira").mask).all()
     assert (roundtrip.column("athena") == df.column("athena")).all()
+    assert (roundtrip.column("athena").mask == df.column("athena").mask).all()
+
+    # Test with HDF5.
+    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    dl.write_metadata(meta2, dir)
+
+    roundtrip2 = dl.load_hdf5_data_frame(meta2, dir)
+    assert isinstance(roundtrip, BiocFrame)
+    assert (roundtrip.column("alicia") == df.column("alicia")).all()
+    assert (roundtrip.column("alicia").mask == df.column("alicia").mask).all()
+    assert (roundtrip.column("akira") == df.column("akira")).all()
+    assert (roundtrip.column("akira").mask == df.column("akira").mask).all()
+    assert (roundtrip.column("athena") == df.column("athena")).all()
+    assert (roundtrip.column("athena").mask == df.column("athena").mask).all()
 
 
 def test_data_frame_empty():
@@ -219,6 +277,17 @@ def test_data_frame_empty():
     assert df.shape == roundtrip.shape
     assert roundtrip.row_names is None
 
+    # Same for HDF5.
+    df = BiocFrame(number_of_rows=10)
+    meta = dl.stage_object(df, dir, "empty2", mode="hdf5")
+    dl.write_metadata(meta, dir)
+
+    meta2 = dl.acquire_metadata(dir, "empty2/simple.h5")
+    roundtrip2 = dl.load_hdf5_data_frame(meta2, dir)
+    assert isinstance(roundtrip2, BiocFrame)
+    assert df.shape == roundtrip2.shape
+    assert roundtrip2.row_names is None
+
 
 def test_data_frame_nested():
     df = BiocFrame({
@@ -236,6 +305,8 @@ def test_data_frame_nested():
     })
 
     dir = mkdtemp()
+
+    # Works for CSV.
     meta = dl.stage_object(df, dir, "foo")
     assert meta["data_frame"]["columns"][1]["type"] == "other"
     assert meta["data_frame"]["columns"][3]["type"] == "other"
@@ -252,6 +323,22 @@ def test_data_frame_nested():
     assert (liella_df.column("best") == np.array([False, False, False, True, False ])).all()
 
     bsb_df = roundtrip.column("bsb")
+    assert isinstance(bsb_df, BiocFrame)
+    assert bsb_df.column("first") == df.column("bsb").column("first")
+    assert bsb_df.column("last") == df.column("bsb").column("last")
+
+    # Works for HDF5.
+    meta2 = dl.stage_object(df, dir, "foo2")
+    dl.write_metadata(meta2, dir)
+    roundtrip2 = dl.load_object(meta2, dir)
+    assert isinstance(roundtrip2, BiocFrame)
+
+    liella_df = roundtrip2.column("liella")
+    assert isinstance(liella_df, BiocFrame)
+    assert liella_df.column("first") == df.column("liella").column("first")
+    assert liella_df.column("last") == df.column("liella").column("last")
+
+    bsb_df = roundtrip2.column("bsb")
     assert isinstance(bsb_df, BiocFrame)
     assert bsb_df.column("first") == df.column("bsb").column("first")
     assert bsb_df.column("last") == df.column("bsb").column("last")

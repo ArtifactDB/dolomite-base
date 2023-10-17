@@ -190,13 +190,18 @@ def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFr
 
             if "missing-value-placeholder" in dhandle.attrs:
                 placeholder = dhandle.attrs["missing-value-placeholder"]
-                if isinstance(placeholder, float) and numpy.isnan(placeholder): # need to handle NaNs with weird payloads.
-                    mask = numpy.ndarray(len(values), dtype=numpy.uint8)
-                    buffered = numpy.array(placeholder, dtype=values.dtype)
-                    lib.fill_nan_mask(values.ctypes.data, len(values), buffered.ctypes.data, values.dtype.itemsize, mask)
+                if is_str:
+                    for j, y in enumerate(values):
+                        if y == placeholder:
+                            values[j] = None
                 else:
-                    mask = (values == placeholder)
-                contents = numpy.ma.array(contents, mask=mask)
+                    if isinstance(placeholder, float) and np.isnan(placeholder): # need to handle NaNs with weird payloads.
+                        mask = np.ndarray(len(values), dtype=np.uint8)
+                        buffered = np.array(placeholder, dtype=values.dtype)
+                        lib.fill_nan_mask(values.ctypes.data, len(values), buffered.ctypes.data, values.dtype.itemsize, mask)
+                    else:
+                        mask = (values == placeholder)
+                    values = np.ma.array(values, mask=mask)
 
             contents[i] = values 
 
