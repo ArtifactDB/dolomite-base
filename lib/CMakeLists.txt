@@ -13,42 +13,43 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/ArtifactDB/millijson
   GIT_TAG v1.0.0
 )
-FetchContent_MakeAvailable(millijson)
 
 FetchContent_Declare(
   byteme 
   GIT_REPOSITORY https://github.com/LTLA/byteme
   GIT_TAG v1.1.0
 )
-FetchContent_MakeAvailable(byteme)
 
 FetchContent_Declare(
   comservatory
   GIT_REPOSITORY https://github.com/ArtifactDB/comservatory
   GIT_TAG v1.1.0
 )
-FetchContent_MakeAvailable(comservatory)
 
 FetchContent_Declare(
   ritsuko 
   GIT_REPOSITORY https://github.com/ArtifactDB/ritsuko
   GIT_TAG v0.2.0
 )
-FetchContent_MakeAvailable(ritsuko)
 
 FetchContent_Declare(
   uzuki2
   GIT_REPOSITORY https://github.com/ArtifactDB/uzuki2
   GIT_TAG v1.2.0
 )
-FetchContent_MakeAvailable(uzuki2)
 
 FetchContent_Declare(
   takane
   GIT_REPOSITORY https://github.com/ArtifactDB/takane
   GIT_TAG v0.2.0
 )
+
+FetchContent_MakeAvailable(uzuki2)
+FetchContent_MakeAvailable(byteme)
+FetchContent_MakeAvailable(millijson)
 FetchContent_MakeAvailable(takane)
+FetchContent_MakeAvailable(ritsuko)
+FetchContent_MakeAvailable(comservatory)
 
 # Defining the targets.
 set(TARGET dolomite_base)
