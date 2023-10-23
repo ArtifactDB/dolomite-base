@@ -1,106 +1,175 @@
+#include "pybind11/pybind11.h"
+#include "pybind11/numpy.h"
 #include "comservatory/comservatory.hpp"
 #include <cstdint>
+#include "utils.h"
 
-//[[export]]
-void* load_csv(const char* path, bool parallel) {
-    comservatory::ReadOptions opt;
-    opt.parallel = parallel;
-    auto contents = comservatory::read_file(path, opt); // throws error for invalid formats.
-    return new comservatory::Contents(std::move(contents));
-}
-
-//[[export]]
-void free_csv(void* ptr) {
-    delete reinterpret_cast<comservatory::Contents*>(ptr);
-}
-
-//[[export]]
-int32_t get_csv_num_fields(void* ptr) {
-    return reinterpret_cast<const comservatory::Contents*>(ptr)->num_fields();
-}
-
-//[[export]]
-int32_t get_csv_num_records(void* ptr) {
-    return reinterpret_cast<const comservatory::Contents*>(ptr)->num_records();
-}
-
-//[[export]]
-void get_csv_column_stats(void* ptr, int32_t column, int32_t* type, int32_t* size, int32_t* loaded) {
-    auto mat = reinterpret_cast<const comservatory::Contents*>(ptr);
-    const auto& current = mat->fields[column];
-
-    // Manually specifying it here, so that we're robust to changes in comservatory itself.
-    auto mytype = current->type();
-    if (mytype == comservatory::STRING) {
-        *type = 0;
-    } else if (mytype == comservatory::NUMBER) {
-        *type = 1;
-    } else if (mytype == comservatory::COMPLEX) {
-        *type = 2;
-    } else if (mytype == comservatory::BOOLEAN) {
-        *type = 3;
-    } else if (mytype == comservatory::UNKNOWN) {
-        *type = -1;
+template<typename T, typename Base>
+struct PythonNumpyField : public Base {
+    PythonNumpyField(size_t current, size_t max) : position(current), storage(max) {
+        for (size_t i = 0; i < position; ++i) {
+            storage.mutable_at(i) = 0;
+            masked.push_back(i);
+        }
     }
 
-    *size = current->size();
-    *loaded = current->filled();
-}
-
-//[[export]]
-uint8_t fetch_csv_numbers(void* ptr, int32_t column, double* contents /** numpy */, uint8_t* mask /** numpy */) {
-    auto mat = reinterpret_cast<comservatory::Contents*>(ptr);
-    auto& current = mat->fields[column];
-
-    auto nptr = reinterpret_cast<const comservatory::FilledNumberField*>(current.get());
-    std::copy(nptr->values.begin(), nptr->values.end(), contents);
-    for (auto i : nptr->missing) {
-        mask[i] = 1;
+    size_t size() const { 
+        return position; 
     }
 
-    return !(nptr->missing.empty());
-}
-
-//[[export]]
-uint8_t fetch_csv_booleans(void* ptr, int32_t column, uint8_t* contents /** numpy */) {
-    auto mat = reinterpret_cast<comservatory::Contents*>(ptr);
-    auto& current = mat->fields[column];
-
-    auto nptr = reinterpret_cast<const comservatory::FilledBooleanField*>(current.get());
-    std::copy(nptr->values.begin(), nptr->values.end(), contents);
-    for (auto i : nptr->missing) {
-        contents[i] = 2;
+    void push_back(T x) {
+        if (position == storage.size()) {
+            throw std::runtime_error("more rows present in the CSV than expected");
+        }
+        storage.mutable_at(position) = x;
+        ++position;
     }
 
-    return !(nptr->missing.empty());
-}
-
-//[[export]]
-uint8_t get_csv_string_stats(void* ptr, int32_t column, int32_t* lengths /** numpy */, uint8_t* mask /** numpy */) {
-    auto mat = reinterpret_cast<const comservatory::Contents*>(ptr);
-    const auto& current = mat->fields[column];
-
-    auto nptr = reinterpret_cast<const comservatory::FilledStringField*>(current.get());
-    for (const auto& x : nptr->values) {
-        *lengths = x.size();
-        ++lengths;
+    void add_missing() {
+        if (position == storage.size()) {
+            throw std::runtime_error("more rows present in the CSV than expected");
+        }
+        storage.mutable_at(position) = 0;
+        masked.push_back(position);
+        ++position;
     }
 
-    for (auto i : nptr->missing) {
-        mask[i] = 1;
+    pybind11::object format_output() const {
+        if (masked.empty()) {
+            return storage;
+        } else {
+            return mask_numpy_array(storage, masked);
+        }
     }
 
-    return !(nptr->missing.empty());
+    size_t position;
+    pybind11::array_t<T> storage;
+    std::vector<size_t> masked;
+};
+
+typedef PythonNumpyField<double, comservatory::NumberField> PythonNumberField;
+typedef PythonNumpyField<char, comservatory::BooleanField> PythonBooleanField;
+
+struct PythonStringField : public comservatory::StringField {
+    PythonStringField(size_t current) {
+        for (size_t i = 0; i < current; ++i) {
+            storage.append(pybind11::none());
+        }
+    }
+
+    size_t size() const { 
+        return storage.size();
+    }
+
+    void push_back(std::string x) {
+        storage.append(std::move(x));
+    }
+
+    void add_missing() {
+        storage.append(pybind11::none());
+    }
+
+    pybind11::object format_output() const {
+        return storage;
+    }
+
+    pybind11::list storage;
+};
+
+struct PythonFieldCreator : public comservatory::FieldCreator {
+    PythonFieldCreator(size_t n) : num_records(n) {}
+
+    comservatory::Field* create(comservatory::Type observed, size_t n, bool) const {
+        comservatory::Field* ptr;
+
+        switch (observed) {
+            case comservatory::STRING:
+                ptr = new PythonStringField(n);
+                break;
+            case comservatory::NUMBER:
+                ptr = new PythonNumberField(n, num_records);
+                break;
+            case comservatory::BOOLEAN:
+                ptr = new PythonBooleanField(n, num_records);
+                break;
+            default:
+                throw std::runtime_error("unsupported type during field creation");
+        }
+
+        return ptr;
+    }
+
+    size_t num_records;
+};
+
+pybind11::object load_csv(std::string path, size_t nrow, bool is_compressed, bool parallel) {
+    comservatory::ReadOptions opts;
+    opts.parallel = parallel;
+    PythonFieldCreator creator(nrow);
+    opts.creator = &creator;
+
+    comservatory::Contents contents;
+    if (is_compressed) {
+        byteme::GzipFileReader reader(path);
+        contents = comservatory::read(reader, opts);
+    } else {
+        byteme::RawFileReader reader(path);
+        contents = comservatory::read(reader, opts);
+    }
+    if (contents.num_records() != nrow) {
+        throw std::runtime_error("difference between the observed and expected number of CSV rows (" + std::to_string(contents.num_records()) + " to " + std::to_string(nrow) + ")");
+    }
+
+    pybind11::list names;
+    for (const auto& n : contents.names) {
+        names.append(n);
+    }
+
+    using namespace pybind11::literals;
+
+    pybind11::list fields;
+    for (size_t o = 0; o < contents.num_fields(); ++o) {
+        switch (contents.fields[o]->type()) {
+            case comservatory::STRING:
+                fields.append(static_cast<PythonStringField*>(contents.fields[o].get())->format_output());
+                break;
+            case comservatory::NUMBER:
+                fields.append(static_cast<PythonNumberField*>(contents.fields[o].get())->format_output());
+                break;
+            case comservatory::BOOLEAN:
+                fields.append(static_cast<PythonBooleanField*>(contents.fields[o].get())->format_output());
+                break;
+            case comservatory::UNKNOWN:
+                {
+                    pybind11::array_t<bool> values(nrow);
+                    pybind11::array_t<bool> mask(nrow);
+                    for (size_t i = 0; i < nrow; ++i) {
+                        values.mutable_at(i) = 0;
+                        mask.mutable_at(i) = 1; 
+                    }
+                    pybind11::module np = pybind11::module::import("numpy");
+                    pybind11::module ma = np.attr("ma");
+                    fields.append(ma.attr("array")(values, "mask"_a=mask));
+                }
+                break;
+            default:
+                throw std::runtime_error("unrecognized type during list assignment");
+        }
+    }
+
+    return pybind11::dict("names"_a = names, "fields"_a = fields);
 }
 
-//[[export]]
-void fetch_csv_strings(void* ptr, int32_t column, char* contents) {
-    auto mat = reinterpret_cast<comservatory::Contents*>(ptr);
-    auto& current = mat->fields[column];
+void validate_csv(std::string path, bool is_compressed, bool parallel) {
+    comservatory::ReadOptions opts;
+    opts.parallel = parallel;
+    opts.validate_only = true;
 
-    auto nptr = reinterpret_cast<const comservatory::FilledStringField*>(current.get());
-    for (const auto& x : nptr->values) {
-        std::copy(x.begin(), x.end(), contents);
-        contents += x.size();
+    if (is_compressed) {
+        byteme::GzipFileReader reader(path);
+        comservatory::read(reader, opts);
+    } else {
+        byteme::RawFileReader reader(path);
+        comservatory::read(reader, opts);
     }
 }

@@ -12,6 +12,8 @@ from glob import glob
 import pathlib
 import os
 import shutil
+import sys
+import pybind11
 
 ## Adapted from https://stackoverflow.com/questions/42585210/extending-setuptools-extension-to-use-cmake-in-setup-py.
 class CMakeExtension(Extension):
@@ -32,7 +34,8 @@ class build_ext(build_ext_orig):
             cmd = [ 
                 "cmake", 
                 "-S", "lib",
-                "-B", build_temp
+                "-B", build_temp,
+                "-Dpybind11_DIR=" + os.path.join(os.path.dirname(pybind11.__file__), "share", "cmake", "pybind11"),
             ]
             if os.name != "nt":
                 cmd.append("-DCMAKE_BUILD_TYPE=Release")
