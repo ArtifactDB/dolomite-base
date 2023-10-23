@@ -13,45 +13,50 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/ArtifactDB/millijson
   GIT_TAG v1.0.0
 )
-FetchContent_MakeAvailable(millijson)
 
 FetchContent_Declare(
   byteme 
   GIT_REPOSITORY https://github.com/LTLA/byteme
   GIT_TAG v1.1.0
 )
-FetchContent_MakeAvailable(byteme)
 
 FetchContent_Declare(
   uzuki2
   GIT_REPOSITORY https://github.com/ArtifactDB/uzuki2
   GIT_TAG v1.1.4
 )
-FetchContent_MakeAvailable(uzuki2)
 
 FetchContent_Declare(
   comservatory
   GIT_REPOSITORY https://github.com/ArtifactDB/comservatory
   GIT_TAG v1.0.0
 )
+
+FetchContent_MakeAvailable(millijson)
+FetchContent_MakeAvailable(byteme)
+FetchContent_MakeAvailable(uzuki2)
 FetchContent_MakeAvailable(comservatory)
 
 # Defining the targets.
 set(TARGET dolomite_base)
 
-add_library(${TARGET} SHARED
-    src/bindings.cpp
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
+find_package(pybind11 CONFIG)
+
+# pybind11 method:
+pybind11_add_module(${TARGET} 
     src/load_csv.cpp
     src/load_list.cpp
     src/misc.cpp
+    src/init.cpp
 )
 
 set_property(TARGET ${TARGET} PROPERTY CXX_STANDARD 17)
 
-target_link_libraries(${TARGET} uzuki2 comservatory)
+target_link_libraries(${TARGET} PRIVATE uzuki2 comservatory pybind11::pybind11)
 
-set_target_properties(${TARGET} PROPERTIES 
-    OUTPUT_NAME _core 
+set_target_properties(${TARGET} PROPERTIES
+    OUTPUT_NAME lib_dolomite_base
     PREFIX ""
 )
 

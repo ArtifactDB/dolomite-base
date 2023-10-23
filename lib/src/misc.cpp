@@ -1,17 +1,19 @@
+#include "pybind11/pybind11.h"
+#include "pybind11/numpy.h"
 #include "uzuki2/uzuki2.hpp"
 #include <cstring>
 
-//[[export]]
-void extract_r_missing_double(double* buffer /** numpy */) {
-    *buffer = uzuki2::hdf5::legacy_missing_double();
-    return;
+pybind11::object create_r_missing_double() {
+    pybind11::module np = pybind11::module::import("numpy");
+    return np.attr("float64")(uzuki2::hdf5::legacy_missing_double());
 }
 
-//[[export]]
-void fill_nan_mask(void* values, int32_t number, void* placeholder, int32_t size, uint8_t* mask /** numpy */) {
+pybind11::object create_nan_mask(uintptr_t values, size_t number, size_t size, uintptr_t placeholder) {
     auto vptr = reinterpret_cast<const unsigned char*>(values);
     auto pptr = reinterpret_cast<const unsigned char*>(placeholder);
-    for (int32_t i = 0; i < number; ++i, vptr += size) {
-        mask[i] = (std::memcmp(vptr, pptr, size) == 0);
+    pybind11::array_t<bool> mask(number);
+    for (size_t i = 0; i < number; ++i, vptr += size) {
+        mask.mutable_at(i) = (std::memcmp(vptr, pptr, size) == 0);
     }
+    return mask;
 }

@@ -15,6 +15,7 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
+from .lib_dolomite_base import *
 from .stage_object import stage_object
 from .stage_data_frame import stage_data_frame, choose_data_frame_format
 from .write_metadata import write_metadata

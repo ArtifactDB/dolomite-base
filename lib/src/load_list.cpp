@@ -1,447 +1,319 @@
+#include "pybind11/pybind11.h"
+#include "pybind11/numpy.h"
 #include "uzuki2/uzuki2.hpp"
+
+#include "utils.h"
+
 #include <cstdint>
+#include <iostream>
 
 /** Defining the various elements. **/
 
-template<typename T>
-struct DefaultVectorBase { 
-    DefaultVectorBase(size_t l, bool n, bool s) : values(l), has_names(n), names(n ? l : 0), scalar(s) {}
+struct PythonBase {
+    virtual ~PythonBase() = default;
+    virtual pybind11::object extract() const = 0;
+};
+
+template<typename T, class Base>
+struct PythonNumpyVector : public Base, public PythonBase {
+    PythonNumpyVector(size_t l, bool n, bool s) : storage(l), names(n ? l : 0), is_scalar(s) {}
 
     size_t size() const { 
-        return values.size(); 
+        return storage.size();
     }
 
     void set(size_t i, T val) {
-        values[i] = std::move(val);
+        storage.mutable_at(i) = val;
     }
 
     void set_missing(size_t i) {
+        storage.mutable_at(i) = 0;
         missing.push_back(i);
+    }
+
+    void set_name(size_t i, std::string n) {
+        names[i] = std::move(n);
+    }
+
+    pybind11::object extract() const {
+        if (names.empty()) {
+            if (is_scalar) {
+                pybind11::module np = pybind11::module::import("numpy");
+                if (!missing.empty()) {
+                    pybind11::module ma = np.attr("ma");
+                    return ma.attr("masked");
+                } else {
+                    return pybind11::cast(storage.at(0));
+                }
+
+            } else {
+                if (missing.empty()) {
+                    return storage;
+                } else {
+                    return mask_numpy_array(storage, missing);
+                }
+            }
+
+        } else {
+            // Numpy arrays don't have direct support for names, so we
+            // just convert it into a dict.
+            pybind11::dict output;
+            pybind11::module np = pybind11::module::import("numpy");
+
+            if (missing.empty()) {
+                for (size_t i = 0, end = storage.size(); i < end; ++i) {
+                    output[names[i].c_str()] = pybind11::cast(storage.at(i));
+                }
+            } else {
+                std::unordered_set<size_t> all_missing(missing.begin(), missing.end());
+                pybind11::module ma = np.attr("ma");
+                pybind11::object masked = ma.attr("masked");
+
+                for (size_t i = 0, end = storage.size(); i < end; ++i) {
+                    if (all_missing.find(i) == all_missing.end()) {
+                        output[names[i].c_str()] = pybind11::cast(storage.at(i));
+                    } else {
+                        output[names[i].c_str()] = masked;
+                    }
+                }
+            }
+
+            return output;
+        }
+    }
+
+    pybind11::array_t<T> storage;
+    std::vector<std::string> names;
+    std::vector<size_t> missing;
+    bool is_scalar;
+};
+
+typedef PythonNumpyVector<double, uzuki2::NumberVector> PythonNumberVector;
+typedef PythonNumpyVector<int32_t, uzuki2::IntegerVector> PythonIntegerVector;
+typedef PythonNumpyVector<bool, uzuki2::BooleanVector> PythonBooleanVector;
+
+struct PythonStringVector : public uzuki2::StringVector, public PythonBase {
+    PythonStringVector(size_t l, bool n, bool s, uzuki2::StringVector::Format) : storage(l), names(n ? l : 0), is_scalar(s) {}
+
+    size_t size() const { 
+        return storage.size();
+    }
+
+    void set(size_t i, std::string val) {
+        storage[i] = std::move(val);
+    }
+
+    void set_missing(size_t i) {
+        storage[i] = pybind11::none();
     }
 
     void set_name(size_t i, std::string name) {
         names[i] = std::move(name);
     }
 
-    std::vector<T> values;
-    std::vector<int32_t> missing;
-    bool has_names;
+    pybind11::object extract() const {
+        if (names.empty()) {
+            if (is_scalar) {
+                return storage[0];
+            } else {
+                return storage;
+            }
+        } else {
+            // Numpy arrays don't have direct support for names, so we
+            // just convert it into a dict.
+            pybind11::dict output;
+            for (size_t i = 0, end = storage.size(); i < end; ++i) {
+                output[names[i].c_str()] = storage[i];
+            }
+            return output;
+        }
+    }
+
+    pybind11::list storage;
     std::vector<std::string> names;
-    bool scalar;
+    std::vector<size_t> missing;
+    bool is_scalar;
 };
 
-struct DefaultIntegerVector : public uzuki2::IntegerVector {
-    DefaultIntegerVector(size_t l, bool n, bool s) : base(l, n, s) {}
+struct PythonFactor : public uzuki2::Factor, public PythonBase {
+    PythonFactor(size_t l, bool n, bool s, size_t ll, bool o) : storage(l), names(n ? l : 0), is_scalar(s), levels(ll), ordered(o) {}
 
     size_t size() const { 
-        return base.size();
-    }
-
-    void set(size_t i, int32_t val) {
-        base.set(i, val);
-    }
-
-    void set_missing(size_t i) {
-        base.set_missing(i);
-    }
-
-    void set_name(size_t i, std::string name) {
-        base.set_name(i, std::move(name));
-    }
-
-    DefaultVectorBase<int32_t> base;
-};
-
-struct DefaultNumberVector : public uzuki2::NumberVector {
-    DefaultNumberVector(size_t l, bool n, bool s) : base(l, n, s) {}
-
-    size_t size() const { 
-        return base.size();
-    }
-
-    void set(size_t i, double val) {
-        base.set(i, val);
-    }
-
-    void set_missing(size_t i) {
-        base.set_missing(i);
-    }
-
-    void set_name(size_t i, std::string name) {
-        base.set_name(i, std::move(name));
-    }
-
-    DefaultVectorBase<double> base;
-};
-
-struct DefaultBooleanVector : public uzuki2::BooleanVector {
-    DefaultBooleanVector(size_t l, bool n, bool s) : base(l, n, s) {}
-
-    size_t size() const { 
-        return base.size();
-    }
-
-    void set(size_t i, bool val) {
-        base.set(i, val);
-    }
-
-    void set_missing(size_t i) {
-        base.set_missing(i);
-    }
-
-    void set_name(size_t i, std::string name) {
-        base.set_name(i, std::move(name));
-    }
-
-    DefaultVectorBase<uint8_t> base;
-};
-
-struct DefaultStringVector : public uzuki2::StringVector {
-    DefaultStringVector(size_t l, bool n, bool s, uzuki2::StringVector::Format f) : base(l, n, s), format(f) {}
-
-    size_t size() const { 
-        return base.size();
-    }
-
-    void set(size_t i, std::string val) {
-        base.set(i, std::move(val));
-    }
-
-    void set_missing(size_t i) {
-        base.set_missing(i);
-    }
-
-    void set_name(size_t i, std::string name) {
-        base.set_name(i, std::move(name));
-    }
-
-    DefaultVectorBase<std::string> base;
-    uzuki2::StringVector::Format format;
-};
-
-struct DefaultFactor : public uzuki2::Factor {
-    DefaultFactor(size_t l, bool n, bool s, size_t ll, bool o) : vbase(l, n, s), levels(ll), ordered(o) {}
-
-    size_t size() const { 
-        return vbase.size(); 
+        return storage.size(); 
     }
 
     void set(size_t i, size_t l) {
-        vbase.set(i, l);
+        storage.mutable_at(i) = l;
     }
 
     void set_missing(size_t i) {
-        vbase.set_missing(i);
+        storage.mutable_at(i) = 0;
+        missing.insert(i);
     }
 
     void set_name(size_t i, std::string name) {
-        vbase.set_name(i, std::move(name));
+        names[i] = std::move(name);
     }
 
     void set_level(size_t i, std::string l) {
         levels[i] = std::move(l);
     }
 
-    DefaultVectorBase<size_t> vbase;
-    std::vector<std::string> levels;
+    pybind11::object extract() const {
+        if (names.empty()) {
+            if (is_scalar) {
+                if (missing.empty()) {
+                    return levels[storage.at(0)];
+                } else {
+                    return pybind11::none();
+                }
+
+            } else {
+                pybind11::list output;
+                for (size_t i = 0, end = storage.size(); i < end; ++i) {
+                    if (missing.find(i) == missing.end()) {
+                        output.append(levels[storage.at(i)]);
+                    } else {
+                        output.append(pybind11::none());
+                    }
+                }
+                return output;
+            }
+
+        } else {
+            // Numpy arrays don't have direct support for names, so we
+            // just convert it into a dict.
+            pybind11::dict output;
+            for (size_t i = 0, end = storage.size(); i < end; ++i) {
+                if (missing.find(i) == missing.end()) {
+                    output[names[i].c_str()] = levels[storage.at(i)];
+                } else {
+                    output[names[i].c_str()] = pybind11::none();
+                }
+            }
+            return output;
+        }
+    }
+
+    pybind11::array_t<int32_t> storage;
+    std::vector<std::string> names;
+    std::unordered_set<size_t> missing;
+    bool is_scalar;
+    pybind11::list levels;
     bool ordered;
 };
 
-struct DefaultNothing : public uzuki2::Nothing {};
+struct PythonNothing : public uzuki2::Nothing, public PythonBase {
+    pybind11::object extract() const {
+        return pybind11::none();
+    }
+};
 
-struct DefaultExternal : public uzuki2::External {
-    DefaultExternal(void *p) : ptr(p) {}
+struct PythonExternal : public uzuki2::External, public PythonBase {
+    PythonExternal(void *p) : ptr(p) {}
+
+    pybind11::object extract() const {
+        return *reinterpret_cast<pybind11::object*>(ptr);
+    }
+
     void* ptr;
 };
 
-struct DefaultList : public uzuki2::List {
-    DefaultList(size_t l, bool n) : values(l), has_names(n), names(n ? l : 0) {}
+struct PythonList : public uzuki2::List, public PythonBase {
+    PythonList(size_t l, bool n) : values(l), has_names(n), names(n ? l : 0) {}
 
     size_t size() const { 
         return values.size(); 
     }
 
     void set(size_t i, std::shared_ptr<uzuki2::Base> ptr) {
-        values[i] = std::move(ptr);
+        values[i] = dynamic_cast<PythonBase*>(ptr.get())->extract();
     }
 
     void set_name(size_t i, std::string name) {
         names[i] = std::move(name);
     }
 
-    std::vector<std::shared_ptr<uzuki2::Base> > values;
+    pybind11::object extract() const {
+        if (!has_names) {
+            return values;
+        } else {
+            pybind11::dict output;
+            for (size_t i = 0, end = names.size(); i < end; ++i) {
+                output[names[i].c_str()] = values[i];
+            }
+            return output;
+        }
+    }
+
+    pybind11::list values;
     bool has_names = false;
     std::vector<std::string> names;
 };
 
 /** Provisioner. **/
 
-struct DefaultProvisioner {
-    static uzuki2::Nothing* new_Nothing() { return (new DefaultNothing); }
+struct PythonProvisioner {
+    static uzuki2::Nothing* new_Nothing() { return (new PythonNothing); }
 
-    static uzuki2::External* new_External(void* p) { return (new DefaultExternal(p)); }
-
-    template<class ... Args_>
-    static uzuki2::List* new_List(Args_&& ... args) { return (new DefaultList(std::forward<Args_>(args)...)); }
+    static uzuki2::External* new_External(void* p) { return (new PythonExternal(p)); }
 
     template<class ... Args_>
-    static uzuki2::IntegerVector* new_Integer(Args_&& ... args) { return (new DefaultIntegerVector(std::forward<Args_>(args)...)); }
+    static uzuki2::List* new_List(Args_&& ... args) { return (new PythonList(std::forward<Args_>(args)...)); }
 
     template<class ... Args_>
-    static uzuki2::NumberVector* new_Number(Args_&& ... args) { return (new DefaultNumberVector(std::forward<Args_>(args)...)); }
+    static uzuki2::IntegerVector* new_Integer(Args_&& ... args) { return (new PythonIntegerVector(std::forward<Args_>(args)...)); }
 
     template<class ... Args_>
-    static uzuki2::StringVector* new_String(Args_&& ... args) { return (new DefaultStringVector(std::forward<Args_>(args)...)); }
+    static uzuki2::NumberVector* new_Number(Args_&& ... args) { return (new PythonNumberVector(std::forward<Args_>(args)...)); }
 
     template<class ... Args_>
-    static uzuki2::BooleanVector* new_Boolean(Args_&& ... args) { return (new DefaultBooleanVector(std::forward<Args_>(args)...)); }
+    static uzuki2::StringVector* new_String(Args_&& ... args) { return (new PythonStringVector(std::forward<Args_>(args)...)); }
 
     template<class ... Args_>
-    static uzuki2::Factor* new_Factor(Args_&& ... args) { return (new DefaultFactor(std::forward<Args_>(args)...)); }
+    static uzuki2::BooleanVector* new_Boolean(Args_&& ... args) { return (new PythonBooleanVector(std::forward<Args_>(args)...)); }
+
+    template<class ... Args_>
+    static uzuki2::Factor* new_Factor(Args_&& ... args) { return (new PythonFactor(std::forward<Args_>(args)...)); }
 };
 
-struct DefaultExternals {
-    DefaultExternals(size_t n) : number(n) {}
+struct PythonExternals {
+    PythonExternals(const pybind11::list& current) {
+        stored.reserve(current.size());
+        for (size_t i = 0, end = current.size(); i < end; ++i) {
+            stored.emplace_back(current[i]);
+        }
+    }
 
     void* get(size_t i) {
-        return reinterpret_cast<void*>(static_cast<uintptr_t>(i));
+        return reinterpret_cast<void*>(&(stored[i]));
     }
 
     size_t size() const {
-        return number;
+        return stored.size();
     }
 
-    size_t number;
+    std::vector<pybind11::object> stored;
 };
 
 /** General methods. **/
 
-//[[export]]
-void* load_list_json(const char* path, int32_t n) {
-    auto parsed = uzuki2::json::parse_file<DefaultProvisioner>(path, DefaultExternals(n));
-    return new uzuki2::ParsedList(std::move(parsed));
+pybind11::object load_list_json(std::string path, pybind11::list children) {
+    std::cout << "Parsing start" << std::endl;
+    auto parsed = uzuki2::json::parse_file<PythonProvisioner>(path, PythonExternals(children));
+    std::cout << "Parsing done" << std::endl;
+    return dynamic_cast<PythonBase*>(parsed.get())->extract();
 }
 
-//[[export]]
-void validate_list_json(const char* path, int32_t n) {
+void validate_list_json(std::string path, size_t n) {
     uzuki2::json::validate_file(path, n);
 }
 
-//[[export]]
-void* load_list_hdf5(const char* path, const char* name, int32_t n) {
-    auto parsed = uzuki2::hdf5::parse<DefaultProvisioner>(path, name, DefaultExternals(n));
-    return new uzuki2::ParsedList(std::move(parsed));
+pybind11::object load_list_hdf5(std::string path, std::string name, pybind11::list children) {
+    auto parsed = uzuki2::hdf5::parse<PythonProvisioner>(path, name, PythonExternals(children));
+    return dynamic_cast<PythonBase*>(parsed.get())->extract();
 }
 
-//[[export]]
-void validate_list_hdf5(const char* path, const char* name, int32_t n) {
+void validate_list_hdf5(std::string path, std::string name, size_t n) {
     uzuki2::hdf5::validate(path, name, n);
-}
-
-//[[export]]
-void uzuki2_free_list(void* ptr) {
-    delete reinterpret_cast<uzuki2::ParsedList*>(ptr);
-}
-
-//[[export]]
-void* uzuki2_get_parent_node(void * ptr) {
-    return reinterpret_cast<uzuki2::ParsedList*>(ptr)->get();
-}
-
-//[[export]]
-int32_t uzuki2_get_node_type(void* ptr) {
-    auto casted = reinterpret_cast<uzuki2::Base*>(ptr);
-    auto list_type = casted->type();
-
-    if (list_type == uzuki2::INTEGER) {
-        return 0;
-    } else if (list_type == uzuki2::NUMBER) {
-        return 1;
-    } else if (list_type == uzuki2::BOOLEAN) {
-        return 2;
-    } else if (list_type == uzuki2::STRING) {
-        return 3;
-    } else if (list_type == uzuki2::LIST) {
-        return 4;
-    } else if (list_type == uzuki2::NOTHING) {
-        return 5;
-    } else if (list_type == uzuki2::EXTERNAL) {
-        return 6;
-    }
-
-    throw std::runtime_error("unsupported uzuki2 type");
-    return -1;
-}
-
-/* Integer vector handlers */
-
-//[[export]]
-int32_t uzuki2_get_integer_vector_length(void* ptr) {
-    auto casted = reinterpret_cast<DefaultIntegerVector*>(ptr);
-    if (casted->base.scalar) {
-        return -1;
-    } else {
-        return casted->size();
-    }
-}
-
-//[[export]]
-uint8_t uzuki2_get_integer_vector_values(void* ptr, int32_t* contents /** numpy */) {
-    auto casted = reinterpret_cast<DefaultIntegerVector*>(ptr);
-    const auto& vals = casted->base.values;
-    std::copy(vals.begin(), vals.end(), contents);
-    return !(casted->base.missing.empty());
-}
-
-//[[export]]
-void uzuki2_get_integer_vector_mask(void* ptr, uint8_t* mask /** numpy */) {
-    auto casted = reinterpret_cast<DefaultIntegerVector*>(ptr);
-    for (auto i : casted->base.missing) {
-        mask[i] = 1;
-    }
-}
-
-/* Number vector handlers */
-
-//[[export]]
-int32_t uzuki2_get_number_vector_length(void* ptr) {
-    auto casted = reinterpret_cast<DefaultNumberVector*>(ptr);
-    if (casted->base.scalar) {
-        return -1;
-    } else {
-        return casted->size();
-    }
-}
-
-//[[export]]
-uint8_t uzuki2_get_number_vector_values(void* ptr, double* contents /** numpy */) {
-    auto casted = reinterpret_cast<DefaultNumberVector*>(ptr);
-    const auto& vals = casted->base.values;
-    std::copy(vals.begin(), vals.end(), contents);
-    return !(casted->base.missing.empty());
-}
-
-//[[export]]
-void uzuki2_get_number_vector_mask(void* ptr, uint8_t* mask /** numpy */) {
-    auto casted = reinterpret_cast<DefaultNumberVector*>(ptr);
-    for (auto i : casted->base.missing) {
-        mask[i] = 1;
-    }
-}
-
-/* Boolean vector handlers */
-
-//[[export]]
-int32_t uzuki2_get_boolean_vector_length(void* ptr) {
-    auto casted = reinterpret_cast<DefaultBooleanVector*>(ptr);
-    if (casted->base.scalar) {
-        return -1;
-    } else {
-        return casted->size();
-    }
-}
-
-//[[export]]
-uint8_t uzuki2_get_boolean_vector_values(void* ptr, uint8_t* contents /** numpy */) {
-    auto casted = reinterpret_cast<DefaultBooleanVector*>(ptr);
-    const auto& vals = casted->base.values;
-    std::copy(vals.begin(), vals.end(), contents);
-    return !(casted->base.missing.empty());
-}
-
-//[[export]]
-void uzuki2_get_boolean_vector_mask(void* ptr, uint8_t* mask /** numpy */) {
-    auto casted = reinterpret_cast<DefaultBooleanVector*>(ptr);
-    for (auto i : casted->base.missing) {
-        mask[i] = 1;
-    }
-}
-
-/* String vector handlers */
-
-//[[export]]
-int32_t uzuki2_get_string_vector_length(void* ptr) {
-    auto casted = reinterpret_cast<DefaultStringVector*>(ptr);
-    if (casted->base.scalar) {
-        return -1;
-    } else {
-        return casted->size();
-    }
-}
-
-//[[export]]
-uint64_t uzuki2_get_string_vector_lengths(void* ptr, int32_t* lengths /** numpy */) {
-    const auto& vals = reinterpret_cast<DefaultStringVector*>(ptr)->base.values;
-    uint64_t total = 0;
-    for (auto x : vals) {
-        *lengths = x.size();
-        total += x.size();
-        ++lengths;
-    }
-    return total;
-}
-
-//[[export]]
-uint8_t uzuki2_get_string_vector_contents(void* ptr, char* contents) {
-    auto casted = reinterpret_cast<DefaultStringVector*>(ptr);
-    const auto& vals = casted->base.values;
-    for (const auto& x : vals) {
-        std::copy(x.begin(), x.end(), contents);
-        contents += x.size();
-    }
-    return !(casted->base.missing.empty());
-}
-
-//[[export]]
-void uzuki2_get_string_vector_mask(void* ptr, uint8_t* mask /** numpy */) {
-    auto casted = reinterpret_cast<DefaultStringVector*>(ptr);
-    for (auto i : casted->base.missing) {
-        mask[i] = 1;
-    }
-}
-
-/* List handlers */
-
-//[[export]]
-int32_t uzuki2_get_list_length(void* ptr) {
-    return reinterpret_cast<DefaultList*>(ptr)->size(); 
-}
-
-//[[export]]
-uint8_t uzuki2_get_list_named(void* ptr) {
-    return reinterpret_cast<DefaultList*>(ptr)->has_names;
-}
-
-//[[export]]
-uint64_t uzuki2_get_list_names_lengths(void* ptr, int32_t* lengths /** numpy */) {
-    const auto& names = reinterpret_cast<DefaultList*>(ptr)->names;
-    uint64_t total = 0;
-    for (const auto& x : names) {
-        *lengths = x.size();
-        total += x.size();
-        ++lengths;
-    }
-    return total;
-}
-
-//[[export]]
-void uzuki2_get_list_names_contents(void* ptr, char* contents) {
-    const auto& names = reinterpret_cast<DefaultList*>(ptr)->names;
-    for (const auto& x : names) {
-        std::copy(x.begin(), x.end(), contents);
-        contents += x.size();
-    }
-    return;
-}
-
-//[[export]]
-void* uzuki2_get_list_element(void* ptr, int32_t i) {
-    return reinterpret_cast<DefaultList*>(ptr)->values[i].get();
-}
-
-/* External handlers */
-
-//[[export]]
-int32_t uzuki2_get_external_index(void* ptr) {
-    return reinterpret_cast<uintptr_t>(reinterpret_cast<DefaultExternal*>(ptr)->ptr);
 }
