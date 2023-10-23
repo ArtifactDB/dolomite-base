@@ -2,17 +2,11 @@
 #include <cstdint>
 
 //[[export]]
-void* load_csv(const char* path) {
-    comservatory::ReadCsv reader;
-    auto contents = reader.read(path); // throws error for invalid formats.
+void* load_csv(const char* path, bool parallel) {
+    comservatory::ReadOptions opt;
+    opt.parallel = parallel;
+    auto contents = comservatory::read_file(path, opt); // throws error for invalid formats.
     return new comservatory::Contents(std::move(contents));
-}
-
-//[[export]]
-void validate_csv(const char* path) {
-    comservatory::ReadCsv reader;
-    reader.validate_only = true;
-    reader.read(path);
 }
 
 //[[export]]

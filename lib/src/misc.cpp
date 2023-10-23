@@ -3,7 +3,7 @@
 
 //[[export]]
 void extract_r_missing_double(double* buffer /** numpy */) {
-    *buffer = uzuki2::hdf5::legacy_missing_double();
+    *buffer = ritsuko::r_missing_value();
     return;
 }
 

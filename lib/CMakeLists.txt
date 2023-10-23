@@ -23,18 +23,32 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(byteme)
 
 FetchContent_Declare(
+  comservatory
+  GIT_REPOSITORY https://github.com/ArtifactDB/comservatory
+  GIT_TAG v1.1.0
+)
+FetchContent_MakeAvailable(comservatory)
+
+FetchContent_Declare(
+  ritsuko 
+  GIT_REPOSITORY https://github.com/ArtifactDB/ritsuko
+  GIT_TAG v0.2.0
+)
+FetchContent_MakeAvailable(ritsuko)
+
+FetchContent_Declare(
   uzuki2
   GIT_REPOSITORY https://github.com/ArtifactDB/uzuki2
-  GIT_TAG v1.1.4
+  GIT_TAG v1.2.0
 )
 FetchContent_MakeAvailable(uzuki2)
 
 FetchContent_Declare(
-  comservatory
-  GIT_REPOSITORY https://github.com/ArtifactDB/comservatory
-  GIT_TAG v1.0.0
+  takane
+  GIT_REPOSITORY https://github.com/ArtifactDB/takane
+  GIT_TAG v0.2.0
 )
-FetchContent_MakeAvailable(comservatory)
+FetchContent_MakeAvailable(takane)
 
 # Defining the targets.
 set(TARGET dolomite_base)
@@ -48,7 +62,7 @@ add_library(${TARGET} SHARED
 
 set_property(TARGET ${TARGET} PROPERTY CXX_STANDARD 17)
 
-target_link_libraries(${TARGET} uzuki2 comservatory)
+target_link_libraries(${TARGET} uzuki2 comservatory takane)
 
 set_target_properties(${TARGET} PROPERTIES 
     OUTPUT_NAME _core 
