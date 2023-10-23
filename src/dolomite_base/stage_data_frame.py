@@ -116,6 +116,8 @@ def _process_columns(x: BiocFrame, handle) -> Tuple:
                 final_type = list(all_types)[0]
             elif len(all_types) == 2 and int in all_types and float in all_types:
                 final_type = float
+            elif len(all_types) == 0:
+                final_type = str
             else:
                 columns.append({ "type": "other", "name": col })
                 operations.append(lambda x : 0)

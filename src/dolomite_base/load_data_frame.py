@@ -66,8 +66,16 @@ def _create_BiocFrame(expected_rows: int, row_names: Optional[list], columns: li
             if not np.issubdtype(c.dtype, np.integer):
                 c = c.astype(np.int32)
 
+        elif curval["type"] == "number":
+            if not np.issubdtype(c.dtype, np.floating):
+                c = c.astype(np.float64)
+
         elif curval["type"] == "boolean":
             c = c.astype(np.bool_, copy=False)
+
+        elif curval["type"] == "string":
+            if not isinstance(c, list): # only happens if the entire column is NA.
+                c = [None] * len(c)
 
         output[curval["name"]] = c
 

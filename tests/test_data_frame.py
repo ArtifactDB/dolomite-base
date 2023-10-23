@@ -127,6 +127,7 @@ def test_data_frame_none():
         "aika": [ "sydney", None, "", "perth", "adelaide" ],
         "alice": [ True, None, False, None, True ],
         "ai": [ 2.3, None, 5.2, None, -1.2 ],
+        "aria": [ None, None, None, None, None ],
     })
 
     def compare_masked_to_list(l, m):
@@ -145,6 +146,7 @@ def test_data_frame_none():
     assert meta["data_frame"]["columns"][1] == { "type": "string", "name": "aika" }
     assert meta["data_frame"]["columns"][2] == { "type": "boolean", "name": "alice" }
     assert meta["data_frame"]["columns"][3] == { "type": "number", "name": "ai" }
+    assert meta["data_frame"]["columns"][4] == { "type": "string", "name": "aria" }
     dl.write_metadata(meta, dir)
 
     meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
@@ -162,6 +164,8 @@ def test_data_frame_none():
     compare_masked_to_list(df.column("ai"), roundtrip.column("ai"))
     assert roundtrip.column("ai").dtype.type == np.float64
 
+    assert roundtrip.column("aria") == df.column("aria")
+
     # Test with HDF5.
     meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
     assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
@@ -175,6 +179,7 @@ def test_data_frame_none():
     assert roundtrip2.column("alice").dtype.type == np.bool_
     compare_masked_to_list(df.column("ai"), roundtrip2.column("ai"))
     assert roundtrip2.column("ai").dtype.type == np.float64
+    assert roundtrip2.column("aria") == df.column("aria")
 
 
 def test_data_frame_numpy():
@@ -207,10 +212,10 @@ def test_data_frame_numpy():
     dl.write_metadata(meta2, dir)
     roundtrip2 = dl.load_object(meta2, dir)
 
-    assert (roundtrip.column("alicia") == df.column("alicia")).all()
-    assert roundtrip.column("alicia").dtype == np.int32
-    assert (roundtrip.column("akira") == df.column("akira")).all()
-    assert (roundtrip.column("athena") == df.column("athena")).all()
+    assert (roundtrip2.column("alicia") == df.column("alicia")).all()
+    assert roundtrip2.column("alicia").dtype == np.int32
+    assert (roundtrip2.column("akira") == df.column("akira")).all()
+    assert (roundtrip2.column("athena") == df.column("athena")).all()
 
 
 def test_data_frame_large_integers():
@@ -250,14 +255,14 @@ def test_data_frame_large_integers():
     dl.write_metadata(meta2, dir)
     roundtrip2 = dl.load_object(meta2, dir)
 
-    assert (roundtrip.column("alicia") == df.column("alicia")).all()
-    assert roundtrip.column("alicia").dtype == np.int32
-    assert (roundtrip.column("akira") == df.column("akira")).all()
-    assert roundtrip.column("akira").dtype == np.float64
-    assert (roundtrip.column("alice") == df.column("alice")).all()
-    assert roundtrip.column("alice").dtype == np.int32
-    assert (roundtrip.column("athena") == df.column("athena")).all()
-    assert roundtrip.column("athena").dtype == np.float64
+    assert (roundtrip2.column("alicia") == df.column("alicia")).all()
+    assert roundtrip2.column("alicia").dtype == np.int32
+    assert (roundtrip2.column("akira") == df.column("akira")).all()
+    assert roundtrip2.column("akira").dtype == np.float64
+    assert (roundtrip2.column("alice") == df.column("alice")).all()
+    assert roundtrip2.column("alice").dtype == np.int32
+    assert (roundtrip2.column("athena") == df.column("athena")).all()
+    assert roundtrip2.column("athena").dtype == np.float64
 
 
 def test_data_frame_special_floats():
@@ -290,21 +295,22 @@ def test_data_frame_special_floats():
     as_expected_masked(roundtrip.column("chisato"))
 
     # Test with HDF5.
-    meta = dl.stage_object(df, dir, "foo2", mode="hdf5")
-    dl.write_metadata(meta, dir)
+    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    dl.write_metadata(meta2, dir)
 
-    roundtrip = dl.load_object(meta, dir)
+    roundtrip2 = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
-    as_expected(roundtrip.column("sumire"))
-    as_expected(roundtrip.column("kanon"))
-    as_expected_masked(roundtrip.column("chisato"))
+    as_expected(roundtrip2.column("sumire"))
+    as_expected(roundtrip2.column("kanon"))
+    as_expected_masked(roundtrip2.column("chisato"))
 
 
 def test_data_frame_masked():
     df = BiocFrame({
         "alicia": np.ma.array(np.array([ 1, 2, 3, 4, 5 ]), mask=[0, 1, 0, 1, 0]),
-        "akira": np.ma.array(np.array([ True, True, False, False, True ]), mask=[1, 1, 0, 0, 0]),
-        "athena": np.ma.array(np.array([ 2.3, 2.3, 5.2, 32, -1.2 ]), mask=[0, 0, 0, 1, 1]),
+        "akira": np.ma.array(np.array([ True, True, False, False, True ]), mask=[1, 1, 0, 0, 0]), # important: test masking at the front.
+        "athena": np.ma.array(np.array([ 2.3, -12.8, 5.2, 32, -1.2 ]), mask=[0, 0, 0, 1, 1]),
+        "aika": np.ma.array(np.array([ 0, 0, 0, 0, 0 ]), mask=[1, 1, 1, 1, 1]),
     })
 
     dir = mkdtemp()
@@ -325,6 +331,7 @@ def test_data_frame_masked():
     assert (roundtrip.column("akira").mask == df.column("akira").mask).all()
     assert (roundtrip.column("athena") == df.column("athena")).all()
     assert (roundtrip.column("athena").mask == df.column("athena").mask).all()
+    assert (roundtrip.column("aika").mask == df.column("aika").mask).all()
 
     # Test with HDF5.
     meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
@@ -332,12 +339,13 @@ def test_data_frame_masked():
 
     roundtrip2 = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
-    assert (roundtrip.column("alicia") == df.column("alicia")).all()
-    assert (roundtrip.column("alicia").mask == df.column("alicia").mask).all()
-    assert (roundtrip.column("akira") == df.column("akira")).all()
-    assert (roundtrip.column("akira").mask == df.column("akira").mask).all()
-    assert (roundtrip.column("athena") == df.column("athena")).all()
-    assert (roundtrip.column("athena").mask == df.column("athena").mask).all()
+    assert (roundtrip2.column("alicia") == df.column("alicia")).all()
+    assert (roundtrip2.column("alicia").mask == df.column("alicia").mask).all()
+    assert (roundtrip2.column("akira") == df.column("akira")).all()
+    assert (roundtrip2.column("akira").mask == df.column("akira").mask).all()
+    assert (roundtrip2.column("athena") == df.column("athena")).all()
+    assert (roundtrip2.column("athena").mask == df.column("athena").mask).all()
+    assert (roundtrip2.column("aika").mask == df.column("aika").mask).all()
 
 
 def test_data_frame_empty():
