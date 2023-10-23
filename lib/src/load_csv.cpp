@@ -7,7 +7,12 @@ using namespace pybind11::literals;
 
 template<typename T, typename Base>
 struct PythonNumpyField : public Base {
-    PythonNumpyField(size_t current, size_t max) : position(current), storage(max) {}
+    PythonNumpyField(size_t current, size_t max) : position(current), storage(max) {
+        for (size_t i = 0; i < position; ++i) {
+            storage.mutable_at(i) = 0;
+            masked.push_back(i);
+        }
+    }
 
     size_t size() const { 
         return position; 
@@ -25,6 +30,7 @@ struct PythonNumpyField : public Base {
         if (position == storage.size()) {
             throw std::runtime_error("more rows present in the CSV than expected");
         }
+        storage.mutable_at(position) = 0;
         masked.push_back(position);
         ++position;
     }
@@ -43,7 +49,7 @@ struct PythonNumpyField : public Base {
             }
 
             pybind11::module np = pybind11::module::import("numpy");
-            pybind11::module ma = np.attr("masked");
+            pybind11::module ma = np.attr("ma");
             return ma.attr("array")(storage, "mask"_a=mask);
         }
     }
@@ -112,7 +118,11 @@ pybind11::object load_csv(std::string path, size_t nrow) {
     comservatory::ReadCsv reader;
     PythonFieldCreator creator(nrow);
     reader.creator = &creator;
+
     auto contents = reader.read(path.c_str()); // throws error for invalid formats.
+    if (contents.num_records() != nrow) {
+        throw std::runtime_error("difference between the observed and expected number of CSV rows (" + std::to_string(contents.num_records()) + " to " + std::to_string(nrow) + ")");
+    }
 
     pybind11::list names;
     for (const auto& n : contents.names) {
@@ -133,15 +143,14 @@ pybind11::object load_csv(std::string path, size_t nrow) {
                 break;
             case comservatory::UNKNOWN:
                 {
-                    size_t n = contents.num_records();
-                    pybind11::array_t<bool> values(n);
-                    pybind11::array_t<bool> mask(n);
-                    for (size_t i = 0; i < n; ++i) {
+                    pybind11::array_t<bool> values(nrow);
+                    pybind11::array_t<bool> mask(nrow);
+                    for (size_t i = 0; i < nrow; ++i) {
                         values.mutable_at(i) = 0;
                         mask.mutable_at(i) = 1; 
                     }
                     pybind11::module np = pybind11::module::import("numpy");
-                    pybind11::module ma = np.attr("masked");
+                    pybind11::module ma = np.attr("ma");
                     fields.append(ma.attr("array")(values, "mask"_a=mask));
                 }
                 break;

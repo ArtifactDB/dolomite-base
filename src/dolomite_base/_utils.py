@@ -1,23 +1,7 @@
 from numpy import ndarray
 import numpy
 from typing import Union, Sequence
-from . import _cpphelpers as lib
-
-
-def _fragment_string_contents(strlengths: ndarray, buffer: ndarray) -> list[str]:
-    sofar = 0
-    collected = []
-    for i, x in enumerate(strlengths):
-        endpoint = sofar + x 
-        collected.append(buffer[sofar:endpoint].decode("ASCII"))
-        sofar = endpoint
-    return collected
-
-
-def _mask_strings(collected: list, mask: ndarray):
-    for i, x in enumerate(mask):
-        if x:
-            collected[i] = None
+from . import lib_dolomite_base as lib
 
 
 def _choose_string_missing_placeholder(x: Sequence[str]) -> str:
@@ -64,9 +48,7 @@ def _fill_integer_missing_placeholder(x : numpy.ma.array, placeholder: numpy.int
 
 
 def _choose_float_missing_placeholder() -> numpy.float64:
-    store = numpy.ndarray(1, dtype=numpy.float64)
-    lib.extract_r_missing_double(store)
-    return store[0]
+    return lib.create_r_missing_double()
 
 
 def _fill_float_missing_placeholder(x: numpy.ma.array, placeholder: numpy.float64) -> numpy.ndarray:

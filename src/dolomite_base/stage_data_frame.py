@@ -5,7 +5,7 @@ import numpy as np
 import h5py
 import gzip
 
-from . import _cpphelpers as lib
+from . import lib_dolomite_base as lib
 from .stage_object import stage_object
 from .write_metadata import write_metadata
 from . import _utils as ut

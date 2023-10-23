@@ -7,7 +7,7 @@ pybind11::object create_nan_mask_for_double(pybind11::array_t<double>, pybind11:
 pybind11::object create_nan_mask_for_float(pybind11::array_t<float>, pybind11::array_t<float>);
 
 pybind11::object load_csv(std::string, size_t);
-pybind11::object validate_csv(std::string);
+void validate_csv(std::string);
 
 // Binding:
 PYBIND11_MODULE(lib_dolomite_base, m) {

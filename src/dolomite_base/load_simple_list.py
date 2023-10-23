@@ -6,7 +6,6 @@ from .acquire_file import acquire_file
 from .acquire_metadata import acquire_metadata
 from .load_object import load_object
 from . import _cpphelpers as lib
-from ._utils import _fragment_string_contents, _mask_strings
 
 
 class _ParsedList:
