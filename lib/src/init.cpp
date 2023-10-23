@@ -5,8 +5,8 @@
 pybind11::object create_r_missing_double();
 pybind11::object create_nan_mask(uintptr_t, size_t, size_t, uintptr_t);
 
-pybind11::object load_csv(std::string, size_t);
-void validate_csv(std::string);
+pybind11::object load_csv(std::string, size_t, bool, bool);
+void validate_csv(std::string, bool, bool);
 
 pybind11::object load_list_json(std::string, pybind11::list);
 void validate_list_json(std::string, size_t);

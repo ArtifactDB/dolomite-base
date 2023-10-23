@@ -32,7 +32,12 @@ def load_csv_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFra
     full_path = acquire_file(project, meta["path"])
     expected_rows = meta["data_frame"]["dimensions"][0]
 
-    details = lib.load_csv(full_path, expected_rows)
+    details = lib.load_csv(
+        full_path, 
+        expected_rows,
+        meta["csv_data_frame"]["compression"] == "gzip",
+        True
+    )
     contents = details["fields"]
 
     has_row_names = "row_names" in meta["data_frame"] and meta["data_frame"]["row_names"]
@@ -98,19 +103,20 @@ def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFr
         if has_row_names:
             row_names = [v.decode("UTF8") for v in ghandle["row_names"]]
 
+        dhandle = ghandle["data"]
         for i in range(len(columns)):
             name = str(i)
-            if name not in ghandle:
+            if name not in dhandle:
                 continue
-            dhandle = ghandle[name]
-            values = dhandle[:]
+            xhandle = dhandle[name]
+            values = xhandle[:]
 
             is_str = columns[i]["type"] == "string"
             if is_str:
                 values = [v.decode('UTF8') for v in values]
 
-            if "missing-value-placeholder" in dhandle.attrs:
-                placeholder = dhandle.attrs["missing-value-placeholder"]
+            if "missing-value-placeholder" in xhandle.attrs:
+                placeholder = xhandle.attrs["missing-value-placeholder"]
                 if is_str:
                     for j, y in enumerate(values):
                         if y == placeholder:
