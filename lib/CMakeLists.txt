@@ -23,13 +23,13 @@ FetchContent_Declare(
 FetchContent_Declare(
   uzuki2
   GIT_REPOSITORY https://github.com/ArtifactDB/uzuki2
-  GIT_TAG v1.1.4
+  GIT_TAG v1.2.0
 )
 
 FetchContent_Declare(
   comservatory
   GIT_REPOSITORY https://github.com/ArtifactDB/comservatory
-  GIT_TAG v1.1.0
+  GIT_TAG v2.0.1
 )
 
 FetchContent_Declare(

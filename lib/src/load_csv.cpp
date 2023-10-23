@@ -48,7 +48,7 @@ struct PythonNumpyField : public Base {
 };
 
 typedef PythonNumpyField<double, comservatory::NumberField> PythonNumberField;
-typedef PythonNumpyField<char, comservatory::BooleanField> PythonBooleanField;
+typedef PythonNumpyField<bool, comservatory::BooleanField> PythonBooleanField;
 
 struct PythonStringField : public comservatory::StringField {
     PythonStringField(size_t current) {
