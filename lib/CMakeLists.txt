@@ -29,12 +29,32 @@ FetchContent_Declare(
 FetchContent_Declare(
   comservatory
   GIT_REPOSITORY https://github.com/ArtifactDB/comservatory
-  GIT_TAG v1.0.0
+  GIT_TAG v1.1.0
 )
 
-FetchContent_MakeAvailable(millijson)
-FetchContent_MakeAvailable(byteme)
+FetchContent_Declare(
+  ritsuko 
+  GIT_REPOSITORY https://github.com/ArtifactDB/ritsuko
+  GIT_TAG v0.2.0
+)
+
+FetchContent_Declare(
+  uzuki2
+  GIT_REPOSITORY https://github.com/ArtifactDB/uzuki2
+  GIT_TAG v1.2.0
+)
+
+FetchContent_Declare(
+  takane
+  GIT_REPOSITORY https://github.com/ArtifactDB/takane
+  GIT_TAG v0.2.0
+)
+
 FetchContent_MakeAvailable(uzuki2)
+FetchContent_MakeAvailable(byteme)
+FetchContent_MakeAvailable(millijson)
+FetchContent_MakeAvailable(takane)
+FetchContent_MakeAvailable(ritsuko)
 FetchContent_MakeAvailable(comservatory)
 
 # Defining the targets.
@@ -48,12 +68,13 @@ pybind11_add_module(${TARGET}
     src/load_csv.cpp
     src/load_list.cpp
     src/misc.cpp
+    src/check_df.cpp
     src/init.cpp
 )
 
 set_property(TARGET ${TARGET} PROPERTY CXX_STANDARD 17)
 
-target_link_libraries(${TARGET} PRIVATE uzuki2 comservatory pybind11::pybind11)
+target_link_libraries(${TARGET} PRIVATE uzuki2 comservatory takane pybind11::pybind11)
 
 set_target_properties(${TARGET} PROPERTIES
     OUTPUT_NAME lib_dolomite_base

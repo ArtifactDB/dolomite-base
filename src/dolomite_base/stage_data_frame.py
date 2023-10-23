@@ -84,6 +84,15 @@ def choose_data_frame_format(format: Optional[Literal["hdf5", "csv"]] = None) ->
 #######################################################
 
 
+def _save_fixed_length_strings(handle, name: str, strings: list[str]):
+    tmp = [ y.encode("UTF8") for y in strings ]
+    maxed = 1
+    for b in tmp:
+        if len(b) > maxed:
+            maxed = len(b)
+    return handle.create_dataset(name, data=tmp, dtype="S" + str(maxed), compression="gzip", chunks=True)
+
+
 def _process_columns(x: BiocFrame, handle) -> Tuple:
     columns = []
     otherable = []
@@ -154,7 +163,10 @@ def _process_columns(x: BiocFrame, handle) -> Tuple:
                 raise NotImplementedError("saving a list of " + str(list(all_types)[0]) + " is not supported yet")
 
             if not as_csv:
-                dhandle = handle.create_dataset(str(i), data=current, dtype=savetype, compression="gzip", chunks=True)
+                if savetype: 
+                    dhandle = handle.create_dataset(str(i), data=current, dtype=savetype, compression="gzip", chunks=True)
+                else:
+                    dhandle = _save_fixed_length_strings(handle, str(i), current)
                 if has_none:
                     dhandle.attrs.create("missing-value-placeholder", data=placeholder, dtype=savetype)
 
@@ -223,6 +235,22 @@ def _process_columns(x: BiocFrame, handle) -> Tuple:
     return columns, otherable, operations
 
 
+def _inspect_columns(columns: list) -> Tuple:
+    all_names = [None] * len(columns)
+    all_types = np.zeros(len(columns), dtype=np.int32)
+    all_formats = np.zeros(len(columns), dtype=np.int32)
+
+    type_mapping = { "integer": 0, "number": 1, "string": 2, "boolean": 3, "factor": 4, "other": 5 }
+    format_mapping = { "date": 1, "date-time": 2 }
+    for i, x in enumerate(columns):
+        all_names[i] = x["name"]
+        all_types[i] = type_mapping[x["type"]]
+        if "format" in x:
+            all_formats[i] = format_mapping[x["format"]]
+
+    return all_names, all_types, all_formats
+
+
 #######################################################
 
 
@@ -244,14 +272,18 @@ def _select_hdf5_placeholder(current, dtype) -> Tuple:
 
 def _stage_hdf5_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> Tuple:
     basename = "simple.h5"
+    groupname = "df"
+
     full = os.path.join(dir, path, basename)
     with h5py.File(full, "w") as handle:
-        ghandle = handle.create_group("df")
-        columns, otherable, operations = _process_columns(x, ghandle)
-        ghandle.create_dataset("column_names", data=x.column_names, compression="gzip", chunks=True)
+        ghandle = handle.create_group(groupname)
+        dhandle = ghandle.create_group("data")
+        columns, otherable, operations = _process_columns(x, dhandle)
+        _save_fixed_length_strings(ghandle, "column_names", x.column_names)
+
         has_row_names = x.row_names is not None
         if has_row_names:
-            ghandle.create_dataset("row_names", data=x.row_names, compression="gzip", chunks=True)
+            _save_fixed_length_strings(ghandle, "row_names", x.row_names)
 
     metadata = {
         "$schema": "hdf5_data_frame/v1.json",
@@ -264,10 +296,25 @@ def _stage_hdf5_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) ->
             "version": 2,
         },
         "hdf5_data_frame": {
-            "group": "df",
+            "group": groupname,
             "version": 2
         }
     }
+
+    # Running some validation.
+    all_names, all_types, all_formats = _inspect_columns(columns)
+    lib.check_hdf5_df(
+        full, 
+        groupname, 
+        x.shape[0], 
+        has_row_names,
+        all_names,
+        all_types,
+        all_formats,
+        [[]] * len(columns),
+        metadata["data_frame"]["version"],
+        metadata["hdf5_data_frame"]["version"]
+    )
 
     return metadata, otherable
 
@@ -337,7 +384,6 @@ def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> 
             line += "\n"
             handle.write(line.encode("ASCII"))
 
-    lib.validate_csv(full.encode("UTF8"))
     metadata = {
         "$schema": "csv_data_frame/v1.json",
         "path": path + "/" + basename,
@@ -352,5 +398,20 @@ def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> 
             "compression": "gzip",
         }
     }
+
+    # Running some validation.
+    all_names, all_types, all_formats = _inspect_columns(columns)
+    lib.check_csv_df(
+        full, 
+        x.shape[0], 
+        has_row_names,
+        all_names,
+        all_types,
+        all_formats,
+        [[]] * len(columns),
+        metadata["data_frame"]["version"],
+        metadata["csv_data_frame"]["compression"] == 'gzip',
+        True,
+    )
 
     return metadata, otherable

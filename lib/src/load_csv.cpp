@@ -4,8 +4,6 @@
 #include <cstdint>
 #include "utils.h"
 
-using namespace pybind11::literals;
-
 template<typename T, typename Base>
 struct PythonNumpyField : public Base {
     PythonNumpyField(size_t current, size_t max) : position(current), storage(max) {
@@ -104,12 +102,20 @@ struct PythonFieldCreator : public comservatory::FieldCreator {
     size_t num_records;
 };
 
-pybind11::object load_csv(std::string path, size_t nrow) {
-    comservatory::ReadCsv reader;
+pybind11::object load_csv(std::string path, size_t nrow, bool is_compressed, bool parallel) {
+    comservatory::ReadOptions opts;
+    opts.parallel = parallel;
     PythonFieldCreator creator(nrow);
-    reader.creator = &creator;
+    opts.creator = &creator;
 
-    auto contents = reader.read(path.c_str()); // throws error for invalid formats.
+    comservatory::Contents contents;
+    if (is_compressed) {
+        byteme::GzipFileReader reader(path);
+        contents = comservatory::read(reader, opts);
+    } else {
+        byteme::RawFileReader reader(path);
+        contents = comservatory::read(reader, opts);
+    }
     if (contents.num_records() != nrow) {
         throw std::runtime_error("difference between the observed and expected number of CSV rows (" + std::to_string(contents.num_records()) + " to " + std::to_string(nrow) + ")");
     }
@@ -118,6 +124,8 @@ pybind11::object load_csv(std::string path, size_t nrow) {
     for (const auto& n : contents.names) {
         names.append(n);
     }
+
+    using namespace pybind11::literals;
 
     pybind11::list fields;
     for (size_t o = 0; o < contents.num_fields(); ++o) {
@@ -152,8 +160,16 @@ pybind11::object load_csv(std::string path, size_t nrow) {
     return pybind11::dict("names"_a = names, "fields"_a = fields);
 }
 
-void validate_csv(std::string path) {
-    comservatory::ReadCsv reader;
-    reader.validate_only = true;
-    reader.read(path);
+void validate_csv(std::string path, bool is_compressed, bool parallel) {
+    comservatory::ReadOptions opts;
+    opts.parallel = parallel;
+    opts.validate_only = true;
+
+    if (is_compressed) {
+        byteme::GzipFileReader reader(path);
+        comservatory::read(reader, opts);
+    } else {
+        byteme::RawFileReader reader(path);
+        comservatory::read(reader, opts);
+    }
 }
