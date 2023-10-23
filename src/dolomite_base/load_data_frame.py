@@ -117,12 +117,10 @@ def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFr
                             values[j] = None
                 else:
                     if isinstance(placeholder, float) and np.isnan(placeholder): # need to handle NaNs with weird payloads.
-                        if values.dtype == np.float64:
-                            mask = lib.create_nan_mask_for_double(values, placeholder)
-                        elif values.dtype == np.float32:
-                            mask = lib.create_nan_mask_for_float(values, placeholder)
-                        else:
-                            raise NotImplementedError("unknown placeholder type")
+                        if values.dtype != placeholder.dtype:
+                            raise ValueError("types of missing placeholder and array should be the same")
+                        tmp = np.array(placeholder, dtype=placeholder.dtype)
+                        mask = lib.create_nan_mask(values.ctypes.data, len(values), values.dtype.itemsize, tmp.ctypes.data)
                     else:
                         mask = (values == placeholder)
                     values = np.ma.array(values, mask=mask)
