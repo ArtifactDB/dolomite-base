@@ -2,6 +2,7 @@
 #include "pybind11/numpy.h"
 #include "comservatory/comservatory.hpp"
 #include <cstdint>
+#include "utils.h"
 
 using namespace pybind11::literals;
 
@@ -39,18 +40,7 @@ struct PythonNumpyField : public Base {
         if (masked.empty()) {
             return storage;
         } else {
-            size_t n = storage.size();
-            pybind11::array_t<bool> mask(n);
-            for (size_t i = 0; i < n; ++i) {
-                mask.mutable_at(i) = 0; 
-            }
-            for (auto m : masked) {
-                mask.mutable_at(m) = 1;
-            }
-
-            pybind11::module np = pybind11::module::import("numpy");
-            pybind11::module ma = np.attr("ma");
-            return ma.attr("array")(storage, "mask"_a=mask);
+            return mask_numpy_array(storage, masked);
         }
     }
 

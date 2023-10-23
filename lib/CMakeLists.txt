@@ -46,7 +46,7 @@ find_package(pybind11 CONFIG)
 # pybind11 method:
 pybind11_add_module(${TARGET} 
     src/load_csv.cpp
-    #    src/load_list.cpp
+    src/load_list.cpp
     src/misc.cpp
     src/init.cpp
 )
