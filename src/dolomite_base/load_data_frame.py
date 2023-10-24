@@ -50,7 +50,12 @@ def load_csv_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFra
         row_names = contents[0]
         contents = contents[1:]
 
-    return _create_BiocFrame(expected_rows, row_names, columns, contents, project, **kwargs)
+    df = _create_BiocFrame(expected_rows, row_names, columns, contents, project, **kwargs)
+    if "other_data" in meta["data_frame"]:
+        mmeta = acquire_metadata(project, meta["data_frame"]["other_data"]["resource"]["path"])
+        df.metadata = load_object(mmeta, project)
+
+    return df
 
 
 def _create_BiocFrame(expected_rows: int, row_names: Optional[list], columns: list, contents: list, project, **kwargs) -> BiocFrame:
@@ -142,4 +147,9 @@ def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFr
             contents[i] = values 
 
     expected_rows = meta["data_frame"]["dimensions"][0]
-    return _create_BiocFrame(expected_rows, row_names, columns, contents, project, **kwargs)
+    df = _create_BiocFrame(expected_rows, row_names, columns, contents, project, **kwargs)
+    if "other_data" in meta["data_frame"]:
+        mmeta = acquire_metadata(project, meta["data_frame"]["other_data"]["resource"]["path"])
+        df.metadata = load_object(mmeta, project)
+
+    return df

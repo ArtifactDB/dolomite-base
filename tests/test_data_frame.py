@@ -423,7 +423,7 @@ def test_data_frame_nested():
     assert bsb_df.column("last") == df.column("bsb").column("last")
 
     # Works for HDF5.
-    meta2 = dl.stage_object(df, dir, "foo2")
+    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
     dl.write_metadata(meta2, dir)
     roundtrip2 = dl.load_object(meta2, dir)
     assert isinstance(roundtrip2, BiocFrame)
@@ -437,6 +437,29 @@ def test_data_frame_nested():
     assert isinstance(bsb_df, BiocFrame)
     assert bsb_df.column("first") == df.column("bsb").column("first")
     assert bsb_df.column("last") == df.column("bsb").column("last")
+
+
+def test_data_frame_metadata():
+    df = BiocFrame({ "foo": [ 1, 3, 5, 7, 9 ] })
+    df.metadata["a"] = 2
+    df.metadata["b"] = ['a', 'b', 'c', 'd']
+
+    dir = mkdtemp()
+
+    # CSV first.
+    meta = dl.stage_object(df, dir, "foo")
+    assert "other_data" in meta["data_frame"]
+    dl.write_metadata(meta, dir)
+
+    roundtrip = dl.load_object(meta, dir)
+    assert df.metadata == roundtrip.metadata
+    assert isinstance(roundtrip, BiocFrame)
+
+    # Trying with HDF5.
+    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    dl.write_metadata(meta2, dir)
+    roundtrip2 = dl.load_object(meta2, dir)
+    assert df.metadata == roundtrip2.metadata
 
 
 def test_data_frame_format():
