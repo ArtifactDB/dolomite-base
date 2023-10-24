@@ -21,6 +21,7 @@ jobs:
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
           CIBW_MANYLINUX_X86_64_IMAGE: ghcr.io/artifactdb/prebuilt-hdf5/manylinux_x86_64:0.0.4
           CIBW_MUSLLINUX_X86_64_IMAGE: ghcr.io/artifactdb/prebuilt-hdf5/musllinux_x86_64:0.0.4
+          CIBW_SKIP: pp*
 
       - uses: actions/upload-artifact@v3
         with:
@@ -45,6 +46,8 @@ jobs:
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
           CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed -DCMAKE_OSX_ARCHITECTURES=x86_64\""
           CIBW_BUILD_VERBOSITY: 3
+          CIBW_SKIP: pp*
+          MACOSX_DEPLOYMENT_TARGET: 11.7
 
       - uses: actions/upload-artifact@v3
         with:
@@ -69,6 +72,7 @@ jobs:
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
           CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed -DCMAKE_OSX_ARCHITECTURES=arm64\""
           CIBW_BUILD_VERBOSITY: 3
+          MACOSX_DEPLOYMENT_TARGET: 13.0
 
       - uses: actions/upload-artifact@v3
         with:
