@@ -68,6 +68,14 @@ dolomite\_base.stage\_simple\_list module
    :undoc-members:
    :show-inheritance:
 
+dolomite\_base.write\_csv module
+--------------------------------
+
+.. automodule:: dolomite_base.write_csv
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dolomite\_base.write\_metadata module
 -------------------------------------
 
