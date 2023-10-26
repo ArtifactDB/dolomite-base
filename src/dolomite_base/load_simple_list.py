@@ -6,6 +6,8 @@ from .acquire_file import acquire_file
 from .acquire_metadata import acquire_metadata
 from .load_object import load_object
 from . import lib_dolomite_base as lib
+from ._utils import _is_gzip_compressed
+
 
 def load_json_simple_list(meta: dict[str, Any], project: Any, **kwargs) -> Union[list, dict]:
     """Load an R-style list from a (possibly Gzip-compressed) JSON file in the
@@ -25,6 +27,7 @@ def load_json_simple_list(meta: dict[str, Any], project: Any, **kwargs) -> Union
     Returns:
         A list or dictionary.
     """
+    _is_gzip_compressed(meta, "json_simple_list") # check it's not crazy.
     full_path = acquire_file(project, meta["path"])
     children = _load_all_children(meta, project)
     return lib.load_list_json(full_path, children)

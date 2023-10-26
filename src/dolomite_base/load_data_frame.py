@@ -9,6 +9,7 @@ from . import lib_dolomite_base as lib
 from .acquire_file import acquire_file
 from .acquire_metadata import acquire_metadata
 from .load_object import load_object
+from ._utils import _is_gzip_compressed
 
 
 def load_csv_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFrame:
@@ -32,13 +33,12 @@ def load_csv_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFra
     full_path = acquire_file(project, meta["path"])
     expected_rows = meta["data_frame"]["dimensions"][0]
 
-    details = lib.load_csv(
+    cnames, contents = lib.load_csv(
         full_path, 
         expected_rows,
-        meta["csv_data_frame"]["compression"] == "gzip",
+        _is_gzip_compressed(meta, "csv_data_frame"),
         True
     )
-    contents = details["fields"]
 
     has_row_names = "row_names" in meta["data_frame"] and meta["data_frame"]["row_names"]
     columns = meta["data_frame"]["columns"]

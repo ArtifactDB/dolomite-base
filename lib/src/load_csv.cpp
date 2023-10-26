@@ -157,7 +157,7 @@ pybind11::object load_csv(std::string path, size_t nrow, bool is_compressed, boo
         }
     }
 
-    return pybind11::dict("names"_a = names, "fields"_a = fields);
+    return pybind11::make_tuple(names, fields);
 }
 
 void validate_csv(std::string path, bool is_compressed, bool parallel) {
