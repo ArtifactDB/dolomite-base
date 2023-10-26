@@ -1,4 +1,4 @@
-from typing import Optional, Any, Literal
+from typing import Optional, Any, Literal, Tuple
 from biocframe import BiocFrame
 from ._process_columns import (
     _process_columns_for_csv, 
