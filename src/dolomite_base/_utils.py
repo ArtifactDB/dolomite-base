@@ -63,3 +63,14 @@ def _choose_boolean_missing_placeholder() -> numpy.int8:
 def _fill_boolean_missing_placeholder(x : numpy.ma.array, placeholder: numpy.int8) -> numpy.ndarray:
     copy = x.astype(numpy.int8).filled(placeholder)
     return copy.data
+
+def _is_gzip_compressed(meta, parent_name):
+    if parent_name in meta:
+        x = meta[parent_name]
+        if "compression" in x:
+            method = x["compression"]
+            if method == "gzip":
+                return True
+            elif method != "none":
+                raise NotImplementedError(method + " decompression is not yet supported for '" + parent_name + "'")
+    return False
