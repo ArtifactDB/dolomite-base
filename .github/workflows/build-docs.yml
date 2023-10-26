@@ -21,26 +21,17 @@ jobs:
           python-version: 3.9
           cache: 'pip'
 
-      - name: Set up HDF5
-        run: |
-          sudo apt-get update
-          sudo apt-get install libhdf5-dev
-
-      - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip setuptools
           DEPENDENCIES=$(python -c 'from setuptools.config.setupcfg import read_configuration as c; a = c("setup.cfg"); print(" ".join(a["options"]["install_requires"][1:]))')
-          pip install ${DEPENDENCIES} pybind11
+          pip install ${DEPENDENCIES}
           DOCDEPENDENCIES=$(python -c 'with open("docs/requirements.txt") as a: available = list(a); print(" ".join(map(lambda x : x.strip(), filter(lambda x : not x.startswith("#"), available))))')
           pip install ${DOCDEPENDENCIES}
 
-      # Note that doc building requires the inplace shared library.
       - name: Build docs
         run: |
-          CC="ccache gcc" python setup.py build_ext --inplace
+          touch src/dolomite_base/lib_dolomite_base.py
           sphinx-build --color -b html -d docs/doctrees docs docs/_build/html
           touch ./docs/_build/html/.nojekyll
 

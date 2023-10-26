@@ -56,3 +56,4 @@ MANIFEST
 # Other stuff
 lib/build/
 src/dolomite_base/_core.*
+src/dolomite_base/lib_dolomite_base.py
