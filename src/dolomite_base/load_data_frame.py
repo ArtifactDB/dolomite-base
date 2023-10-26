@@ -51,10 +51,7 @@ def load_csv_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFra
         contents = contents[1:]
 
     df = _create_BiocFrame(expected_rows, row_names, columns, contents, project, **kwargs)
-    if "other_data" in meta["data_frame"]:
-        mmeta = acquire_metadata(project, meta["data_frame"]["other_data"]["resource"]["path"])
-        df.metadata = load_object(mmeta, project)
-
+    _attach_metadata(meta, df, project)
     return df
 
 
@@ -85,6 +82,16 @@ def _create_BiocFrame(expected_rows: int, row_names: Optional[list], columns: li
         output[curval["name"]] = c
 
     return output
+
+
+def _attach_metadata(meta: dict[str, Any], df: BiocFrame, project):
+    dmeta = meta["data_frame"]
+    if "other_data" in dmeta:
+        mmeta = acquire_metadata(project, dmeta["other_data"]["resource"]["path"])
+        df.metadata = load_object(mmeta, project)
+    if "column_data" in dmeta:
+        mmeta = acquire_metadata(project, dmeta["column_data"]["resource"]["path"])
+        df.mcols = load_object(mmeta, project)
 
 
 def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFrame:
@@ -148,8 +155,5 @@ def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFr
 
     expected_rows = meta["data_frame"]["dimensions"][0]
     df = _create_BiocFrame(expected_rows, row_names, columns, contents, project, **kwargs)
-    if "other_data" in meta["data_frame"]:
-        mmeta = acquire_metadata(project, meta["data_frame"]["other_data"]["resource"]["path"])
-        df.metadata = load_object(mmeta, project)
-
+    _attach_metadata(meta, df, project)
     return df
