@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -192,7 +192,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -204,51 +204,19 @@
 [![Built Status](https://api.cirrus-ci.com/github/<USER>/dolomite.svg?branch=main)](https://cirrus-ci.com/github/<USER>/dolomite)
 [![ReadTheDocs](https://readthedocs.org/projects/dolomite/badge/?version=latest)](https://dolomite.readthedocs.io/en/stable/)
 [![Coveralls](https://img.shields.io/coveralls/github/<USER>/dolomite/main.svg)](https://coveralls.io/r/<USER>/dolomite)
-[![PyPI-Server](https://img.shields.io/pypi/v/dolomite.svg)](https://pypi.org/project/dolomite/)
 [![Conda-Forge](https://img.shields.io/conda/vn/conda-forge/dolomite.svg)](https://anaconda.org/conda-forge/dolomite)
-[![Monthly Downloads](https://pepy.tech/badge/dolomite/month)](https://pepy.tech/project/dolomite)
 [![Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Twitter)](https://twitter.com/dolomite)
 -->
 <p><a class="reference external" href="https://pyscaffold.org/"><img alt="Project generated with PyScaffold" src="https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold" /></a>
-<img alt="Unit tests" src="https://github.com/ArtifactDB/dolomite-base/actions/workflows/pypi-test.yml/badge.svg" /></p>
+<a class="reference external" href="https://pypi.org/project/dolomite-base/"><img alt="PyPI-Server" src="https://img.shields.io/pypi/v/dolomite-base.svg" /></a>
+<a class="reference external" href="https://pepy.tech/project/dolomite-base"><img alt="Monthly Downloads" src="https://pepy.tech/badge/dolomite-base/month" /></a>
+<img alt="Unit tests" src="https://github.com/ArtifactDB/dolomite-base/actions/workflows/run-tests.yml/badge.svg" /></p>
 <section class="tex2jax_ignore mathjax_ignore" id="save-and-load-bioconductor-objects-in-python">
 <h1>Save and load Bioconductor objects in Python<a class="headerlink" href="#save-and-load-bioconductor-objects-in-python" title="Link to this heading">#</a></h1>
-<section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
 <p>The <strong>dolomite-base</strong> package is the Python counterpart to the <a class="reference external" href="https://github.com/ArtifactDB/alabaster.base"><strong>alabaster.base</strong></a> R package,
 defining the basic generics for language-agnostic reading and writing of Bioconductor objects with their associated metadata.
 Implementations of methods for these generics can be found in the other <strong>dolomite-</strong> packages.</p>
-</section>
-<section id="developer-notes">
-<h2>Developer notes<a class="headerlink" href="#developer-notes" title="Link to this heading">#</a></h2>
-<p>Obtain the headers:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">(</span><span class="nb">cd</span><span class="w"> </span>extern<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./fetch<span class="o">)</span>
-</pre></div>
-</div>
-<p>Build the shared object file:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nv">CC</span><span class="o">=</span><span class="s2">&quot;ccache clang++&quot;</span><span class="w"> </span>python<span class="w"> </span>setup.py<span class="w"> </span>build_ext<span class="w"> </span>--inplace
-</pre></div>
-</div>
-<p>For installation:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nv">CC</span><span class="o">=</span><span class="s2">&quot;ccache clang++&quot;</span><span class="w"> </span>python<span class="w"> </span>setup.py<span class="w"> </span>install<span class="w"> </span>--user
-</pre></div>
-</div>
-<p>For quick testing:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pytest
-</pre></div>
-</div>
-<p>For more complex testing:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>setup.py<span class="w"> </span>build_ext<span class="w"> </span>--inplace<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>tox
-</pre></div>
-</div>
-<p>To rebuild the <strong>ctypes</strong> bindings with <a class="reference external" href="https://github.com/BiocPy/ctypes-wrapper"><strong>cpptypes</strong></a>:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>cpptypes<span class="w"> </span>lib/src<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--py<span class="w"> </span>src/dolomite_base/_cpphelpers.py<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--cpp<span class="w"> </span>lib/src/bindings.cpp<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--dll<span class="w"> </span>_core
-</pre></div>
-</div>
-</section>
+<p>Check out the <a class="reference external" href="https://artifactdb.github.io/dolomite-base/">API documentation</a> for more details.</p>
 </section>
 
         </article>
@@ -294,28 +262,8 @@ Implementations of methods for these generics can be found in the other <strong>
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Save and load Bioconductor objects in Python</a><ul>
-<li><a class="reference internal" href="#overview">Overview</a></li>
-<li><a class="reference internal" href="#developer-notes">Developer notes</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
