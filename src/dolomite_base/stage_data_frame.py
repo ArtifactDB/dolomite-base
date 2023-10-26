@@ -59,6 +59,14 @@ def stage_data_frame(
         resource_stub = write_metadata(more_meta, dir=dir)
         meta["data_frame"]["columns"][i]["resource"] = resource_stub
 
+    if x.metadata is not None and len(x.metadata):
+        mmeta = stage_object(x.metadata, dir, path + "/other", is_child=True)
+        meta["data_frame"]["other_data"] = { "resource": write_metadata(mmeta, dir=dir) }
+
+    if x.mcols is not None and x.mcols.shape[1] > 0:
+        mmeta = stage_object(x.mcols, dir, path + "/mcols", is_child=True)
+        meta["data_frame"]["column_data"] = { "resource": write_metadata(mmeta, dir=dir) }
+
     return meta
 
 
