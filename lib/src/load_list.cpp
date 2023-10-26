@@ -299,9 +299,7 @@ struct PythonExternals {
 /** General methods. **/
 
 pybind11::object load_list_json(std::string path, pybind11::list children) {
-    std::cout << "Parsing start" << std::endl;
     auto parsed = uzuki2::json::parse_file<PythonProvisioner>(path, PythonExternals(children));
-    std::cout << "Parsing done" << std::endl;
     return dynamic_cast<PythonBase*>(parsed.get())->extract();
 }
 
