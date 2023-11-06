@@ -79,7 +79,7 @@ def _create_BiocFrame(expected_rows: int, row_names: Optional[list], columns: li
             if not isinstance(c, list): # only happens if the entire column is NA.
                 c = [None] * len(c)
 
-        output[curval["name"]] = c
+        output.set_column(curval["name"], c, in_place=True)
 
     return output
 
@@ -88,10 +88,10 @@ def _attach_metadata(meta: dict[str, Any], df: BiocFrame, project):
     dmeta = meta["data_frame"]
     if "other_data" in dmeta:
         mmeta = acquire_metadata(project, dmeta["other_data"]["resource"]["path"])
-        df.metadata = alt_load_object(mmeta, project)
+        df.set_metadata(alt_load_object(mmeta, project), in_place=True)
     if "column_data" in dmeta:
         mmeta = acquire_metadata(project, dmeta["column_data"]["resource"]["path"])
-        df.mcols = alt_load_object(mmeta, project)
+        df.set_mcols(alt_load_object(mmeta, project), in_place=True)
 
 
 def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFrame:

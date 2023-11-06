@@ -440,10 +440,11 @@ def test_data_frame_nested():
 
 
 def test_data_frame_metadata():
-    df = BiocFrame({ "foo": [ 1, 3, 5, 7, 9 ] })
-    df.metadata["a"] = 2
-    df.metadata["b"] = ['a', 'b', 'c', 'd']
-    df.mcols = BiocFrame({ "args": [ 99 ] })
+    df = BiocFrame(
+        { "foo": [ 1, 3, 5, 7, 9 ] },
+        mcols = BiocFrame({ "args": [ 99 ] }),
+        metadata = { "a": 2, "b": ['a', 'b', 'c', 'd'] }
+    )
 
     dir = mkdtemp()
 
@@ -451,7 +452,6 @@ def test_data_frame_metadata():
     meta = dl.stage_object(df, dir, "foo")
     assert "other_data" in meta["data_frame"]
     assert "column_data" in meta["data_frame"]
-    print(meta)
     dl.write_metadata(meta, dir)
 
     roundtrip = dl.load_object(meta, dir)
