@@ -20,6 +20,22 @@ dolomite\_base.acquire\_metadata module
    :undoc-members:
    :show-inheritance:
 
+dolomite\_base.alt\_load\_object module
+---------------------------------------
+
+.. automodule:: dolomite_base.alt_load_object
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.alt\_stage\_object module
+----------------------------------------
+
+.. automodule:: dolomite_base.alt_stage_object
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dolomite\_base.lib\_dolomite\_base module
 -----------------------------------------
 

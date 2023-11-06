@@ -207,7 +207,7 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lib_dolomite_base</span> <span class="k">as</span> <span class="n">lib</span>
 <span class="kn">from</span> <span class="nn">.acquire_file</span> <span class="kn">import</span> <span class="n">acquire_file</span>
 <span class="kn">from</span> <span class="nn">.acquire_metadata</span> <span class="kn">import</span> <span class="n">acquire_metadata</span>
-<span class="kn">from</span> <span class="nn">.load_object</span> <span class="kn">import</span> <span class="n">load_object</span>
+<span class="kn">from</span> <span class="nn">.alt_load_object</span> <span class="kn">import</span> <span class="n">alt_load_object</span>
 <span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">_is_gzip_compressed</span>
 
 
@@ -264,7 +264,7 @@
         <span class="n">curval</span> <span class="o">=</span> <span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">curval</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;other&quot;</span><span class="p">:</span>
             <span class="n">child_meta</span> <span class="o">=</span> <span class="n">acquire_metadata</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">curval</span><span class="p">[</span><span class="s2">&quot;resource&quot;</span><span class="p">][</span><span class="s2">&quot;path&quot;</span><span class="p">])</span>
-            <span class="n">c</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">child_meta</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">alt_load_object</span><span class="p">(</span><span class="n">child_meta</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">curval</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;integer&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
@@ -290,10 +290,10 @@
     <span class="n">dmeta</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;data_frame&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="s2">&quot;other_data&quot;</span> <span class="ow">in</span> <span class="n">dmeta</span><span class="p">:</span>
         <span class="n">mmeta</span> <span class="o">=</span> <span class="n">acquire_metadata</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">dmeta</span><span class="p">[</span><span class="s2">&quot;other_data&quot;</span><span class="p">][</span><span class="s2">&quot;resource&quot;</span><span class="p">][</span><span class="s2">&quot;path&quot;</span><span class="p">])</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">mmeta</span><span class="p">,</span> <span class="n">project</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">alt_load_object</span><span class="p">(</span><span class="n">mmeta</span><span class="p">,</span> <span class="n">project</span><span class="p">)</span>
     <span class="k">if</span> <span class="s2">&quot;column_data&quot;</span> <span class="ow">in</span> <span class="n">dmeta</span><span class="p">:</span>
         <span class="n">mmeta</span> <span class="o">=</span> <span class="n">acquire_metadata</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">dmeta</span><span class="p">[</span><span class="s2">&quot;column_data&quot;</span><span class="p">][</span><span class="s2">&quot;resource&quot;</span><span class="p">][</span><span class="s2">&quot;path&quot;</span><span class="p">])</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">mcols</span> <span class="o">=</span> <span class="n">load_object</span><span class="p">(</span><span class="n">mmeta</span><span class="p">,</span> <span class="n">project</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">mcols</span> <span class="o">=</span> <span class="n">alt_load_object</span><span class="p">(</span><span class="n">mmeta</span><span class="p">,</span> <span class="n">project</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="load_hdf5_data_frame">

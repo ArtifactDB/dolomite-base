@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>dolomite_base.load_simple_list - dolomite-base unknown documentation</title>
+        <title>dolomite_base.alt_stage_object - dolomite-base unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -196,83 +196,74 @@
           </label>
         </div>
         <article role="main">
-          <h1>Source code for dolomite_base.load_simple_list</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">ctypes</span> <span class="k">as</span> <span class="nn">ct</span>
-
-<span class="kn">from</span> <span class="nn">.acquire_file</span> <span class="kn">import</span> <span class="n">acquire_file</span>
-<span class="kn">from</span> <span class="nn">.acquire_metadata</span> <span class="kn">import</span> <span class="n">acquire_metadata</span>
-<span class="kn">from</span> <span class="nn">.alt_load_object</span> <span class="kn">import</span> <span class="n">alt_load_object</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lib_dolomite_base</span> <span class="k">as</span> <span class="n">lib</span>
-<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">_is_gzip_compressed</span>
+          <h1>Source code for dolomite_base.alt_stage_object</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">.stage_object</span> <span class="kn">import</span> <span class="n">stage_object</span>
 
 
-<div class="viewcode-block" id="load_json_simple_list">
-<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.load_simple_list.load_json_simple_list">[docs]</a>
-<span class="k">def</span> <span class="nf">load_json_simple_list</span><span class="p">(</span><span class="n">meta</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">project</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load an R-style list from a (possibly Gzip-compressed) JSON file in the</span>
-<span class="sd">    **uzuki2** format. In general, this function should not be called directly</span>
-<span class="sd">    but instead via :py:meth:`~dolomite_base.load_object.load_object`.</span>
+<span class="n">ALT_STAGE_OBJECT_FUNCTION</span> <span class="o">=</span> <span class="n">stage_object</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        meta: Metadata for this JSON list.</span>
 
-<span class="sd">        project: Value specifying the project of interest. This is most</span>
-<span class="sd">            typically a string containing a file path to a staging directory</span>
-<span class="sd">            but may also be an application-specific object that works with</span>
-<span class="sd">            :py:meth:`~dolomite_base.acquire_file.acquire_file`.</span>
+<div class="viewcode-block" id="alt_stage_object_function">
+<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.alt_stage_object.alt_stage_object_function">[docs]</a>
+<span class="k">def</span> <span class="nf">alt_stage_object_function</span><span class="p">(</span><span class="n">fun</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get or set the alternative staging function for use by</span>
+<span class="sd">    :py:meth:`~alt_stage_object`. Typically set by applications prior to</span>
+<span class="sd">    staging for customization, e.g., to save extra metadata.</span>
 
-<span class="sd">        kwargs: Further arguments, passed to nested objects.</span>
+<span class="sd">    Arguments:</span>
+<span class="sd">        fun:</span>
+<span class="sd">            The alternative staging function. This should accept the same</span>
+<span class="sd">            arguments and return the same value as</span>
+<span class="sd">            :py:meth:`~dolomite_base.stage_object.stage_object`.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        A list or dictionary.</span>
+<span class="sd">        If ``fun = None``, the current setting of the alternative staging</span>
+<span class="sd">        function is returned. </span>
+
+<span class="sd">        Otherwise, the alternative staging function is set to ``fun``,</span>
+<span class="sd">        and the previous function is returned.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_is_gzip_compressed</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s2">&quot;json_simple_list&quot;</span><span class="p">)</span> <span class="c1"># check it&#39;s not crazy.</span>
-    <span class="n">full_path</span> <span class="o">=</span> <span class="n">acquire_file</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">])</span>
-    <span class="n">children</span> <span class="o">=</span> <span class="n">_load_all_children</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">project</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">lib</span><span class="o">.</span><span class="n">load_list_json</span><span class="p">(</span><span class="n">full_path</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span></div>
+    <span class="k">global</span> <span class="n">ALT_STAGE_OBJECT_FUNCTION</span>
+    <span class="k">if</span> <span class="n">fun</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ALT_STAGE_OBJECT_FUNCTION</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">old</span> <span class="o">=</span> <span class="n">ALT_STAGE_OBJECT_FUNCTION</span>
+        <span class="n">ALT_STAGE_OBJECT_FUNCTION</span> <span class="o">=</span> <span class="n">fun</span>
+        <span class="k">return</span> <span class="n">old</span></div>
 
 
 
-<div class="viewcode-block" id="load_hdf5_simple_list">
-<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.load_simple_list.load_hdf5_simple_list">[docs]</a>
-<span class="k">def</span> <span class="nf">load_hdf5_simple_list</span><span class="p">(</span><span class="n">meta</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">project</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load an R-style list from a HDF5 file in the **uzuki2** format. In</span>
-<span class="sd">    general, this function should not be called directly but instead via</span>
-<span class="sd">    :py:meth:`~dolomite_base.load_object.load_object`.</span>
+<div class="viewcode-block" id="alt_stage_object">
+<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.alt_stage_object.alt_stage_object">[docs]</a>
+<span class="k">def</span> <span class="nf">alt_stage_object</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="nb">dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper around :py:meth:`~dolomite_base.stage_object.stage_object` that</span>
+<span class="sd">    respects application-defined overrides from</span>
+<span class="sd">    :py:meth:`~alt_stage_object_function`.  This allows applications to</span>
+<span class="sd">    customize the staging process for some or all of the object classes,</span>
+<span class="sd">    assuming that developers of dolomite extensions (and the associated</span>
+<span class="sd">    ``stage_object`` methods) use ``alt_stage_object`` internally for staging</span>
+<span class="sd">    child objects instead of ``stage_object``.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        meta: Metadata for this HDF5 list.</span>
+<span class="sd">    Arguments:</span>
+<span class="sd">        x: Object to be staged.</span>
 
-<span class="sd">        project: Value specifying the project of interest. This is most</span>
-<span class="sd">            typically a string containing a file path to a staging directory</span>
-<span class="sd">            but may also be an application-specific object that works with</span>
-<span class="sd">            :py:meth:`~dolomite_base.acquire_file.acquire_file`.</span>
+<span class="sd">        dir: Path to a staging directory.</span>
 
-<span class="sd">        kwargs: Further arguments, passed to nested objects.</span>
+<span class="sd">        path: Relative path inside ``dir`` where ``x`` is to be saved.</span>
+<span class="sd">            This will be used to create a subdirectory inside ``dir``.</span>
+
+<span class="sd">        kwargs: Further arguments to be passed to individual methods.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        A list or dictionary.</span>
+<span class="sd">        Metadata for ``x``, see</span>
+<span class="sd">        :py:meth:`~dolomite_base.stage_object.stage_object` for details.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">full_path</span> <span class="o">=</span> <span class="n">acquire_file</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">])</span>
-    <span class="n">children</span> <span class="o">=</span> <span class="n">_load_all_children</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">project</span><span class="p">)</span>
-    <span class="n">group_name</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;hdf5_simple_list&quot;</span><span class="p">][</span><span class="s2">&quot;group&quot;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">lib</span><span class="o">.</span><span class="n">load_list_hdf5</span><span class="p">(</span><span class="n">full_path</span><span class="p">,</span> <span class="n">group_name</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span></div>
+    <span class="n">fun</span> <span class="o">=</span> <span class="n">alt_stage_object_function</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fun</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dir</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-
-
-<span class="k">def</span> <span class="nf">_load_all_children</span><span class="p">(</span><span class="n">meta</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">project</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-    <span class="n">collected</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">if</span> <span class="s2">&quot;simple_list&quot;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
-        <span class="n">smeta</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;simple_list&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s2">&quot;children&quot;</span> <span class="ow">in</span> <span class="n">smeta</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">cinfo</span> <span class="ow">in</span> <span class="n">smeta</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">]:</span>
-                <span class="n">cmeta</span> <span class="o">=</span> <span class="n">acquire_metadata</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">cinfo</span><span class="p">[</span><span class="s2">&quot;resource&quot;</span><span class="p">][</span><span class="s2">&quot;path&quot;</span><span class="p">])</span>
-                <span class="n">collected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alt_load_object</span><span class="p">(</span><span class="n">cmeta</span><span class="p">,</span> <span class="n">project</span><span class="p">))</span>
-
-    <span class="k">return</span> <span class="n">collected</span>
 </pre></div>
         </article>
       </div>

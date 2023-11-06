@@ -297,6 +297,120 @@ This is a method for the <a class="reference internal" href="#dolomite_base.acqu
 </dd></dl>
 
 </section>
+<section id="module-dolomite_base.alt_load_object">
+<span id="dolomite-base-alt-load-object-module"></span><h2>dolomite_base.alt_load_object module<a class="headerlink" href="#module-dolomite_base.alt_load_object" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.alt_load_object.alt_load_object">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.alt_load_object.</span></span><span class="sig-name descname"><span class="pre">alt_load_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/alt_load_object.html#alt_load_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.alt_load_object.alt_load_object" title="Link to this definition">#</a></dt>
+<dd><p>Wrapper around <a class="reference internal" href="#dolomite_base.load_object.load_object" title="dolomite_base.load_object.load_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_object()</span></code></a> that
+respects application-defined overrides from
+<a class="reference internal" href="#dolomite_base.alt_load_object.alt_load_object_function" title="dolomite_base.alt_load_object.alt_load_object_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">alt_load_object_function()</span></code></a>.  This allows applications to
+customize the loading process for some or all of the object classes,
+assuming that developers of dolomite extensions (and the associated
+functions called by <code class="docutils literal notranslate"><span class="pre">load_object</span></code>) use <code class="docutils literal notranslate"><span class="pre">alt_load_object</span></code> internally for
+staging child objects instead of <code class="docutils literal notranslate"><span class="pre">load_object</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>) – Metadata for this object.</p></li>
+<li><p><strong>project</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>) – Value specifying the project of interest, see
+<a class="reference internal" href="#dolomite_base.load_object.load_object" title="dolomite_base.load_object.load_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_object()</span></code></a> for details.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, passed to individual methods.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Some kind of object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.alt_load_object.alt_load_object_function">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.alt_load_object.</span></span><span class="sig-name descname"><span class="pre">alt_load_object_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fun</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/alt_load_object.html#alt_load_object_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.alt_load_object.alt_load_object_function" title="Link to this definition">#</a></dt>
+<dd><p>Get or set the alternative loading function for use by
+<a class="reference internal" href="#dolomite_base.alt_load_object.alt_load_object" title="dolomite_base.alt_load_object.alt_load_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">alt_load_object()</span></code></a>. Typically set by applications prior to loading
+for customization, e.g., to attach more metadata to the loaded object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fun</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Callable" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>]) – The alternative loading function. This should accept the same
+arguments and return the same value as
+<a class="reference internal" href="#dolomite_base.load_object.load_object" title="dolomite_base.load_object.load_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load_object()</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Callable" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>If <code class="docutils literal notranslate"><span class="pre">fun</span> <span class="pre">=</span> <span class="pre">None</span></code>, the current setting of the alternative loading
+function is returned.</p>
+<p>Otherwise, the alternative loading function is set to <code class="docutils literal notranslate"><span class="pre">fun</span></code>,
+and the previous function is returned.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-dolomite_base.alt_stage_object">
+<span id="dolomite-base-alt-stage-object-module"></span><h2>dolomite_base.alt_stage_object module<a class="headerlink" href="#module-dolomite_base.alt_stage_object" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.alt_stage_object.alt_stage_object">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.alt_stage_object.</span></span><span class="sig-name descname"><span class="pre">alt_stage_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/alt_stage_object.html#alt_stage_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.alt_stage_object.alt_stage_object" title="Link to this definition">#</a></dt>
+<dd><p>Wrapper around <a class="reference internal" href="#dolomite_base.stage_object.stage_object" title="dolomite_base.stage_object.stage_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stage_object()</span></code></a> that
+respects application-defined overrides from
+<a class="reference internal" href="#dolomite_base.alt_stage_object.alt_stage_object_function" title="dolomite_base.alt_stage_object.alt_stage_object_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">alt_stage_object_function()</span></code></a>.  This allows applications to
+customize the staging process for some or all of the object classes,
+assuming that developers of dolomite extensions (and the associated
+<code class="docutils literal notranslate"><span class="pre">stage_object</span></code> methods) use <code class="docutils literal notranslate"><span class="pre">alt_stage_object</span></code> internally for staging
+child objects instead of <code class="docutils literal notranslate"><span class="pre">stage_object</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>) – Object to be staged.</p></li>
+<li><p><strong>dir</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Path to a staging directory.</p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Relative path inside <code class="docutils literal notranslate"><span class="pre">dir</span></code> where <code class="docutils literal notranslate"><span class="pre">x</span></code> is to be saved.
+This will be used to create a subdirectory inside <code class="docutils literal notranslate"><span class="pre">dir</span></code>.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments to be passed to individual methods.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Metadata for <code class="docutils literal notranslate"><span class="pre">x</span></code>, see
+<a class="reference internal" href="#dolomite_base.stage_object.stage_object" title="dolomite_base.stage_object.stage_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stage_object()</span></code></a> for details.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.alt_stage_object.alt_stage_object_function">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.alt_stage_object.</span></span><span class="sig-name descname"><span class="pre">alt_stage_object_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fun</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/alt_stage_object.html#alt_stage_object_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.alt_stage_object.alt_stage_object_function" title="Link to this definition">#</a></dt>
+<dd><p>Get or set the alternative staging function for use by
+<a class="reference internal" href="#dolomite_base.alt_stage_object.alt_stage_object" title="dolomite_base.alt_stage_object.alt_stage_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">alt_stage_object()</span></code></a>. Typically set by applications prior to
+staging for customization, e.g., to save extra metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fun</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Callable" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>]) – The alternative staging function. This should accept the same
+arguments and return the same value as
+<a class="reference internal" href="#dolomite_base.stage_object.stage_object" title="dolomite_base.stage_object.stage_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stage_object()</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Callable" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>If <code class="docutils literal notranslate"><span class="pre">fun</span> <span class="pre">=</span> <span class="pre">None</span></code>, the current setting of the alternative staging
+function is returned.</p>
+<p>Otherwise, the alternative staging function is set to <code class="docutils literal notranslate"><span class="pre">fun</span></code>,
+and the previous function is returned.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="module-dolomite_base.lib_dolomite_base">
 <span id="dolomite-base-lib-dolomite-base-module"></span><h2>dolomite_base.lib_dolomite_base module<a class="headerlink" href="#module-dolomite_base.lib_dolomite_base" title="Link to this heading">#</a></h2>
 </section>
@@ -320,7 +434,7 @@ but may also be an application-specific object that works with
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.3.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A data frame.</p>
@@ -345,7 +459,7 @@ but may also be an application-specific object that works with
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.3.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></p>
+<dd class="field-even"><p><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A data frame.</p>
@@ -505,13 +619,13 @@ and the previous choice is returned.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.stage_data_frame.stage_data_frame">
 <span class="sig-prename descclassname"><span class="pre">dolomite_base.stage_data_frame.</span></span><span class="sig-name descname"><span class="pre">stage_data_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_child</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/stage_data_frame.html#stage_data_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.stage_data_frame.stage_data_frame" title="Link to this definition">#</a></dt>
-<dd><p>Method for saving <a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.3.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>
+<dd><p>Method for saving <a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>
 objects to the corresponding file representations, see
 <a class="reference internal" href="#dolomite_base.stage_object.stage_object" title="dolomite_base.stage_object.stage_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stage_object()</span></code></a> for details.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.3.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>) – Object to be staged.</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>) – Object to be staged.</p></li>
 <li><p><strong>dir</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Staging directory.</p></li>
 <li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – Relative path inside <code class="docutils literal notranslate"><span class="pre">dir</span></code> to save the object.</p></li>
 <li><p><strong>is_child</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – Is <code class="docutils literal notranslate"><span class="pre">x</span></code> a child of another object?</p></li>
@@ -668,12 +782,12 @@ This is intended for use by developers of dolomite extensions.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.write_csv.write_csv">
 <span class="sig-prename descclassname"><span class="pre">dolomite_base.write_csv.</span></span><span class="sig-name descname"><span class="pre">write_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'none'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/write_csv.html#write_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.write_csv.write_csv" title="Link to this definition">#</a></dt>
-<dd><p>Write a <a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.3.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a> to a CSV.
+<dd><p>Write a <a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a> to a CSV.
 This is intended for use by developers of dolomite extensions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.3.18)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>) – Data frame.</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>) – Data frame.</p></li>
 <li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – File path to write the CSV.</p></li>
 <li><p><strong>compression</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Literal" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'none'</span></code>, <code class="docutils literal notranslate"><span class="pre">'gzip'</span></code>]) – Compression algorithm to use, if any.</p></li>
 </ul>
@@ -785,6 +899,16 @@ metadata itself is written to a JSON file at a path derived from
 <li><a class="reference internal" href="#module-dolomite_base.acquire_metadata">dolomite_base.acquire_metadata module</a><ul>
 <li><a class="reference internal" href="#dolomite_base.acquire_metadata.acquire_metadata"><code class="docutils literal notranslate"><span class="pre">acquire_metadata()</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.acquire_metadata.acquire_metadata_from_dir"><code class="docutils literal notranslate"><span class="pre">acquire_metadata_from_dir()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.alt_load_object">dolomite_base.alt_load_object module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.alt_load_object.alt_load_object"><code class="docutils literal notranslate"><span class="pre">alt_load_object()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.alt_load_object.alt_load_object_function"><code class="docutils literal notranslate"><span class="pre">alt_load_object_function()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.alt_stage_object">dolomite_base.alt_stage_object module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.alt_stage_object.alt_stage_object"><code class="docutils literal notranslate"><span class="pre">alt_stage_object()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.alt_stage_object.alt_stage_object_function"><code class="docutils literal notranslate"><span class="pre">alt_stage_object_function()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-dolomite_base.lib_dolomite_base">dolomite_base.lib_dolomite_base module</a></li>
