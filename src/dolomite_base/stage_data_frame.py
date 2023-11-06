@@ -7,6 +7,7 @@ import gzip
 
 from . import lib_dolomite_base as lib
 from .stage_object import stage_object
+from .alt_stage_object import alt_stage_object
 from .write_metadata import write_metadata
 from . import _utils as ut
 from ._process_columns import (
@@ -55,16 +56,16 @@ def stage_data_frame(
         meta, other = _stage_hdf5_data_frame(x, dir, path, is_child=is_child)
 
     for i in other:
-        more_meta = stage_object(x.column(i), dir, path + "/child-" + str(i + 1), is_child = True)
+        more_meta = alt_stage_object(x.column(i), dir, path + "/child-" + str(i + 1), is_child = True)
         resource_stub = write_metadata(more_meta, dir=dir)
         meta["data_frame"]["columns"][i]["resource"] = resource_stub
 
     if x.metadata is not None and len(x.metadata):
-        mmeta = stage_object(x.metadata, dir, path + "/other", is_child=True)
+        mmeta = alt_stage_object(x.metadata, dir, path + "/other", is_child=True)
         meta["data_frame"]["other_data"] = { "resource": write_metadata(mmeta, dir=dir) }
 
     if x.mcols is not None and x.mcols.shape[1] > 0:
-        mmeta = stage_object(x.mcols, dir, path + "/mcols", is_child=True)
+        mmeta = alt_stage_object(x.mcols, dir, path + "/mcols", is_child=True)
         meta["data_frame"]["column_data"] = { "resource": write_metadata(mmeta, dir=dir) }
 
     return meta

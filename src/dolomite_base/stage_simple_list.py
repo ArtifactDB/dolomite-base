@@ -7,6 +7,7 @@ import gzip
 import h5py
 
 from .stage_object import stage_object
+from .alt_stage_object import alt_stage_object
 from .write_metadata import write_metadata
 from . import lib_dolomite_base as lib
 from . import _utils as ut
@@ -155,7 +156,7 @@ def _stage_simple_list_internal(
 
     children = []
     for i, ex in enumerate(externals):
-        child_meta = stage_object(ex, dir, path + "/" + str(i))
+        child_meta = alt_stage_object(ex, dir, path + "/" + str(i))
         children.append({ "resource": write_metadata(child_meta, dir) })
     components["simple_list"] = { "children": children }
     components["is_child"] = is_child

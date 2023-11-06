@@ -8,7 +8,7 @@ import os
 from . import lib_dolomite_base as lib
 from .acquire_file import acquire_file
 from .acquire_metadata import acquire_metadata
-from .load_object import load_object
+from .alt_load_object import alt_load_object
 from ._utils import _is_gzip_compressed
 
 
@@ -62,7 +62,7 @@ def _create_BiocFrame(expected_rows: int, row_names: Optional[list], columns: li
         curval = columns[i]
         if curval["type"] == "other":
             child_meta = acquire_metadata(project, curval["resource"]["path"])
-            c = load_object(child_meta, project, **kwargs)
+            c = alt_load_object(child_meta, project, **kwargs)
 
         elif curval["type"] == "integer":
             if not np.issubdtype(c.dtype, np.integer):
@@ -88,10 +88,10 @@ def _attach_metadata(meta: dict[str, Any], df: BiocFrame, project):
     dmeta = meta["data_frame"]
     if "other_data" in dmeta:
         mmeta = acquire_metadata(project, dmeta["other_data"]["resource"]["path"])
-        df.metadata = load_object(mmeta, project)
+        df.metadata = alt_load_object(mmeta, project)
     if "column_data" in dmeta:
         mmeta = acquire_metadata(project, dmeta["column_data"]["resource"]["path"])
-        df.mcols = load_object(mmeta, project)
+        df.mcols = alt_load_object(mmeta, project)
 
 
 def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFrame:
