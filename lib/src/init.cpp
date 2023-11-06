@@ -13,8 +13,8 @@ void validate_list_json(std::string, size_t);
 pybind11::object load_list_hdf5(std::string, std::string, pybind11::list);
 void validate_list_hdf5(std::string, std::string, size_t);
 
-void check_csv_df(std::string, int, bool, pybind11::list, pybind11::array_t<int32_t>, pybind11::array_t<int32_t>, pybind11::list, int, bool, bool);
-void check_hdf5_df(std::string, std::string, int, bool, pybind11::list, pybind11::array_t<int32_t>, pybind11::array_t<int32_t>, pybind11::list, int, int);
+void check_csv_df(std::string, int, bool, pybind11::list, pybind11::list, pybind11::list, pybind11::array_t<bool>, pybind11::list, int, bool, bool);
+void check_hdf5_df(std::string, std::string, int, bool, pybind11::list, pybind11::list, pybind11::list, pybind11::array_t<bool>, pybind11::list, int, int);
 
 // Binding:
 PYBIND11_MODULE(lib_dolomite_base, m) {

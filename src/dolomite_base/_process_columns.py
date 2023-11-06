@@ -237,6 +237,7 @@ def _process_columns_for_hdf5(x: BiocFrame, handle) -> Tuple:
                 dhandle = handle.create_dataset(str(i), data=current, dtype=savetype, compression="gzip", chunks=True)
             else:
                 dhandle = _save_fixed_length_strings(handle, str(i), current)
+            dhandle.attrs.create("type", data=columns[-1]["type"])
             if has_none:
                 dhandle.attrs.create("missing-value-placeholder", data=placeholder, dtype=savetype)
 
@@ -268,6 +269,7 @@ def _process_columns_for_hdf5(x: BiocFrame, handle) -> Tuple:
                 raise NotImplementedError("saving a NumPy array as " + str(final_type) + " is not supported yet")
 
             dhandle = handle.create_dataset(str(i), data=current, dtype=savetype, compression="gzip", chunks=True)
+            dhandle.attrs.create("type", data=columns[-1]["type"])
             if placeholder:
                 dhandle.attrs.create("missing-value-placeholder", data=placeholder, dtype=savetype)
 

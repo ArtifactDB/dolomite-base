@@ -23,7 +23,7 @@ FetchContent_Declare(
 FetchContent_Declare(
   uzuki2
   GIT_REPOSITORY https://github.com/ArtifactDB/uzuki2
-  GIT_TAG v1.2.0
+  GIT_TAG v1.3.0
 )
 
 FetchContent_Declare(
@@ -35,19 +35,13 @@ FetchContent_Declare(
 FetchContent_Declare(
   ritsuko 
   GIT_REPOSITORY https://github.com/ArtifactDB/ritsuko
-  GIT_TAG v0.2.0
-)
-
-FetchContent_Declare(
-  uzuki2
-  GIT_REPOSITORY https://github.com/ArtifactDB/uzuki2
-  GIT_TAG v1.2.0
+  GIT_TAG v0.3.3
 )
 
 FetchContent_Declare(
   takane
   GIT_REPOSITORY https://github.com/ArtifactDB/takane
-  GIT_TAG v0.2.0
+  GIT_TAG v0.5.0
 )
 
 FetchContent_MakeAvailable(uzuki2)
