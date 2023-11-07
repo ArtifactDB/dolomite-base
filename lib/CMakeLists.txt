@@ -35,7 +35,7 @@ FetchContent_Declare(
 FetchContent_Declare(
   ritsuko 
   GIT_REPOSITORY https://github.com/ArtifactDB/ritsuko
-  GIT_TAG v0.3.3
+  GIT_TAG master
 )
 
 FetchContent_Declare(
@@ -61,7 +61,7 @@ find_package(pybind11 CONFIG)
 pybind11_add_module(${TARGET} 
     src/load_csv.cpp
     src/load_list.cpp
-    src/misc.cpp
+    src/choose_missing_placeholder.cpp
     src/check_df.cpp
     src/init.cpp
 )

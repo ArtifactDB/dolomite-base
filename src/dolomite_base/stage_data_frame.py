@@ -16,7 +16,6 @@ from . import _utils as ut
 from ._process_columns import (
     _process_columns_for_csv, 
     _process_columns_for_hdf5, 
-    _save_fixed_length_strings, 
     _write_csv,
 )
 
@@ -110,11 +109,11 @@ def _stage_hdf5_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) ->
         ghandle.attrs.create("version", data="1.0")
         dhandle = ghandle.create_group("data")
         columns, otherable = _process_columns_for_hdf5(x, dhandle)
-        _save_fixed_length_strings(ghandle, "column_names", x.column_names)
+        ut._save_fixed_length_strings(ghandle, "column_names", x.column_names)
 
         has_row_names = x.row_names is not None
         if has_row_names:
-            _save_fixed_length_strings(ghandle, "row_names", x.row_names)
+            ut._save_fixed_length_strings(ghandle, "row_names", x.row_names)
 
     metadata = {
         "$schema": "hdf5_data_frame/v1.json",

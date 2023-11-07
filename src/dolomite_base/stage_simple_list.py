@@ -1,6 +1,7 @@
 from typing import Any, Union, Optional, Literal
 import numpy as np
 from numpy import ndarray, issubdtype, integer, floating, bool_
+from functools import singledispatch
 import os
 import json
 import gzip
@@ -163,36 +164,35 @@ def _stage_simple_list_internal(
     return components
 
 
-def _stage_simple_list_recursive(x, externals, handle):
-    if isinstance(x, list):
-        typecheck = set()
-        has_none = False
-        for y in x:
-            if y is not None:
-                has_none = True
-                typecheck.add(type(y))
+@singledispatch
+def _stage_simple_list_recursive(x: Any, externals: list, handle):
+    externals.append(x)
+    if handle is None:
+        return { "type": "external", "index": len(externals) - 1 }
+    else:
+        handle.attrs["uzuki_object"] = "external"
+        handle.create_dataset("index", data=len(externals) - 1, dtype='i4')
+        return
 
-        if len(typecheck) == 1:
-            if str in typecheck:
-                if handle is None:
-                    return { "type": "string", "values": x }
-                else:
-                    if has_none:
-                        missing_placeholder = ut._choose_string_missing_placeholder(x)
-                        new_x = x[:]
-                        for i, y in enumerate(new_x):
-                            if y is None:
-                                new_x[i] = missing_placeholder
-                        x = new_x
 
-                    handle.attrs["uzuki_object"] = "vector"
-                    handle.attrs["uzuki_type"] = "string"
-                    dset = handle.create_dataset("data", data=x, compression="gzip", chunks=True)
+@_stage_simple_list_recursive.register
+def _stage_simple_list_recursive_list(x: list, externals: list, handle):
+    final_type, has_none = ut._determine_list_type(x)
+    if final_type == str: # special handling of a list of strings.
+        if handle is None:
+            return { "type": "string", "values": x }
+        else:
+            if has_none:
+                x, placeholder = ut._choose_missing_string_placeholder(x)
 
-                    if has_none:
-                        dset.attrs["missing-value-placeholder"] = missing_placeholder
-                    return
+            handle.attrs["uzuki_object"] = "vector"
+            handle.attrs["uzuki_type"] = "string"
+            dset = ut._save_fixed_length_strings(handle, "data", x)
 
+            if has_none:
+               dset.attrs["missing-value-placeholder"] = placeholder
+            return
+    else:
         if handle is None:
             vals = []
             collected = { "type": "list", "values": vals }
@@ -207,218 +207,198 @@ def _stage_simple_list_recursive(x, externals, handle):
                 _stage_simple_list_recursive(y, externals, ghandle)
             return
 
-    elif isinstance(x, dict):
+
+@_stage_simple_list_recursive.register
+def _stage_simple_list_recursive_dict(x: dict, externals: list, handle):
+    if handle is None:
+        vals = []
+        names = []
+        collected = { "type": "list", "values": vals, "names": names }
+        for k, v in x.items():
+            names.append(k)
+            vals.append(_stage_simple_list_recursive(v, externals, None))
+        return collected
+    else:
+        handle.attrs["uzuki_object"] = "list"
+        dhandle = handle.create_group("data")
+        names = []
+        for k, v in x.items():
+            ghandle = dhandle.create_group(str(len(names)))
+            _stage_simple_list_recursive(v, externals, ghandle)
+            names.append(k)
+        handle.create_dataset("names", data=names, compression="gzip", chunks=True)
+        return
+
+
+@_stage_simple_list_recursive.register
+def _stage_simple_list_recursive_bool(x: bool, externals: list, handle):
+    if handle is None:
+        return { "type": "boolean", "values": bool(x) }
+    else:
+        _stage_scalar_hdf5(handle, x=x, dtype=bool)
+        return
+
+
+@_stage_simple_list_recursive.register
+def _stage_simple_list_recursive_int(x: int, externals: list, handle):
+    if ut._is_integer_scalar_within_limit(x):
         if handle is None:
-            vals = []
-            names = []
-            collected = { "type": "list", "values": vals, "names": names }
-            for k, v in x.items():
-                names.append(k)
-                vals.append(_stage_simple_list_recursive(v, externals, None))
-            return collected
+            return { "type": "integer", "values": int(x) }
         else:
-            handle.attrs["uzuki_object"] = "list"
-            dhandle = handle.create_group("data")
-            names = []
-            for k, v in x.items():
-                ghandle = dhandle.create_group(str(len(names)))
-                _stage_simple_list_recursive(v, externals, ghandle)
-                names.append(k)
-            handle.create_dataset("names", data=names, compression="gzip", chunks=True)
+            _stage_scalar_hdf5(handle, x=x, dtype=int)
+            return
+    else:
+        if handle is None:
+            return { "type": "number", "values": x }
+        else:
+            _stage_scalar_hdf5(handle, x=x, dtype=float)
             return
 
-    elif isinstance(x, bool): # bools are ints, so put this before the int check.
-        if handle is None:
-            return { "type": "boolean", "values": x }
-        else:
-            _stage_scalar_hdf5(handle, x=x, dtype=bool)
-            return
 
-    elif isinstance(x, int):
-        if ut._is_integer_scalar_within_limit(x):
-            if handle is None:
-                return { "type": "integer", "values": x }
+@_stage_simple_list_recursive.register
+def _stage_simple_list_recursive_str(x: str, externals: list, handle):
+    if handle is None:
+        return { "type": "string", "values": str(x) }
+    else:
+        _stage_scalar_hdf5(handle, x=x, dtype=str)
+        return
+
+
+@_stage_simple_list_recursive.register
+def _stage_simple_list_recursive_float(x: float, externals: list, handle):
+    if handle is None:
+        return { "type": "number", "values": _sanitize_float_json(x) }
+    else:
+        _stage_scalar_hdf5(handle, x=x, dtype=float)
+        return
+
+
+@_stage_simple_list_recursive.register
+def _stage_simple_list_recursive_ndarray(x: np.ndarray, externals: list, handle):
+    ndims = len(x.shape)
+    if ndims == 0:
+        if not np.ma.is_masked(x) or not bool(x.mask):
+            return _stage_simple_list_recursive(x.dtype.type(x), externals, handle)
+        else:
+            final_type = ut._determine_numpy_type(x.dtype.type(x))
+            if final_type == int:
+                if handle is None:
+                    return { "type": "integer", "values": None }
+                else:
+                    _stage_scalar_hdf5(handle, x=-ut.LIMIT32, dtype=int, missing_placeholder=-ut.LIMIT32)
+                    return
+            elif final_type == float:
+                if handle is None:
+                    return { "type": "number", "values": None }
+                else:
+                    _stage_scalar_hdf5(handle, x=np.NaN, dtype=float, missing_placeholder=np.NaN)
+                    return
+            elif x.dtype == bool_:
+                if handle is None:
+                    return { "type": "boolean", "values": None }
+                else:
+                    _stage_scalar_hdf5(handle, x=-1, dtype=bool, missing_placeholder=-1)
+                    return
             else:
-                _stage_scalar_hdf5(handle, x=x, dtype=int)
-                return
-        else:
-            if handle is None:
-                return { "type": "number", "values": x }
+                raise NotImplementedError("no staging method for 1D NumPy masked arrays of " + str(x.dtype))
+
+    elif ndims != 1:
+        return _stage_simple_list_recursive.registry[Any](x, externals, handle)
+    else:
+        final_type = ut._determine_numpy_type(x)
+        if np.ma.is_masked(x):
+            if final_type == int:
+                if handle is None:
+                    return { "type": "integer", "values": [None if np.ma.is_masked(y) else int(y) for y in x] }
+                else:
+                    # If there's no valid missing placeholder, we just save it as floating-point.
+                    x, placeholder = ut._choose_missing_integer_placeholder(x)
+                    if placeholder is not None:
+                        _stage_vector_hdf5(handle, x=x, dtype=int, missing_placeholder=placeholder)
+                    else:
+                        x, placeholder = ut._choose_missing_float_placeholder(x)
+                        _stage_vector_hdf5(handle, x=x, dtype=float, missing_placeholder=placeholder)
+                    return
+            elif final_type == float:
+                if handle is None:
+                    return { "type": "number", "values": [_sanitize_masked_float_json(y) for y in x] }
+                else:
+                    x, placeholder = ut._choose_missing_float_placeholder(x)
+                    _stage_vector_hdf5(handle, x=x, dtype=float, missing_placeholder=placeholder)
+                    return
+            elif x.dtype == bool_:
+                if handle is None:
+                    return { "type": "boolean", "values": [None if np.ma.is_masked(y) else bool(y) for y in x] }
+                else:
+                    x, placeholder = ut._choose_missing_boolean_placeholder(x)
+                    _stage_vector_hdf5(handle, x=x, dtype=bool, missing_placeholder=placeholder)
+                    return
             else:
-                _stage_scalar_hdf5(handle, x=x, dtype=float)
-                return
-
-    elif isinstance(x, str):
-        if handle is None:
-            return { "type": "string", "values": x }
+                raise NotImplementedError("no staging method for 1D NumPy masked arrays of " + str(x.dtype))
         else:
-            _stage_scalar_hdf5(handle, x=x, dtype=str)
-            return
+            if final_type == int:
+                if handle is None:
+                    return { "type": "integer", "values": [int(y) for y in x] }
+                else:
+                    _stage_vector_hdf5(handle, x=x, dtype=int)
+                    return
+            elif final_type == float:
+                if handle is None:
+                    return { "type": "number", "values": [_sanitize_float_json(y) for y in x] }
+                else:
+                    _stage_vector_hdf5(handle, x=x, dtype=float)
+                    return
+            elif final_type == bool:
+                if handle is None:
+                    return { "type": "boolean", "values": [bool(y) for y in x] }
+                else:
+                    _stage_vector_hdf5(handle, x=x, dtype=bool)
+                    return
+            else:
+                raise NotImplementedError("no staging method for 1D NumPy arrays of " + str(x.dtype))
 
-    elif isinstance(x, float):
+
+@_stage_simple_list_recursive.register
+def _stage_simple_list_recursive_MaskedConstant(x: np.ma.core.MaskedConstant, externals: list, handle):
+    if handle is None:
+        return { "type": "number", "values": [None]}
+    else:
+        _stage_scalar_hdf5(handle, x=np.NaN, dtype=float, missing_placeholder=np.NaN)
+        return
+
+
+@_stage_simple_list_recursive.register
+def _stage_simple_list_recursive_numpy_generic(x: np.generic, externals: list, handle):
+    final_type = ut._determine_numpy_type(x)
+
+    if final_type == int:
+        if handle is None:
+            return { "type": "integer", "values": int(x) }
+        else:
+            _stage_scalar_hdf5(handle, x=x, dtype=int)
+            return
+    elif final_type == float:
         if handle is None:
             return { "type": "number", "values": _sanitize_float_json(x) }
         else:
             _stage_scalar_hdf5(handle, x=x, dtype=float)
             return
-
-    elif isinstance(x, ndarray):
-        if len(x.shape) == 1:
-            if np.ma.is_masked(x):
-                as_float = False
-                if issubdtype(x.dtype, integer):
-                    if ut._is_integer_vector_within_limit(x):
-                        if handle is None:
-                            return { "type": "integer", "values": [None if np.ma.is_masked(y) else int(y) for y in x] }
-                        else:
-                            # If there's no valid missing placeholder, we just save it as floating-point.
-                            missing_placeholder = ut._choose_integer_missing_placeholder(x)
-                            if missing_placeholder is not None:
-                                x = ut._fill_integer_missing_placeholder(x, missing_placeholder) 
-                                _stage_vector_hdf5(handle, x=x, dtype=int, missing_placeholder=missing_placeholder)
-                                return
-                    as_float = True
-
-                if as_float or issubdtype(x.dtype, floating):
-                    if handle is None:
-                        return { "type": "number", "values": [_sanitize_masked_float_json(y) for y in x] }
-                    else:
-                        missing_placeholder = ut._choose_float_missing_placeholder()
-                        x = ut._fill_float_missing_placeholder(x, missing_placeholder)
-                        _stage_vector_hdf5(handle, x=x, dtype=float, missing_placeholder=missing_placeholder)
-                        return
-                elif x.dtype == bool_:
-                    if handle is None:
-                        return { "type": "boolean", "values": [None if np.ma.is_masked(y) else bool(y) for y in x] }
-                    else:
-                        missing_placeholder = ut._choose_boolean_missing_placeholder()
-                        x = ut._fill_boolean_missing_placeholder(x, missing_placeholder)
-                        _stage_vector_hdf5(handle, x=x, dtype=bool, missing_placeholder=missing_placeholder)
-                        return
-                else:
-                    raise NotImplementedError("no staging method for 1D NumPy masked arrays of " + str(x.dtype))
-
-            else:
-                as_float = False
-                if issubdtype(x.dtype, integer):
-                    if ut._is_integer_vector_within_limit(x):
-                        if handle is None:
-                            return { "type": "integer", "values": [int(y) for y in x] }
-                        else:
-                            _stage_vector_hdf5(handle, x=x, dtype=int)
-                            return
-                    as_float = True
-
-                if as_float or issubdtype(x.dtype, floating):
-                    if handle is None:
-                        return { "type": "number", "values": [_sanitize_float_json(y) for y in x] }
-                    else:
-                        _stage_vector_hdf5(handle, x=x, dtype=float)
-                        return
-                elif x.dtype == bool_:
-                    if handle is None:
-                        return { "type": "boolean", "values": [bool(y) for y in x] }
-                    else:
-                        _stage_vector_hdf5(handle, x=x, dtype=bool)
-                        return
-                else:
-                    raise NotImplementedError("no staging method for 1D NumPy arrays of " + str(x.dtype))
-
-        elif len(x.shape) == 0:
-            if np.ma.is_masked(x):
-                if issubdtype(x.dtype, integer):
-                    if handle is None:
-                        return { "type": "integer", "values": None }
-                    else:
-                        missing_placeholder = ut._choose_integer_missing_placeholder([])
-                        _stage_scalar_hdf5(handle, x=missing_placeholder, dtype=int, missing_placeholder=missing_placeholder)
-                        return
-                elif issubdtype(x.dtype, floating):
-                    if handle is None:
-                        return { "type": "number", "values": None }
-                    else:
-                        missing_placeholder = ut._choose_float_missing_placeholder()
-                        _stage_scalar_hdf5(handle, x=missing_placeholder, dtype=float, missing_placeholder=missing_placeholder)
-                        return
-                elif x.dtype == bool_:
-                    if handle is None:
-                        return { "type": "boolean", "values": None }
-                    else:
-                        missing_placeholder = ut._choose_boolean_missing_placeholder()
-                        _stage_scalar_hdf5(handle, x=missing_placeholder, dtype=bool, missing_placeholder=missing_placeholder)
-                        return
-                else:
-                    raise NotImplementedError("no staging method for 0-d NumPy arrays of " + str(x.dtype))
-
-            else:
-                as_float = False
-                if issubdtype(x.dtype, integer):
-                    y = int(x)
-                    if ut._is_integer_scalar_within_limit(y):
-                        if handle is None:
-                            return { "type": "integer", "values": y } 
-                        else:
-                            _stage_scalar_hdf5(handle, x=y, dtype=int)
-                            return
-                    as_float = True
-
-                if as_float or issubdtype(x.dtype, floating):
-                    if handle is None:
-                        return { "type": "number", "values": _sanitize_float_json(x) }
-                    else:
-                        _stage_scalar_hdf5(handle, x=float(x), dtype=float)
-                        return
-                elif x.dtype == bool_:
-                    y = bool(x)
-                    if handle is None:
-                        return { "type": "boolean", "values": y }
-                    else:
-                        _stage_scalar_hdf5(handle, x=y, dtype=bool)
-                        return
-                else:
-                    raise NotImplementedError("no staging method for 0-d NumPy arrays of " + str(x.dtype))
-
-    elif isinstance(x, np.generic):
-        as_float = False
-        if isinstance(x, integer):
-            y = int(x)
-            if ut._is_integer_scalar_within_limit(y):
-                if handle is None:
-                    return { "type": "integer", "values": y }
-                else:
-                    _stage_scalar_hdf5(handle, x=y, dtype=int)
-                    return
-            as_float = True
-
-        if as_float or isinstance(x, floating):
-            if handle is None:
-                return { "type": "number", "values": _sanitize_float_json(x) }
-            else:
-                _stage_scalar_hdf5(handle, x=float(x), dtype=float)
-                return
-        elif isinstance(x, bool_):
-            y = bool(x)
-            if handle is None:
-                return { "type": "boolean", "values": y }
-            else:
-                _stage_scalar_hdf5(handle, x=y, dtype=bool)
-                return 
-        else:
-            raise NotImplementedError("no staging method for NumPy array scalars of " + str(x.dtype))
-
-    elif x == None:
+    elif final_type == bool:
         if handle is None:
-            return { "type": "nothing" }
+            return { "type": "boolean", "values": bool(x) }
         else:
-            handle.attrs["uzuki_object"] = "nothing"
-            return
-
-    externals.append(x)
-    if handle is None:
-        return { "type": "external", "index": len(externals) - 1 }
+            _stage_scalar_hdf5(handle, x=x, dtype=bool)
+            return 
     else:
-        handle.attrs["uzuki_object"] = "external"
-        handle.create_dataset("index", data=len(externals) - 1, dtype='i4')
+        raise NotImplementedError("no staging method for NumPy array scalars of " + str(x.dtype))
+
+
+@_stage_simple_list_recursive.register
+def _stage_simple_list_recursive_none(x: None, externals: list, handle):
+    if handle is None:
+        return { "type": "nothing" }
+    else:
+        handle.attrs["uzuki_object"] = "nothing"
         return
 
 
