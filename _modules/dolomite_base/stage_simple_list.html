@@ -200,6 +200,7 @@
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Literal</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">issubdtype</span><span class="p">,</span> <span class="n">integer</span><span class="p">,</span> <span class="n">floating</span><span class="p">,</span> <span class="n">bool_</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">gzip</span>
@@ -371,36 +372,35 @@
     <span class="k">return</span> <span class="n">components</span>
 
 
-<span class="k">def</span> <span class="nf">_stage_simple_list_recursive</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">externals</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="n">typecheck</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="n">has_none</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">has_none</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="n">typecheck</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+<span class="nd">@singledispatch</span>
+<span class="k">def</span> <span class="nf">_stage_simple_list_recursive</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+    <span class="n">externals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;external&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">externals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;external&quot;</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">externals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;i4&#39;</span><span class="p">)</span>
+        <span class="k">return</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">typecheck</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">str</span> <span class="ow">in</span> <span class="n">typecheck</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">x</span> <span class="p">}</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">has_none</span><span class="p">:</span>
-                        <span class="n">missing_placeholder</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_choose_string_missing_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-                        <span class="n">new_x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:]</span>
-                        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new_x</span><span class="p">):</span>
-                            <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                                <span class="n">new_x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">missing_placeholder</span>
-                        <span class="n">x</span> <span class="o">=</span> <span class="n">new_x</span>
 
-                    <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;vector&quot;</span>
-                    <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
-                    <span class="n">dset</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s2">&quot;gzip&quot;</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nd">@_stage_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_stage_simple_list_recursive_list</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+    <span class="n">final_type</span><span class="p">,</span> <span class="n">has_none</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_determine_list_type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">final_type</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span> <span class="c1"># special handling of a list of strings.</span>
+        <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">x</span> <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">has_none</span><span class="p">:</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">placeholder</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_choose_missing_string_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-                    <span class="k">if</span> <span class="n">has_none</span><span class="p">:</span>
-                        <span class="n">dset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;missing-value-placeholder&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">missing_placeholder</span>
-                    <span class="k">return</span>
+            <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;vector&quot;</span>
+            <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
+            <span class="n">dset</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_save_fixed_length_strings</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
 
+            <span class="k">if</span> <span class="n">has_none</span><span class="p">:</span>
+               <span class="n">dset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;missing-value-placeholder&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">placeholder</span>
+            <span class="k">return</span>
+    <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">collected</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">vals</span> <span class="p">}</span>
@@ -415,218 +415,198 @@
                 <span class="n">_stage_simple_list_recursive</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">externals</span><span class="p">,</span> <span class="n">ghandle</span><span class="p">)</span>
             <span class="k">return</span>
 
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+
+<span class="nd">@_stage_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_stage_simple_list_recursive_dict</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">collected</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">vals</span><span class="p">,</span> <span class="s2">&quot;names&quot;</span><span class="p">:</span> <span class="n">names</span> <span class="p">}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_stage_simple_list_recursive</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">externals</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">collected</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;list&quot;</span>
+        <span class="n">dhandle</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">ghandle</span> <span class="o">=</span> <span class="n">dhandle</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)))</span>
+            <span class="n">_stage_simple_list_recursive</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">externals</span><span class="p">,</span> <span class="n">ghandle</span><span class="p">)</span>
+            <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">names</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s2">&quot;gzip&quot;</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span>
+
+
+<span class="nd">@_stage_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_stage_simple_list_recursive_bool</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">return</span>
+
+
+<span class="nd">@_stage_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_stage_simple_list_recursive_int</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">ut</span><span class="o">.</span><span class="n">_is_integer_scalar_within_limit</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">collected</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">vals</span><span class="p">,</span> <span class="s2">&quot;names&quot;</span><span class="p">:</span> <span class="n">names</span> <span class="p">}</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-                <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_stage_simple_list_recursive</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">externals</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">collected</span>
+            <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;list&quot;</span>
-            <span class="n">dhandle</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
-            <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">ghandle</span> <span class="o">=</span> <span class="n">dhandle</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)))</span>
-                <span class="n">_stage_simple_list_recursive</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">externals</span><span class="p">,</span> <span class="n">ghandle</span><span class="p">)</span>
-                <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="n">handle</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">names</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s2">&quot;gzip&quot;</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+            <span class="k">return</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">x</span> <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
             <span class="k">return</span>
 
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span> <span class="c1"># bools are ints, so put this before the int check.</span>
-        <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">x</span> <span class="p">}</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-            <span class="k">return</span>
 
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">ut</span><span class="o">.</span><span class="n">_is_integer_scalar_within_limit</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">x</span> <span class="p">}</span>
+<span class="nd">@_stage_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_stage_simple_list_recursive_str</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+        <span class="k">return</span>
+
+
+<span class="nd">@_stage_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_stage_simple_list_recursive_float</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">_sanitize_float_json</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span>
+
+
+<span class="nd">@_stage_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_stage_simple_list_recursive_ndarray</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+    <span class="n">ndims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ndims</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">mask</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_stage_simple_list_recursive</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">externals</span><span class="p">,</span> <span class="n">handle</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">final_type</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_determine_numpy_type</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">final_type</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="n">ut</span><span class="o">.</span><span class="n">LIMIT32</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="o">=-</span><span class="n">ut</span><span class="o">.</span><span class="n">LIMIT32</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="k">elif</span> <span class="n">final_type</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">bool_</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">return</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-                <span class="k">return</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">x</span> <span class="p">}</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;no staging method for 1D NumPy masked arrays of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+
+    <span class="k">elif</span> <span class="n">ndims</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_stage_simple_list_recursive</span><span class="o">.</span><span class="n">registry</span><span class="p">[</span><span class="n">Any</span><span class="p">](</span><span class="n">x</span><span class="p">,</span> <span class="n">externals</span><span class="p">,</span> <span class="n">handle</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">final_type</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_determine_numpy_type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">final_type</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span> <span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># If there&#39;s no valid missing placeholder, we just save it as floating-point.</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">placeholder</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_choose_missing_integer_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">placeholder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">_stage_vector_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="o">=</span><span class="n">placeholder</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">x</span><span class="p">,</span> <span class="n">placeholder</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_choose_missing_float_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                        <span class="n">_stage_vector_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="o">=</span><span class="n">placeholder</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="k">elif</span> <span class="n">final_type</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_sanitize_masked_float_json</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span> <span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">placeholder</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_choose_missing_float_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                    <span class="n">_stage_vector_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="o">=</span><span class="n">placeholder</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">bool_</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">else</span> <span class="nb">bool</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span> <span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">placeholder</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_choose_missing_boolean_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                    <span class="n">_stage_vector_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="o">=</span><span class="n">placeholder</span><span class="p">)</span>
+                    <span class="k">return</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-                <span class="k">return</span>
-
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">x</span> <span class="p">}</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;no staging method for 1D NumPy masked arrays of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
-            <span class="k">return</span>
+            <span class="k">if</span> <span class="n">final_type</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span> <span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_stage_vector_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="k">elif</span> <span class="n">final_type</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_sanitize_float_json</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span> <span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_stage_vector_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="k">elif</span> <span class="n">final_type</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">bool</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span> <span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_stage_vector_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+                    <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;no staging method for 1D NumPy arrays of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
 
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+
+<span class="nd">@_stage_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_stage_simple_list_recursive_MaskedConstant</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">MaskedConstant</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">]}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">)</span>
+        <span class="k">return</span>
+
+
+<span class="nd">@_stage_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_stage_simple_list_recursive_numpy_generic</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">generic</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+    <span class="n">final_type</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_determine_numpy_type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">final_type</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+            <span class="k">return</span>
+    <span class="k">elif</span> <span class="n">final_type</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">_sanitize_float_json</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
             <span class="k">return</span>
-
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-                <span class="n">as_float</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="k">if</span> <span class="n">issubdtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">integer</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">ut</span><span class="o">.</span><span class="n">_is_integer_vector_within_limit</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-                        <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                            <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span> <span class="p">}</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="c1"># If there&#39;s no valid missing placeholder, we just save it as floating-point.</span>
-                            <span class="n">missing_placeholder</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_choose_integer_missing_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-                            <span class="k">if</span> <span class="n">missing_placeholder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                                <span class="n">x</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_fill_integer_missing_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="p">)</span> 
-                                <span class="n">_stage_vector_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="o">=</span><span class="n">missing_placeholder</span><span class="p">)</span>
-                                <span class="k">return</span>
-                    <span class="n">as_float</span> <span class="o">=</span> <span class="kc">True</span>
-
-                <span class="k">if</span> <span class="n">as_float</span> <span class="ow">or</span> <span class="n">issubdtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">floating</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_sanitize_masked_float_json</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span> <span class="p">}</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">missing_placeholder</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_choose_float_missing_placeholder</span><span class="p">()</span>
-                        <span class="n">x</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_fill_float_missing_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="p">)</span>
-                        <span class="n">_stage_vector_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="o">=</span><span class="n">missing_placeholder</span><span class="p">)</span>
-                        <span class="k">return</span>
-                <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">bool_</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">else</span> <span class="nb">bool</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span> <span class="p">}</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">missing_placeholder</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_choose_boolean_missing_placeholder</span><span class="p">()</span>
-                        <span class="n">x</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_fill_boolean_missing_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="p">)</span>
-                        <span class="n">_stage_vector_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="o">=</span><span class="n">missing_placeholder</span><span class="p">)</span>
-                        <span class="k">return</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;no staging method for 1D NumPy masked arrays of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
-
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">as_float</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="k">if</span> <span class="n">issubdtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">integer</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">ut</span><span class="o">.</span><span class="n">_is_integer_vector_within_limit</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-                        <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                            <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span> <span class="p">}</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">_stage_vector_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-                            <span class="k">return</span>
-                    <span class="n">as_float</span> <span class="o">=</span> <span class="kc">True</span>
-
-                <span class="k">if</span> <span class="n">as_float</span> <span class="ow">or</span> <span class="n">issubdtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">floating</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_sanitize_float_json</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span> <span class="p">}</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">_stage_vector_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-                        <span class="k">return</span>
-                <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">bool_</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">bool</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span> <span class="p">}</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">_stage_vector_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-                        <span class="k">return</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;no staging method for 1D NumPy arrays of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
-
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">issubdtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">integer</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">missing_placeholder</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_choose_integer_missing_placeholder</span><span class="p">([])</span>
-                        <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">missing_placeholder</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="o">=</span><span class="n">missing_placeholder</span><span class="p">)</span>
-                        <span class="k">return</span>
-                <span class="k">elif</span> <span class="n">issubdtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">floating</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">missing_placeholder</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_choose_float_missing_placeholder</span><span class="p">()</span>
-                        <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">missing_placeholder</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="o">=</span><span class="n">missing_placeholder</span><span class="p">)</span>
-                        <span class="k">return</span>
-                <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">bool_</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">missing_placeholder</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_choose_boolean_missing_placeholder</span><span class="p">()</span>
-                        <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">missing_placeholder</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">missing_placeholder</span><span class="o">=</span><span class="n">missing_placeholder</span><span class="p">)</span>
-                        <span class="k">return</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;no staging method for 0-d NumPy arrays of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
-
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">as_float</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="k">if</span> <span class="n">issubdtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">integer</span><span class="p">):</span>
-                    <span class="n">y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">ut</span><span class="o">.</span><span class="n">_is_integer_scalar_within_limit</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
-                        <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                            <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">y</span> <span class="p">}</span> 
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-                            <span class="k">return</span>
-                    <span class="n">as_float</span> <span class="o">=</span> <span class="kc">True</span>
-
-                <span class="k">if</span> <span class="n">as_float</span> <span class="ow">or</span> <span class="n">issubdtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">floating</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">_sanitize_float_json</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">}</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-                        <span class="k">return</span>
-                <span class="k">elif</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">bool_</span><span class="p">:</span>
-                    <span class="n">y</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">y</span> <span class="p">}</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-                        <span class="k">return</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;no staging method for 0-d NumPy arrays of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
-
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">generic</span><span class="p">):</span>
-        <span class="n">as_float</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">integer</span><span class="p">):</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">ut</span><span class="o">.</span><span class="n">_is_integer_scalar_within_limit</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">y</span> <span class="p">}</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-                    <span class="k">return</span>
-            <span class="n">as_float</span> <span class="o">=</span> <span class="kc">True</span>
-
-        <span class="k">if</span> <span class="n">as_float</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">floating</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">_sanitize_float_json</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">}</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-                <span class="k">return</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bool_</span><span class="p">):</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">y</span> <span class="p">}</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-                <span class="k">return</span> 
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;no staging method for NumPy array scalars of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
-
-    <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">final_type</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;nothing&quot;</span> <span class="p">}</span>
+            <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;nothing&quot;</span>
-            <span class="k">return</span>
-
-    <span class="n">externals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;external&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">externals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">}</span>
+            <span class="n">_stage_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="k">return</span> 
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;external&quot;</span>
-        <span class="n">handle</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">externals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;i4&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;no staging method for NumPy array scalars of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+
+
+<span class="nd">@_stage_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_stage_simple_list_recursive_none</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;nothing&quot;</span> <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;nothing&quot;</span>
         <span class="k">return</span>
 
 
