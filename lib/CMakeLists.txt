@@ -35,7 +35,7 @@ FetchContent_Declare(
 FetchContent_Declare(
   ritsuko 
   GIT_REPOSITORY https://github.com/ArtifactDB/ritsuko
-  GIT_TAG master
+  GIT_TAG v0.3.4
 )
 
 FetchContent_Declare(
