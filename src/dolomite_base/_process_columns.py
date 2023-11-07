@@ -48,7 +48,6 @@ def _process_columns_for_csv(x: BiocFrame) -> Tuple:
                 operations.append(_numpy_element_to_string)
             else:
                 operations.append(str)
-
         elif isinstance(current, list):
             final_type, has_none = ut._determine_list_type(current)
             if final_type is None:
@@ -57,14 +56,18 @@ def _process_columns_for_csv(x: BiocFrame) -> Tuple:
                 operations.append(_quotify_string_or_none)
             else:
                 operations.append(_list_element_to_string)
-
         else:
             is_other = True
 
         if is_other:
-            columns.append({ "type": "other", "name": col })
-            operations.append(lambda x : "0")
-            otherable.append(i)
+            if isinstance(current, Factor):
+                columns.append({ "type": "factor", "name": col, "ordered": current.ordered })
+                meta = ???? ## HERE!! ###
+                columns[-1]["levels"] = { "resource": write_metadata(meta, dir) }
+            else:
+                columns.append({ "type": "other", "name": col })
+                operations.append(lambda x : "0")
+                otherable.append(i)
         else:
             if final_type == int:
                 columns.append({ "type": "integer", "name": col })
@@ -137,7 +140,6 @@ def _process_columns_for_hdf5(x: BiocFrame, handle) -> Tuple:
     columns = []
     otherable = []
 
-    # TODO: handle date-times, pandas' Categorical factors.
     for i, col in enumerate(x.column_names):
         current = x.column(col)
         placeholder = None
@@ -158,8 +160,26 @@ def _process_columns_for_hdf5(x: BiocFrame, handle) -> Tuple:
             is_other = True
 
         if is_other:
-            columns.append({ "type": "other", "name": col })
-            otherable.append(i)
+            if isinstance(current, Factor):
+                columns.append({ "type": "factor", "name": col, "ordered": current.ordered })
+                ghandle = handle.create_group(str(i))
+                ghandle.attrs.create("type", data=columns[-1]["type"])
+                ghandle.attrs.create("ordered", data=int(columns[-1]["ordered"]), dtype="i1")
+                ut._save_fixed_length_strings(ghandle, "levels", current.levels)
+
+                codes = current.codes
+                has_none = any(y is None for y in codes)
+                if has_none:
+                    codes = codes[:]
+                    for i, y in enumerate(codes):
+                        if y is None:
+                            codes[i] = -1
+                dhandle = ghandle.create_dataset("codes", data=codes, dtype='i4', compression="gzip", chunks=True)
+                if has_none:
+                    dhandle.attrs.create("missing-value-placeholder", data=-1, dtype='i4')
+            else:
+                columns.append({ "type": "other", "name": col })
+                otherable.append(i)
         else:
             if final_type == int:
                 columns.append({ "type": "integer", "name": col })
