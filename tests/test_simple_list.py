@@ -86,6 +86,7 @@ def test_simple_list_masking():
     meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
     dl.write_metadata(meta, dir)
 
+    print(dir)
     roundtrip = dl.load_object(meta, dir)
     assert everything["string"] == roundtrip["string"]
     assert (everything["float"] == roundtrip["float"]).all()
@@ -163,6 +164,7 @@ def test_simple_list_masked_scalars():
 
     # Type is kind of lost with the scalar... oh well.
     roundtrip = dl.load_json_simple_list(meta, dir)
+    print(roundtrip)
     assert np.ma.is_masked(roundtrip["float"])
     assert np.ma.is_masked(roundtrip["int"])
     assert np.ma.is_masked(roundtrip["bool"])
