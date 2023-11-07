@@ -1,11 +1,34 @@
 from typing import Optional, Any, Literal, Tuple
+import numpy as np
 from biocframe import BiocFrame
-from ._process_columns import (
-    _process_columns_for_csv, 
-    _write_csv,
-)
 import gzip
+
+from . import _utils as ut
 from . import lib_dolomite_base as lib
+
+
+def _list_element_to_string(s):
+    if s is None:
+        return "NA"
+    return str(s)
+
+
+def _numpy_element_to_string(s):
+    if np.ma.is_masked(s):
+        return "NA"
+    return str(s)
+
+
+def _quotify_string(s):
+    if '"' in s:
+        s = s.replace('"', '""')
+    return '"' + s + '"'
+
+
+def _quotify_string_or_none(s):
+    if s is None:
+        return "NA"
+    return _quotify_string(s)
 
 
 def write_csv(x: BiocFrame, path: str, compression: Literal["none", "gzip"] = "none"):
@@ -22,16 +45,68 @@ def write_csv(x: BiocFrame, path: str, compression: Literal["none", "gzip"] = "n
     Returns:
         A (compressed) CSV file is created at ``path``.
     """
-    columns, otherable, operations = _process_columns_for_csv(x)
-    if len(otherable):
-        raise ValueError("unsupported types for column " + str(otherable[0]))
+    columns = []
+    operations = []
+
+    for i, col in enumerate(x.get_column_names()):
+        current = x.column(col)
+        final_type = bool
+        is_other = False
+
+        if isinstance(current, np.ndarray):
+            final_type = ut._determine_numpy_type(current)
+            if np.ma.is_masked(current):
+                operations.append(_numpy_element_to_string)
+            else:
+                operations.append(str)
+        else:
+            if not isinstance(current, list):
+                current = list(current)
+                if len(current) != x.shape[0]:
+                    raise ValueError("failed to coerce column '" + col + "' to a list")
+            final_type, has_none = ut._determine_list_type(current)
+            if final_type is None:
+                raise ValueError("failed to determine type of column '" + col + "'") 
+            if final_type == str:
+                operations.append(_quotify_string_or_none)
+            else:
+                operations.append(_list_element_to_string)
+
+        columns.append(current)
 
     if compression == "gzip":
         with gzip.open(path, "wb") as handle:
-            _write_csv(x, handle, operations)
+            _dump_csv_contents(handle, x, columns, operations)
     else:
         with open(path, "wb") as handle:
-            _write_csv(x, handle, operations)
+            _dump_csv_contents(handle, x, columns, operations)
+
+
+def _dump_csv_contents(handle, x: BiocFrame, columns: list, operations: list):
+    extracted_row_names = x.get_row_names()
+    has_row_names = extracted_row_names is not None
+
+    header_line = ""
+    if has_row_names:
+        header_line += _quotify_string("row_names")
+    for c in x.column_names:
+        if header_line:
+            header_line += ","
+        header_line += _quotify_string(c)
+    header_line += "\n"
+    handle.write(header_line.encode("UTF8"))
+
+    for r in range(x.shape[0]):
+        if has_row_names:
+            line = _quotify_string(extracted_row_names[r])
+        else:
+            line = ""
+        for i, trans in enumerate(operations):
+            if line:
+                line += ","
+            line += trans(columns[i][r])
+        line += "\n"
+        handle.write(line.encode("UTF8"))
 
 
 def read_csv(path: str, num_rows: int, compression: Literal["none", "gzip"]) -> Tuple[list, list]:
