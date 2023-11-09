@@ -1,7 +1,8 @@
 from typing import Any, Tuple, Optional, Literal
 from collections import namedtuple
 import os
-from biocframe import BiocFrame, Factor
+from biocframe import BiocFrame
+from biocutils import Factor
 import numpy as np
 import h5py
 import gzip
@@ -138,6 +139,8 @@ def _process_columns_for_hdf5(x: BiocFrame, handle) -> Tuple:
         else:
             is_other = True
 
+        print(current, final_type)
+
         if is_other:
             if isinstance(current, Factor):
                 columns.append({ "type": "factor", "name": col, "ordered": current.ordered })
@@ -145,13 +148,8 @@ def _process_columns_for_hdf5(x: BiocFrame, handle) -> Tuple:
                 ghandle.attrs.create("type", data=columns[-1]["type"])
                 ghandle.attrs.create("ordered", data=int(columns[-1]["ordered"]), dtype="i1")
                 ut._save_fixed_length_strings(ghandle, "levels", current.levels)
-
-                codes = current.codes
-                has_none = any(y is None for y in codes)
-                if has_none:
-                    codes, placeholder = ut._choose_missing_factor_placeholder(codes)
-                dhandle = ghandle.create_dataset("codes", data=codes, dtype='i4', compression="gzip", chunks=True)
-                if has_none:
+                dhandle = ghandle.create_dataset("codes", data=current.codes, dtype='i4', compression="gzip", chunks=True)
+                if (y == -1).any():
                     dhandle.attrs.create("missing-value-placeholder", data=-1, dtype='i4')
             else:
                 columns.append({ "type": "other", "name": col })
@@ -261,21 +259,14 @@ def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> 
         if is_other:
             if isinstance(current, Factor):
                 columns.append({ "type": "factor", "name": col, "ordered": current.ordered })
-                os.mkdir(os.path.join(dir, path, "levels"))
-                write_csv(BiocFrame({ "levels": current.levels }), os.path.join(dir, path, "levels", "simple.csv.gz"), compression="gzip")
-                # TODO: move this to an alt_stage_object on a string array.
-                columns[-1]["levels"] = {
-                    "resource": write_metadata({ 
-                        "$schema": "atomic_vector/v1.json",
-                        "path": path + "/levels/simple.csv.gz",
-                        "atomic_vector": {
-                            "type": "string",
-                            "length": len(current.levels),
-                        },
-                        "is_child": True
-                    })
-                }
-                x = x.set_column(col, current.codes)
+                lmeta = stage_object(current.get_levels(), dir, path + "/levels-" + str(i), is_child = True)
+                columns[-1]["levels"] = { "resource": write_metadata(lmeta, dir) }
+
+                codes = current.get_codes()
+                is_missing = (codes == -1)
+                if is_missing.any():
+                    codes = np.ma.array(codes, mask=is_missing)
+                x = x.set_column(col, codes)
             else:
                 columns.append({ "type": "other", "name": col })
                 x = x.set_column(col, np.zeros(len(current), np.int8))
@@ -357,7 +348,6 @@ def _inspect_columns(columns: list, dir: str) -> Tuple:
         all_levels[i] = []
         if "levels" in x:
             meta = acquire_metadata(dir, x["levels"]["resource"]["path"])
-            cnames, contents = alt_load_object(meta, dir)
-            all_levels[i] = contents
+            all_levels[i] = alt_load_object(meta, dir)
 
     return ColumnDetails(all_names, all_types, all_formats, all_ordered, all_levels)

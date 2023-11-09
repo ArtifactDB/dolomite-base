@@ -1,7 +1,6 @@
 from numpy import ndarray
 import numpy
 from typing import Union, Sequence, Tuple
-from biocframe import Factor
 from . import lib_dolomite_base as lib
 
 
@@ -131,14 +130,6 @@ def _choose_missing_string_placeholder(x: Sequence) -> Tuple:
             copy[j] = placeholder 
 
     return copy, placeholder
-
-
-def _choose_missing_factor_placeholder(x: Factor) -> Tuple:
-    copy = x.codes[:]
-    for i, y in enumerate(copy):
-        if y is None:
-            copy[i] = -1
-    return copy, -1
 
 
 def _is_gzip_compressed(meta, parent_name):

@@ -27,3 +27,5 @@ from .load_simple_list import load_json_simple_list, load_hdf5_simple_list
 from .acquire_metadata import acquire_metadata
 from .acquire_file import acquire_file
 from .write_csv import read_csv, write_csv
+from .stage_atomic_vector import stage_string_list
+from .load_atomic_vector import load_atomic_vector
