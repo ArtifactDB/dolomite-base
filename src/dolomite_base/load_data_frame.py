@@ -1,7 +1,7 @@
 import ctypes as ct
 from typing import Any, Optional
 from biocframe import BiocFrame
-from biocutils import Factor
+from biocutils import Factor, StringList
 import numpy as np
 import h5py
 import os

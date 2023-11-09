@@ -15,10 +15,10 @@ def test_string_factor_basic():
     # Regular:
     meta = dl.stage_object(regular, dir, "regular")
     assert meta["factor"]["length"] == 5
-    assert not "ordered" in meta["factor"]
+    assert meta["string_factor"]["ordered"] is None
     dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_string_factor(meta, dir)
+    roundtrip = dl.load_object(meta, dir)
     assert isinstance(roundtrip, Factor)
     assert (roundtrip.get_codes() == regular.get_codes()).all()
     assert roundtrip.get_levels() == regular.get_levels()
@@ -27,10 +27,10 @@ def test_string_factor_basic():
     # With a missing value:
     meta = dl.stage_object(missing, dir, "missing")
     assert meta["factor"]["length"] == 5
-    assert not "ordered" in meta["factor"]
+    assert meta["string_factor"]["ordered"] is None
     dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_string_factor(meta, dir)
+    roundtrip = dl.load_object(meta, dir)
     assert isinstance(roundtrip, Factor)
     assert (roundtrip.get_codes() == missing.get_codes()).all()
     assert roundtrip.get_levels() == missing.get_levels()
@@ -39,11 +39,11 @@ def test_string_factor_basic():
     # Ordered:
     meta = dl.stage_object(ordered, dir, "ordered")
     assert meta["factor"]["length"] == 5
-#    assert meta["factor"]["ordered"]
+    assert meta["string_factor"]["ordered"]
     dl.write_metadata(meta, dir)
 
-    roundtrip = dl.load_string_factor(meta, dir)
+    roundtrip = dl.load_object(meta, dir)
     assert isinstance(roundtrip, Factor)
     assert (roundtrip.get_codes() == ordered.get_codes()).all()
     assert roundtrip.get_levels() == ordered.get_levels()
-#    assert roundtrip.get_ordered() == ordered.get_ordered()
+    assert roundtrip.get_ordered() == ordered.get_ordered()

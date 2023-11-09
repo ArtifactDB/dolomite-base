@@ -15,7 +15,7 @@ def test_string_list_basic():
     dl.write_metadata(meta, dir)
 
     meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
-    roundtrip = dl.load_atomic_vector(meta2, dir)
+    roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, StringList)
     assert roundtrip == sl
 
@@ -30,6 +30,6 @@ def test_atomic_numpy_vector():
     dl.write_metadata(meta, dir)
 
     meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
-    roundtrip = dl.load_atomic_vector(meta2, dir)
+    roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, numpy.ndarray)
     assert numpy.allclose(na, roundtrip)

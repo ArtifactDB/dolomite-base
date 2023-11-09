@@ -39,7 +39,7 @@ def load_string_factor(meta: dict[str, Any], project: Any, **kwargs) -> Factor:
     levels = alt_load_object(lmeta, project)
 
     ordered = False
-    if "ordered" in meta["factor"]:
-        ordered = meta["factor"]["ordered"]
+    if "ordered" in meta["string_factor"]:
+        ordered = meta["string_factor"]["ordered"]
 
     return Factor(codes, levels, ordered=ordered)

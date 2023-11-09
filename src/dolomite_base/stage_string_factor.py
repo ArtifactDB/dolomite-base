@@ -43,19 +43,20 @@ def stage_string_factor(x: Factor, dir: str, path: str, is_child: bool = False, 
     levmeta = alt_stage_object(x.get_levels(), dir, path + "/levels", is_child = True)
     levres = write_metadata(levmeta, dir)
 
-    fmeta = {
-        "length": len(x),
-        "compression": "gzip",
-    }
-#    if x.get_ordered():
-#        fmeta["ordered"] = True
+    ordered = None
+    if x.get_ordered():
+        ordered = True
 
     return {
         "$schema": "string_factor/v1.json",
         "path": ofpath,
         "is_child": is_child,
-        "factor": fmeta,
+        "factor": {
+            "length": len(x),
+            "compression": "gzip",
+        },
         "string_factor": {
             "levels": { "resource": levres },
+            "ordered": ordered,
         }
     }
