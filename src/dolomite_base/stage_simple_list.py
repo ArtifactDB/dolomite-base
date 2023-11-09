@@ -2,6 +2,7 @@ from typing import Any, Union, Optional, Literal
 import numpy as np
 from numpy import ndarray, issubdtype, integer, floating, bool_
 from functools import singledispatch
+from biocutils import Factor
 import os
 import json
 import gzip
@@ -391,6 +392,30 @@ def _stage_simple_list_recursive_numpy_generic(x: np.generic, externals: list, h
             return 
     else:
         raise NotImplementedError("no staging method for NumPy array scalars of " + str(x.dtype))
+
+
+@_stage_simple_list_recursive.register
+def _stage_simple_list_recursive_factor(x: Factor, externals: list, handle):
+    if handle is None:
+        return { 
+            "type": "factor",
+            "values": [(None if y == -1 else int(y)) for y in x.get_codes()],
+            "levels": x.get_levels(),
+            "ordered": x.get_ordered(),
+        }
+
+    else:
+        handle.attrs["uzuki_object"] = "vector"
+        handle.attrs["uzuki_type"] = "factor"
+
+        dhandle = handle.create_dataset("data", data=x.get_codes(), dtype="i4", compression="gzip", chunks=True)
+        if (x.get_codes() == -1).any():
+            dhandle.attrs["missing-value-placeholder"] = -1
+
+        ut._save_fixed_length_strings(handle, "levels", x.get_levels())
+        if x.get_ordered():
+            handle.create_dataset("ordered", data=x.get_ordered(), dtype="i1")
+        return
 
 
 @_stage_simple_list_recursive.register

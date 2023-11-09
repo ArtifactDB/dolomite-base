@@ -147,8 +147,7 @@ struct PythonFactor : public uzuki2::Factor, public PythonBase {
     }
 
     void set_missing(size_t i) {
-        storage.mutable_at(i) = 0;
-        missing.insert(i);
+        storage.mutable_at(i) = -1;
     }
 
     void set_name(size_t i, std::string name) {
@@ -161,31 +160,16 @@ struct PythonFactor : public uzuki2::Factor, public PythonBase {
 
     pybind11::object extract() const {
         if (names.empty()) {
-            if (is_scalar) {
-                if (missing.empty()) {
-                    return levels[storage.at(0)];
-                } else {
-                    return pybind11::none();
-                }
-
-            } else {
-                pybind11::list output;
-                for (size_t i = 0, end = storage.size(); i < end; ++i) {
-                    if (missing.find(i) == missing.end()) {
-                        output.append(levels[storage.at(i)]);
-                    } else {
-                        output.append(pybind11::none());
-                    }
-                }
-                return output;
-            }
+            pybind11::module bu = pybind11::module::import("biocutils");
+            using namespace pybind11::literals;
+            return bu.attr("Factor")(storage, levels, "ordered"_a = ordered);
 
         } else {
-            // Numpy arrays don't have direct support for names, so we
+            // Factor doesn't have direct support for names, so we
             // just convert it into a dict.
             pybind11::dict output;
             for (size_t i = 0, end = storage.size(); i < end; ++i) {
-                if (missing.find(i) == missing.end()) {
+                if (storage.at(i) >= 0) {
                     output[names[i].c_str()] = levels[storage.at(i)];
                 } else {
                     output[names[i].c_str()] = pybind11::none();
@@ -197,7 +181,6 @@ struct PythonFactor : public uzuki2::Factor, public PythonBase {
 
     pybind11::array_t<int32_t> storage;
     std::vector<std::string> names;
-    std::unordered_set<size_t> missing;
     bool is_scalar;
     pybind11::list levels;
     bool ordered;
