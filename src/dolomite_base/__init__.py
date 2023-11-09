@@ -29,3 +29,5 @@ from .acquire_file import acquire_file
 from .write_csv import read_csv, write_csv
 from .stage_atomic_vector import stage_string_list
 from .load_atomic_vector import load_atomic_vector
+from .stage_string_factor import stage_string_factor
+from .load_string_factor import load_string_factor

@@ -139,8 +139,6 @@ def _process_columns_for_hdf5(x: BiocFrame, handle) -> Tuple:
         else:
             is_other = True
 
-        print(current, final_type)
-
         if is_other:
             if isinstance(current, Factor):
                 columns.append({ "type": "factor", "name": col, "ordered": current.ordered })

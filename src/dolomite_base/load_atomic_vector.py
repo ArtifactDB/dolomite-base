@@ -13,7 +13,7 @@ def load_atomic_vector(meta: dict[str, Any], project: Any, **kwargs) -> Union[St
     :py:meth:`~dolomite_base.load_object.load_object`.
 
     Args:
-        meta: Metadata for this string list.
+        meta: Metadata for this atomic vector.
 
         project: Value specifying the project of interest. This is most
             typically a string containing a file path to a staging directory
@@ -28,7 +28,7 @@ def load_atomic_vector(meta: dict[str, Any], project: Any, **kwargs) -> Union[St
     """
     fpath = acquire_file(project, meta["path"])
     gzip = _is_gzip_compressed(meta, "atomic_vector") # check it's not crazy.
-    dump_names, dump_fields = read_csv(fpath, meta["atomic_vector"]["length"], compression="gzip" if gzip else "none") 
+    dump_names, dump_fields = read_csv(fpath, meta["atomic_vector"]["length"], compression=("gzip" if gzip else "none"))
 
     # Better hope it's not named, we don't have a good way to deal with that right now.
     # Probably should just emit a warning about lost names.
