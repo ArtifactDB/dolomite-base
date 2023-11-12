@@ -325,8 +325,10 @@ def test_simple_list_factor():
     roundtrip = dl.load_json_simple_list(meta, dir)
     assert isinstance(roundtrip["regular"], Factor)
     assert list(roundtrip["regular"]) == list(everything["regular"])
+    assert not roundtrip["regular"].get_ordered()
     assert list(roundtrip["missing"]) == list(everything["missing"])
     assert list(roundtrip["ordered"]) == list(everything["ordered"])
+    assert roundtrip["ordered"].get_ordered()
 
     # Stage as HDF5.
     meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
@@ -335,5 +337,7 @@ def test_simple_list_factor():
     roundtrip = dl.load_object(meta, dir)
     assert isinstance(roundtrip["regular"], Factor)
     assert list(roundtrip["regular"]) == list(everything["regular"])
+    assert not roundtrip["regular"].get_ordered()
     assert list(roundtrip["missing"]) == list(everything["missing"])
     assert list(roundtrip["ordered"]) == list(everything["ordered"])
+    assert roundtrip["ordered"].get_ordered()
