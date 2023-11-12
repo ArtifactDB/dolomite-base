@@ -44,6 +44,14 @@ dolomite\_base.lib\_dolomite\_base module
    :undoc-members:
    :show-inheritance:
 
+dolomite\_base.load\_atomic\_vector module
+------------------------------------------
+
+.. automodule:: dolomite_base.load_atomic_vector
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dolomite\_base.load\_data\_frame module
 ---------------------------------------
 
@@ -68,6 +76,22 @@ dolomite\_base.load\_simple\_list module
    :undoc-members:
    :show-inheritance:
 
+dolomite\_base.load\_string\_factor module
+------------------------------------------
+
+.. automodule:: dolomite_base.load_string_factor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.stage\_atomic\_vector module
+-------------------------------------------
+
+.. automodule:: dolomite_base.stage_atomic_vector
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dolomite\_base.stage\_data\_frame module
 ----------------------------------------
 
@@ -88,6 +112,14 @@ dolomite\_base.stage\_simple\_list module
 -----------------------------------------
 
 .. automodule:: dolomite_base.stage_simple_list
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.stage\_string\_factor module
+-------------------------------------------
+
+.. automodule:: dolomite_base.stage_string_factor
    :members:
    :undoc-members:
    :show-inheritance:

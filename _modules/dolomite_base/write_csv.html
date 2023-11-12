@@ -198,13 +198,36 @@
         <article role="main">
           <h1>Source code for dolomite_base.write_csv</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">biocframe</span> <span class="kn">import</span> <span class="n">BiocFrame</span>
-<span class="kn">from</span> <span class="nn">._process_columns</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">_process_columns_for_csv</span><span class="p">,</span> 
-    <span class="n">_write_csv</span><span class="p">,</span>
-<span class="p">)</span>
 <span class="kn">import</span> <span class="nn">gzip</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_utils</span> <span class="k">as</span> <span class="n">ut</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lib_dolomite_base</span> <span class="k">as</span> <span class="n">lib</span>
+
+
+<span class="k">def</span> <span class="nf">_list_element_to_string</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;NA&quot;</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_numpy_element_to_string</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;NA&quot;</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_quotify_string</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s1">&#39;&quot;&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;&quot;&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">_quotify_string_or_none</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;NA&quot;</span>
+    <span class="k">return</span> <span class="n">_quotify_string</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="write_csv">
@@ -223,17 +246,69 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        A (compressed) CSV file is created at ``path``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">columns</span><span class="p">,</span> <span class="n">otherable</span><span class="p">,</span> <span class="n">operations</span> <span class="o">=</span> <span class="n">_process_columns_for_csv</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">otherable</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unsupported types for column &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">otherable</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">operations</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">()):</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+        <span class="n">final_type</span> <span class="o">=</span> <span class="nb">bool</span>
+        <span class="n">is_other</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">final_type</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_determine_numpy_type</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">current</span><span class="p">):</span>
+                <span class="n">operations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_numpy_element_to_string</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">operations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">current</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">current</span><span class="p">)</span> <span class="o">!=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;failed to coerce column &#39;&quot;</span> <span class="o">+</span> <span class="n">col</span> <span class="o">+</span> <span class="s2">&quot;&#39; to a list&quot;</span><span class="p">)</span>
+            <span class="n">final_type</span><span class="p">,</span> <span class="n">has_none</span> <span class="o">=</span> <span class="n">ut</span><span class="o">.</span><span class="n">_determine_list_type</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">final_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;failed to determine type of column &#39;&quot;</span> <span class="o">+</span> <span class="n">col</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span> 
+            <span class="k">if</span> <span class="n">final_type</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="n">operations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_quotify_string_or_none</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">operations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_list_element_to_string</span><span class="p">)</span>
+
+        <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">compression</span> <span class="o">==</span> <span class="s2">&quot;gzip&quot;</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
-            <span class="n">_write_csv</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">operations</span><span class="p">)</span>
+            <span class="n">_dump_csv_contents</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">operations</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
-            <span class="n">_write_csv</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">handle</span><span class="p">,</span> <span class="n">operations</span><span class="p">)</span></div>
+            <span class="n">_dump_csv_contents</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">operations</span><span class="p">)</span></div>
 
+
+
+<span class="k">def</span> <span class="nf">_dump_csv_contents</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">BiocFrame</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">operations</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+    <span class="n">extracted_row_names</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_row_names</span><span class="p">()</span>
+    <span class="n">has_row_names</span> <span class="o">=</span> <span class="n">extracted_row_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="n">header_line</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">has_row_names</span><span class="p">:</span>
+        <span class="n">header_line</span> <span class="o">+=</span> <span class="n">_quotify_string</span><span class="p">(</span><span class="s2">&quot;row_names&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">header_line</span><span class="p">:</span>
+            <span class="n">header_line</span> <span class="o">+=</span> <span class="s2">&quot;,&quot;</span>
+        <span class="n">header_line</span> <span class="o">+=</span> <span class="n">_quotify_string</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">header_line</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header_line</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;UTF8&quot;</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">has_row_names</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">_quotify_string</span><span class="p">(</span><span class="n">extracted_row_names</span><span class="p">[</span><span class="n">r</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">trans</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">operations</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">+=</span> <span class="s2">&quot;,&quot;</span>
+            <span class="n">line</span> <span class="o">+=</span> <span class="n">trans</span><span class="p">(</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">r</span><span class="p">])</span>
+        <span class="n">line</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;UTF8&quot;</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="read_csv">

@@ -201,6 +201,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">issubdtype</span><span class="p">,</span> <span class="n">integer</span><span class="p">,</span> <span class="n">floating</span><span class="p">,</span> <span class="n">bool_</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
+<span class="kn">from</span> <span class="nn">biocutils</span> <span class="kn">import</span> <span class="n">Factor</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">gzip</span>
@@ -599,6 +600,30 @@
             <span class="k">return</span> 
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;no staging method for NumPy array scalars of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+
+
+<span class="nd">@_stage_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_stage_simple_list_recursive_factor</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Factor</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span> 
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;factor&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="kc">None</span> <span class="k">if</span> <span class="n">y</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">get_codes</span><span class="p">()],</span>
+            <span class="s2">&quot;levels&quot;</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">get_levels</span><span class="p">(),</span>
+            <span class="s2">&quot;ordered&quot;</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">get_ordered</span><span class="p">(),</span>
+        <span class="p">}</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;vector&quot;</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;factor&quot;</span>
+
+        <span class="n">dhandle</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">get_codes</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;i4&quot;</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s2">&quot;gzip&quot;</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_codes</span><span class="p">()</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="n">dhandle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;missing-value-placeholder&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="n">ut</span><span class="o">.</span><span class="n">_save_fixed_length_strings</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;levels&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">get_levels</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">get_ordered</span><span class="p">():</span>
+            <span class="n">handle</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;ordered&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">get_ordered</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;i1&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
 
 
 <span class="nd">@_stage_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
