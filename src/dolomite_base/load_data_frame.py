@@ -100,7 +100,7 @@ def _attach_metadata(meta: dict[str, Any], df: BiocFrame, project):
         df.set_metadata(alt_load_object(mmeta, project), in_place=True)
     if "column_data" in dmeta:
         mmeta = acquire_metadata(project, dmeta["column_data"]["resource"]["path"])
-        df.set_mcols(alt_load_object(mmeta, project), in_place=True)
+        df.set_column_data(alt_load_object(mmeta, project), in_place=True)
 
 
 def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFrame:

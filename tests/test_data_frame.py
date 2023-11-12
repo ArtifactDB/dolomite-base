@@ -85,11 +85,11 @@ def test_data_frame_factor():
     meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
     roundtrip = dl.load_object(meta2, dir)
     assert isinstance(roundtrip, BiocFrame)
-    assert isinstance(roundtrip[:,"regular"], Factor)
-    assert list(roundtrip[:,"regular"]) == list(df[:,"regular"])
-    assert list(roundtrip[:,"missing"]) == list(df[:,"missing"])
-    assert list(roundtrip[:,"ordered"]) == list(df[:,"ordered"])
-    assert roundtrip[:,"ordered"].get_ordered()
+    assert isinstance(roundtrip["regular"], Factor)
+    assert list(roundtrip["regular"]) == list(df["regular"])
+    assert list(roundtrip["missing"]) == list(df["missing"])
+    assert list(roundtrip["ordered"]) == list(df["ordered"])
+    assert roundtrip["ordered"].get_ordered()
 
     # Test with HDF5.
     meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
@@ -97,11 +97,11 @@ def test_data_frame_factor():
 
     meta2 = dl.acquire_metadata(dir, "foo2/simple.h5")
     roundtrip2 = dl.load_object(meta2, dir)
-    assert isinstance(roundtrip2[:,"regular"], Factor)
-    assert list(roundtrip2[:,"regular"]) == list(df[:,"regular"])
-    assert list(roundtrip2[:,"missing"]) == list(df[:,"missing"])
-    assert list(roundtrip2[:,"ordered"]) == list(df[:,"ordered"])
-    assert roundtrip[:,"ordered"].get_ordered()
+    assert isinstance(roundtrip2["regular"], Factor)
+    assert list(roundtrip2["regular"]) == list(df["regular"])
+    assert list(roundtrip2["missing"]) == list(df["missing"])
+    assert list(roundtrip2["ordered"]) == list(df["ordered"])
+    assert roundtrip["ordered"].get_ordered()
 
 
 def test_data_frame_row_names():
@@ -484,7 +484,7 @@ def test_data_frame_nested():
 def test_data_frame_metadata():
     df = BiocFrame(
         { "foo": [ 1, 3, 5, 7, 9 ] },
-        mcols = BiocFrame({ "args": [ 99 ] }),
+        column_data = BiocFrame({ "args": [ 99 ] }),
         metadata = { "a": 2, "b": ['a', 'b', 'c', 'd'] }
     )
 
@@ -498,7 +498,7 @@ def test_data_frame_metadata():
 
     roundtrip = dl.load_object(meta, dir)
     assert df.metadata == roundtrip.metadata
-    assert roundtrip.mcols.column("args") == [ 99 ]
+    assert roundtrip.get_column_data().column("args") == [ 99 ]
     assert isinstance(roundtrip, BiocFrame)
 
     # Trying with HDF5.
@@ -506,7 +506,7 @@ def test_data_frame_metadata():
     dl.write_metadata(meta2, dir)
     roundtrip2 = dl.load_object(meta2, dir)
     assert df.metadata == roundtrip2.metadata
-    assert roundtrip2.mcols.column("args") == [ 99 ]
+    assert roundtrip2.get_column_data().column("args") == [ 99 ]
 
 
 def test_data_frame_format():

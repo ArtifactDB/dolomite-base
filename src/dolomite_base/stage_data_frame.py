@@ -55,16 +55,18 @@ def stage_data_frame(
         meta, other = _stage_hdf5_data_frame(x, dir, path, is_child=is_child)
 
     for i in other:
-        more_meta = alt_stage_object(x.column(i), dir, path + "/child-" + str(i + 1), is_child = True)
+        more_meta = alt_stage_object(x.get_column(i), dir, path + "/child-" + str(i + 1), is_child = True)
         resource_stub = write_metadata(more_meta, dir=dir)
         meta["data_frame"]["columns"][i]["resource"] = resource_stub
 
-    if x.metadata is not None and len(x.metadata):
+    md = x.get_metadata()
+    if md is not None and len(md):
         mmeta = alt_stage_object(x.metadata, dir, path + "/other", is_child=True)
         meta["data_frame"]["other_data"] = { "resource": write_metadata(mmeta, dir=dir) }
 
-    if x.mcols is not None and x.mcols.shape[1] > 0:
-        mmeta = alt_stage_object(x.mcols, dir, path + "/mcols", is_child=True)
+    cd = x.get_column_data(with_names=False) 
+    if cd is not None and cd.shape[1] > 0:
+        mmeta = alt_stage_object(cd, dir, path + "/column_data", is_child=True)
         meta["data_frame"]["column_data"] = { "resource": write_metadata(mmeta, dir=dir) }
 
     return meta
@@ -120,8 +122,8 @@ def _process_columns_for_hdf5(x: BiocFrame, handle) -> Tuple:
     columns = []
     otherable = []
 
-    for i, col in enumerate(x.column_names):
-        current = x.column(col)
+    for i, col in enumerate(x.get_column_names()):
+        current = x.get_column(col)
         placeholder = None
         final_type = None
         is_other = False
@@ -141,13 +143,18 @@ def _process_columns_for_hdf5(x: BiocFrame, handle) -> Tuple:
 
         if is_other:
             if isinstance(current, Factor):
-                columns.append({ "type": "factor", "name": col, "ordered": current.ordered })
+                coltype = "factor"
+                ordered = current.get_ordered()
+                columns.append({ "type": coltype, "name": col, "ordered": ordered })
+
                 ghandle = handle.create_group(str(i))
-                ghandle.attrs.create("type", data=columns[-1]["type"])
-                ghandle.attrs.create("ordered", data=int(columns[-1]["ordered"]), dtype="i1")
-                ut._save_fixed_length_strings(ghandle, "levels", current.levels)
-                dhandle = ghandle.create_dataset("codes", data=current.codes, dtype='i4', compression="gzip", chunks=True)
-                if (y == -1).any():
+                ghandle.attrs.create("type", data=coltype)
+                ghandle.attrs.create("ordered", data=ordered, dtype="i1")
+                ut._save_fixed_length_strings(ghandle, "levels", current.get_levels())
+
+                curcodes = current.get_codes()
+                dhandle = ghandle.create_dataset("codes", data=curcodes, dtype='i4', compression="gzip", chunks=True)
+                if (curcodes == -1).any():
                     dhandle.attrs.create("missing-value-placeholder", data=-1, dtype='i4')
             else:
                 columns.append({ "type": "other", "name": col })
@@ -241,7 +248,7 @@ def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> 
 
     # TODO: handle dates, date-times, pandas' Categorical factors.
     for i, col in enumerate(x.get_column_names()):
-        current = x.column(col)
+        current = x.get_column(col)
         final_type = bool
         is_other = False
 
