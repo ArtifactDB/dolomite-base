@@ -2,7 +2,7 @@ import dolomite_base as dl
 import numpy as np
 from tempfile import mkdtemp
 from biocframe import BiocFrame
-from biocutils import Factor
+from biocutils import Factor, StringList
 
 
 def test_simple_list_basic():
@@ -13,7 +13,7 @@ def test_simple_list_basic():
         "i_am_a_boolean": False,
         "i_am_a_list": [ 1, True, 2.3, "bar" ],
         "i_am_a_dict": {
-            "string": [ "b", "c", "d", "e" ],
+            "string": StringList([ "b", "c", "d", "e" ]),
             "float": np.random.rand(10),
             "int": (np.random.rand(10) * 10).astype(np.int32),
             "bool": np.random.rand(10) > 0.5
@@ -55,6 +55,7 @@ def test_simple_list_basic():
     assert everything["i_am_nothing"] == roundtrip["i_am_nothing"]
 
     assert everything["i_am_a_dict"]["string"] == roundtrip["i_am_a_dict"]["string"]
+    assert isinstance(roundtrip["i_am_a_dict"]["string"], StringList)
     assert np.allclose(everything["i_am_a_dict"]["float"], roundtrip["i_am_a_dict"]["float"])
     assert (everything["i_am_a_dict"]["int"] == roundtrip["i_am_a_dict"]["int"]).all()
     assert (everything["i_am_a_dict"]["bool"] == roundtrip["i_am_a_dict"]["bool"]).all()
