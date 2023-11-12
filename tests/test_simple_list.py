@@ -2,6 +2,7 @@ import dolomite_base as dl
 import numpy as np
 from tempfile import mkdtemp
 from biocframe import BiocFrame
+from biocutils import Factor
 
 
 def test_simple_list_basic():
@@ -306,3 +307,37 @@ def test_simple_list_external():
     assert roundtrip["a"].shape[0] == 3
     assert roundtrip["b"].column_names == []
     assert roundtrip["b"].shape[0] == 10
+
+
+def test_simple_list_factor():
+    everything = {
+        "regular": Factor.from_sequence([ "sydney", "brisbane", "sydney", "melbourne"]),
+        "missing": Factor.from_sequence([ "sydney", None, "sydney", None]),
+        "ordered": Factor.from_sequence([ "sydney", "brisbane", "sydney", "melbourne"], levels=["sydney", "melbourne", "brisbane"], ordered=True),
+    }
+
+    dir = mkdtemp()
+
+    # Stage as JSON.
+    meta = dl.stage_object(everything, dir, "foo")
+    dl.write_metadata(meta, dir)
+
+    roundtrip = dl.load_json_simple_list(meta, dir)
+    assert isinstance(roundtrip["regular"], Factor)
+    assert list(roundtrip["regular"]) == list(everything["regular"])
+    assert not roundtrip["regular"].get_ordered()
+    assert list(roundtrip["missing"]) == list(everything["missing"])
+    assert list(roundtrip["ordered"]) == list(everything["ordered"])
+    assert roundtrip["ordered"].get_ordered()
+
+    # Stage as HDF5.
+    meta = dl.stage_object(everything, dir, "foo2", mode="hdf5")
+    dl.write_metadata(meta, dir)
+
+    roundtrip = dl.load_object(meta, dir)
+    assert isinstance(roundtrip["regular"], Factor)
+    assert list(roundtrip["regular"]) == list(everything["regular"])
+    assert not roundtrip["regular"].get_ordered()
+    assert list(roundtrip["missing"]) == list(everything["missing"])
+    assert list(roundtrip["ordered"]) == list(everything["ordered"])
+    assert roundtrip["ordered"].get_ordered()

@@ -1,6 +1,7 @@
 import ctypes as ct
 from typing import Any, Optional
 from biocframe import BiocFrame
+from biocutils import Factor, StringList
 import numpy as np
 import h5py
 import os
@@ -78,6 +79,14 @@ def _create_BiocFrame(expected_rows: int, row_names: Optional[list], columns: li
         elif curval["type"] == "string":
             if not isinstance(c, list): # only happens if the entire column is NA.
                 c = [None] * len(c)
+            if not isinstance(c, StringList):
+                c = StringList(c)
+
+        elif curval["type"] == "factor":
+            if "levels" in curval:
+                lev_meta = acquire_metadata(project, curval["levels"]["resource"]["path"])
+                levels = alt_load_object(lev_meta, project, **kwargs)
+                c = Factor(c, levels, ordered=(curval["ordered"] if "ordered" in curval else False))
 
         output.set_column(curval["name"], c, in_place=True)
 
@@ -91,7 +100,7 @@ def _attach_metadata(meta: dict[str, Any], df: BiocFrame, project):
         df.set_metadata(alt_load_object(mmeta, project), in_place=True)
     if "column_data" in dmeta:
         mmeta = acquire_metadata(project, dmeta["column_data"]["resource"]["path"])
-        df.set_mcols(alt_load_object(mmeta, project), in_place=True)
+        df.set_column_data(alt_load_object(mmeta, project), in_place=True)
 
 
 def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFrame:
@@ -121,7 +130,7 @@ def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFr
     with h5py.File(full_path, "r") as handle:
         ghandle = handle[meta["hdf5_data_frame"]["group"]]
         if has_row_names:
-            row_names = [v.decode("UTF8") for v in ghandle["row_names"]]
+            row_names = StringList(v.decode("UTF8") for v in ghandle["row_names"])
 
         dhandle = ghandle["data"]
         for i in range(len(columns)):
@@ -129,24 +138,35 @@ def load_hdf5_data_frame(meta: dict[str, Any], project: Any, **kwargs) -> BiocFr
             if name not in dhandle:
                 continue
             xhandle = dhandle[name]
-            values = xhandle[:]
 
-            is_str = columns[i]["type"] == "string"
-            if is_str:
-                values = [v.decode('UTF8') for v in values]
-
-            if "missing-value-placeholder" in xhandle.attrs:
-                placeholder = xhandle.attrs["missing-value-placeholder"]
+            curtype = columns[i]["type"] 
+            if curtype == "factor":
+                chandle = xhandle["codes"]
+                codes = chandle[:]
+                if "missing-value-placeholder" in chandle.attrs:
+                    placeholder = chandle.attrs["missing-value-placeholder"]
+                    if placeholder != -1:
+                        values[values == placeholder] = -1
+                levels = StringList(v.decode("UTF8") for v in xhandle["levels"])
+                values = Factor(codes, levels, ordered=(columns[i]["ordered"] if "ordered" in columns[i] else False))
+            else:
+                values = xhandle[:]
+                is_str = (curtype == "string")
                 if is_str:
-                    for j, y in enumerate(values):
-                        if y == placeholder:
-                            values[j] = None
-                else:
-                    if np.isnan(placeholder):
-                        mask = np.isnan(values)
+                    values = StringList(v.decode('UTF8') for v in values)
+
+                if "missing-value-placeholder" in xhandle.attrs:
+                    placeholder = xhandle.attrs["missing-value-placeholder"]
+                    if is_str:
+                        for j, y in enumerate(values):
+                            if y == placeholder:
+                                values[j] = None
                     else:
-                        mask = (values == placeholder)
-                    values = np.ma.array(values, mask=mask)
+                        if np.isnan(placeholder):
+                            mask = np.isnan(values)
+                        else:
+                            mask = (values == placeholder)
+                        values = np.ma.array(values, mask=mask)
 
             contents[i] = values 
 
