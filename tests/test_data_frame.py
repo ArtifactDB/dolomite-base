@@ -184,6 +184,7 @@ def test_data_frame_none():
         "alice": [ True, None, False, None, True ],
         "ai": [ 2.3, None, 5.2, None, -1.2 ],
         "aria": [ None, None, None, None, None ],
+        "akira": [ "south", None, "north", "east", "west" ],
     })
 
     def compare_masked_to_list(l, m):
@@ -203,6 +204,7 @@ def test_data_frame_none():
     assert meta["data_frame"]["columns"][2] == { "type": "boolean", "name": "alice" }
     assert meta["data_frame"]["columns"][3] == { "type": "number", "name": "ai" }
     assert meta["data_frame"]["columns"][4] == { "type": "string", "name": "aria" }
+    assert meta["data_frame"]["columns"][5] == { "type": "string", "name": "akira" }
     dl.write_metadata(meta, dir)
 
     meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
@@ -213,6 +215,7 @@ def test_data_frame_none():
     assert roundtrip.column("akari").dtype.type == np.int32
 
     assert roundtrip.column("aika") == df.column("aika")
+    assert isinstance(roundtrip.column("aika"), StringList)
 
     compare_masked_to_list(df.column("alice"), roundtrip.column("alice"))
     assert roundtrip.column("alice").dtype.type == np.bool_
@@ -222,6 +225,9 @@ def test_data_frame_none():
 
     assert roundtrip.column("aria") == df.column("aria")
 
+    assert roundtrip.column("akira") == df.column("akira")
+    assert isinstance(roundtrip.column("akira"), StringList)
+
     # Test with HDF5.
     meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
     assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
@@ -230,12 +236,20 @@ def test_data_frame_none():
 
     compare_masked_to_list(df.column("akari"), roundtrip2.column("akari"))
     assert roundtrip2.column("akari").dtype.type == np.int32
+
     assert roundtrip2.column("aika") == df.column("aika")
+    assert isinstance(roundtrip2.column("aika"), StringList)
+
     compare_masked_to_list(df.column("alice"), roundtrip2.column("alice"))
     assert roundtrip2.column("alice").dtype.type == np.bool_
+
     compare_masked_to_list(df.column("ai"), roundtrip2.column("ai"))
     assert roundtrip2.column("ai").dtype.type == np.float64
+
     assert roundtrip2.column("aria") == df.column("aria")
+
+    assert roundtrip2.column("akira") == df.column("akira")
+    assert isinstance(roundtrip2.column("akira"), StringList)
 
 
 def test_data_frame_numpy():
