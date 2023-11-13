@@ -1,5 +1,6 @@
 from typing import Any, Union, Optional, Literal
 import numpy as np
+import warnings
 from numpy import ndarray, issubdtype, integer, floating, bool_
 from functools import singledispatch
 from biocutils import Factor, StringList
@@ -218,7 +219,9 @@ def _stage_simple_list_recursive_dict(x: dict, externals: list, handle):
         names = []
         collected = { "type": "list", "values": vals, "names": names }
         for k, v in x.items():
-            names.append(k)
+            if not isinstance(k, str):
+                warnings.warn("converting non-string key with value " + str(k) + " to a string", UserWarning)
+            names.append(str(k))
             vals.append(_stage_simple_list_recursive(v, externals, None))
         return collected
     else:
@@ -228,7 +231,9 @@ def _stage_simple_list_recursive_dict(x: dict, externals: list, handle):
         for k, v in x.items():
             ghandle = dhandle.create_group(str(len(names)))
             _stage_simple_list_recursive(v, externals, ghandle)
-            names.append(k)
+            if not isinstance(k, str):
+                warn("converting non-string key with value " + str(k) + " to a string", UserWarning)
+            names.append(str(k))
         handle.create_dataset("names", data=names, compression="gzip", chunks=True)
         return
 
