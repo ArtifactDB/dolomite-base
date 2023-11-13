@@ -721,12 +721,18 @@ to their corresponding file representation, see
 
 <dl class="py class">
 <dt class="sig sig-object py" id="dolomite_base.stage_data_frame.CsvColumnOutput">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dolomite_base.stage_data_frame.</span></span><span class="sig-name descname"><span class="pre">CsvColumnOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">otherable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.stage_data_frame.CsvColumnOutput" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dolomite_base.stage_data_frame.</span></span><span class="sig-name descname"><span class="pre">CsvColumnOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">otherable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_list_to_vector</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.stage_data_frame.CsvColumnOutput" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="dolomite_base.stage_data_frame.CsvColumnOutput.contents">
 <span class="sig-name descname"><span class="pre">contents</span></span><a class="headerlink" href="#dolomite_base.stage_data_frame.CsvColumnOutput.contents" title="Link to this definition">#</a></dt>
 <dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dolomite_base.stage_data_frame.CsvColumnOutput.convert_list_to_vector">
+<span class="sig-name descname"><span class="pre">convert_list_to_vector</span></span><a class="headerlink" href="#dolomite_base.stage_data_frame.CsvColumnOutput.convert_list_to_vector" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 5</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -757,12 +763,18 @@ to their corresponding file representation, see
 
 <dl class="py class">
 <dt class="sig sig-object py" id="dolomite_base.stage_data_frame.Hdf5ColumnOutput">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dolomite_base.stage_data_frame.</span></span><span class="sig-name descname"><span class="pre">Hdf5ColumnOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">otherable</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.stage_data_frame.Hdf5ColumnOutput" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dolomite_base.stage_data_frame.</span></span><span class="sig-name descname"><span class="pre">Hdf5ColumnOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">otherable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_list_to_vector</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.stage_data_frame.Hdf5ColumnOutput" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="dolomite_base.stage_data_frame.Hdf5ColumnOutput.columns">
 <span class="sig-name descname"><span class="pre">columns</span></span><a class="headerlink" href="#dolomite_base.stage_data_frame.Hdf5ColumnOutput.columns" title="Link to this definition">#</a></dt>
 <dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dolomite_base.stage_data_frame.Hdf5ColumnOutput.convert_list_to_vector">
+<span class="sig-name descname"><span class="pre">convert_list_to_vector</span></span><a class="headerlink" href="#dolomite_base.stage_data_frame.Hdf5ColumnOutput.convert_list_to_vector" title="Link to this definition">#</a></dt>
+<dd><p>Alias for field number 3</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -782,10 +794,10 @@ to their corresponding file representation, see
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.stage_data_frame.choose_data_frame_format">
 <span class="sig-prename descclassname"><span class="pre">dolomite_base.stage_data_frame.</span></span><span class="sig-name descname"><span class="pre">choose_data_frame_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/stage_data_frame.html#choose_data_frame_format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.stage_data_frame.choose_data_frame_format" title="Link to this definition">#</a></dt>
-<dd><p>Get or set the format to save a simple list.</p>
+<dd><p>Get or set the format to save a data frame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>format</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Literal" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'hdf5'</span></code>, <code class="docutils literal notranslate"><span class="pre">'csv'</span></code>]]</span>) – Format to save a simple list, either in HDF5 or as a CSV.</p>
+<dd class="field-odd"><p><strong>format</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Literal" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'hdf5'</span></code>, <code class="docutils literal notranslate"><span class="pre">'csv'</span></code>]]</span>) – Format to save a data frame, either in HDF5 or as a CSV.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
@@ -801,8 +813,32 @@ and the previous choice is returned.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.stage_data_frame.convert_data_frame_list_to_vector">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.stage_data_frame.</span></span><span class="sig-name descname"><span class="pre">convert_data_frame_list_to_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">convert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/stage_data_frame.html#convert_data_frame_list_to_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.stage_data_frame.convert_data_frame_list_to_vector" title="Link to this definition">#</a></dt>
+<dd><p>Whether data frame columns that are lists should be saved as typed vectors,
+if all entries are of the same basic type (integer, string, float, boolean)
+or None. This is more compact but will change the Python representation on
+loading, e.g., all-integer columns will be reloaded as NumPy arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>convert</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>]</span>) – Whether to convert lists to typed vectors on disk.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>If <code class="docutils literal notranslate"><span class="pre">convert</span></code> is not provided, the current conversion choice is
+returned.  This defaults to True if no other setting has been provided.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">convert</span></code> is provided, it is used to define the conversion choice,
+and the previous choice is returned.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.stage_data_frame.stage_data_frame">
-<span class="sig-prename descclassname"><span class="pre">dolomite_base.stage_data_frame.</span></span><span class="sig-name descname"><span class="pre">stage_data_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_child</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/stage_data_frame.html#stage_data_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.stage_data_frame.stage_data_frame" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.stage_data_frame.</span></span><span class="sig-name descname"><span class="pre">stage_data_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_child</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_list_to_vector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/stage_data_frame.html#stage_data_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.stage_data_frame.stage_data_frame" title="Link to this definition">#</a></dt>
 <dd><p>Method for saving <a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>
 objects to the corresponding file representations, see
 <a class="reference internal" href="#dolomite_base.stage_object.stage_object" title="dolomite_base.stage_object.stage_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stage_object()</span></code></a> for details.</p>
@@ -813,6 +849,10 @@ objects to the corresponding file representations, see
 <li><p><strong>dir</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Staging directory.</p></li>
 <li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Relative path inside <code class="docutils literal notranslate"><span class="pre">dir</span></code> to save the object.</p></li>
 <li><p><strong>is_child</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Is <code class="docutils literal notranslate"><span class="pre">x</span></code> a child of another object?</p></li>
+<li><p><strong>format</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Literal" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'hdf5'</span></code>, <code class="docutils literal notranslate"><span class="pre">'csv'</span></code>]]</span>) – Format to use for saving the data frame contents, see
+<a class="reference internal" href="#dolomite_base.stage_data_frame.choose_data_frame_format" title="dolomite_base.stage_data_frame.choose_data_frame_format"><code class="xref py py-func docutils literal notranslate"><span class="pre">choose_data_frame_format()</span></code></a>.</p></li>
+<li><p><strong>convert_list_to_vector</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>]</span>) – Whether list columns should be converted to typed vectors, see
+<a class="reference internal" href="#dolomite_base.stage_data_frame.convert_data_frame_list_to_vector" title="dolomite_base.stage_data_frame.convert_data_frame_list_to_vector"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_data_frame_list_to_vector()</span></code></a>.</p></li>
 <li><p><strong>kwargs</strong> – Further arguments, ignored.</p></li>
 </ul>
 </dd>
@@ -1164,6 +1204,7 @@ metadata itself is written to a JSON file at a path derived from
 </li>
 <li><a class="reference internal" href="#dolomite_base.stage_data_frame.CsvColumnOutput"><code class="docutils literal notranslate"><span class="pre">CsvColumnOutput</span></code></a><ul>
 <li><a class="reference internal" href="#dolomite_base.stage_data_frame.CsvColumnOutput.contents"><code class="docutils literal notranslate"><span class="pre">CsvColumnOutput.contents</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.stage_data_frame.CsvColumnOutput.convert_list_to_vector"><code class="docutils literal notranslate"><span class="pre">CsvColumnOutput.convert_list_to_vector</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.stage_data_frame.CsvColumnOutput.dir"><code class="docutils literal notranslate"><span class="pre">CsvColumnOutput.dir</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.stage_data_frame.CsvColumnOutput.metadata"><code class="docutils literal notranslate"><span class="pre">CsvColumnOutput.metadata</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.stage_data_frame.CsvColumnOutput.otherable"><code class="docutils literal notranslate"><span class="pre">CsvColumnOutput.otherable</span></code></a></li>
@@ -1172,11 +1213,13 @@ metadata itself is written to a JSON file at a path derived from
 </li>
 <li><a class="reference internal" href="#dolomite_base.stage_data_frame.Hdf5ColumnOutput"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput</span></code></a><ul>
 <li><a class="reference internal" href="#dolomite_base.stage_data_frame.Hdf5ColumnOutput.columns"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.columns</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.stage_data_frame.Hdf5ColumnOutput.convert_list_to_vector"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.convert_list_to_vector</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.stage_data_frame.Hdf5ColumnOutput.handle"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.handle</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.stage_data_frame.Hdf5ColumnOutput.otherable"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.otherable</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#dolomite_base.stage_data_frame.choose_data_frame_format"><code class="docutils literal notranslate"><span class="pre">choose_data_frame_format()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.stage_data_frame.convert_data_frame_list_to_vector"><code class="docutils literal notranslate"><span class="pre">convert_data_frame_list_to_vector()</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.stage_data_frame.stage_data_frame"><code class="docutils literal notranslate"><span class="pre">stage_data_frame()</span></code></a></li>
 </ul>
 </li>
