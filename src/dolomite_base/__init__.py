@@ -17,7 +17,7 @@ finally:
 
 from .stage_object import stage_object
 from .alt_stage_object import alt_stage_object, alt_stage_object_function
-from .stage_data_frame import stage_data_frame, choose_data_frame_format
+from .stage_data_frame import stage_data_frame, choose_data_frame_format, convert_data_frame_list_to_vector
 from .write_metadata import write_metadata
 from .load_object import *
 from .alt_load_object import alt_load_object, alt_load_object_function

@@ -25,6 +25,7 @@ def stage_data_frame(
     path: str, 
     is_child: bool = False, 
     mode: Optional[Literal["hdf5", "csv"]] = None,
+    convert_list_to_vector: Optional[bool] = None,
     **kwargs
 ) -> dict[str, Any]:
     """Method for saving :py:class:`~biocframe.BiocFrame.BiocFrame`
@@ -40,6 +41,10 @@ def stage_data_frame(
 
         is_child: Is ``x`` a child of another object?
 
+        convert_list_to_vector: 
+            Whether list columns should be converted to typed vectors, see
+            :py:func:`~convert_data_frame_list_to_vector`.
+
         kwargs: Further arguments, ignored.
 
     Returns:
@@ -48,12 +53,15 @@ def stage_data_frame(
     """
     os.mkdir(os.path.join(dir, path))
 
+    if convert_list_to_vector is None:
+        convert_list_to_vector = convert_data_frame_list_to_vector()
+
     if mode == None:
         mode = choose_data_frame_format()
     if mode == "csv":
-        meta, other = _stage_csv_data_frame(x, dir, path, is_child=is_child)
+        meta, other = _stage_csv_data_frame(x, dir, path, is_child=is_child, convert_list_to_vector=convert_list_to_vector)
     else:
-        meta, other = _stage_hdf5_data_frame(x, dir, path, is_child=is_child)
+        meta, other = _stage_hdf5_data_frame(x, dir, path, is_child=is_child, convert_list_to_vector=convert_list_to_vector)
 
     for i in other:
         more_meta = alt_stage_object(x.get_column(i), dir, path + "/child-" + str(i + 1), is_child = True)
@@ -76,13 +84,14 @@ def stage_data_frame(
 
 
 DATA_FRAME_FORMAT = "csv"
+DATA_FRAME_LIST_TO_VECTOR = True
 
 
 def choose_data_frame_format(format: Optional[Literal["hdf5", "csv"]] = None) -> str:
-    """Get or set the format to save a simple list.
+    """Get or set the format to save a data frame.
 
     Args:
-        format: Format to save a simple list, either in HDF5 or as a CSV.
+        format: Format to save a data frame, either in HDF5 or as a CSV.
 
     Return:
         If ``format`` is not provided, the current format choice is returned.
@@ -97,6 +106,32 @@ def choose_data_frame_format(format: Optional[Literal["hdf5", "csv"]] = None) ->
     else:
         old = DATA_FRAME_FORMAT
         DATA_FRAME_FORMAT = format
+        return old
+
+
+def convert_data_frame_list_to_vector(convert: bool = None) -> bool:
+    """
+    Whether data frame columns that are lists should be saved as typed vectors,
+    if all entries are of the same basic type (integer, string, float, boolean)
+    or None. This is more compact but will change the Python representation on
+    loading, e.g., all-integer columns will be reloaded as NumPy arrays.
+
+    Args:
+        convert: Whether to convert lists to typed vectors on disk.
+
+    Return:
+        If ``convert`` is not provided, the current conversion choice is
+        returned.  This defaults to True if no other setting has been provided.
+
+        If ``convert`` is provided, it is used to define the conversion choice,
+        and the previous choice is returned.
+    """
+    global DATA_FRAME_LIST_TO_VECTOR
+    if convert is None:
+        return DATA_FRAME_LIST_TO_VECTOR
+    else:
+        old = DATA_FRAME_LIST_TO_VECTOR
+        DATA_FRAME_LIST_TO_VECTOR = convert
         return old
 
 
@@ -121,7 +156,7 @@ def _select_hdf5_placeholder(current, dtype) -> Tuple:
     return copy, placeholder, dtype
 
 
-Hdf5ColumnOutput = namedtuple('Hdf5ColumnOutput', ['handle', 'columns', 'otherable'])
+Hdf5ColumnOutput = namedtuple('Hdf5ColumnOutput', ['handle', 'columns', 'otherable', 'convert_list_to_vector'])
 
 
 def _dump_column_to_hdf5(contents, data_type, placeholder, name: str, index: str, output: Hdf5ColumnOutput):
@@ -160,14 +195,15 @@ def _process_column_for_hdf5(x: Any, name: str, index: int, output: Hdf5ColumnOu
 
 @_process_column_for_hdf5.register
 def _process_list_column_for_hdf5(x: list, name: str, index: int, output: Hdf5ColumnOutput):
-    final_type, has_none = ut._determine_list_type(x)
-    if final_type is None:
-        _process_column_for_hdf5.registry[object](x, name, index, output)
-    else:
-        placeholder = None
-        if has_none:
-            x, placeholder, final_type = _select_hdf5_placeholder(x, final_type)
-        _dump_column_to_hdf5(x, final_type, placeholder, name, index, output)
+    if output.convert_list_to_vector:
+        final_type, has_none = ut._determine_list_type(x)
+        if final_type is not None:
+            placeholder = None
+            if has_none:
+                x, placeholder, final_type = _select_hdf5_placeholder(x, final_type)
+            _dump_column_to_hdf5(x, final_type, placeholder, name, index, output)
+            return
+    _process_column_for_hdf5.registry[object](x, name, index, output)
 
 
 @_process_column_for_hdf5.register
@@ -204,7 +240,7 @@ def _process_factor_column_for_hdf5(x: Factor, name: str, index: int, output: Hd
         dhandle.attrs.create("missing-value-placeholder", data=-1, dtype='i4')
 
 
-def _stage_hdf5_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> Tuple:
+def _stage_hdf5_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool, convert_list_to_vector: bool) -> Tuple:
     basename = "simple.h5"
     groupname = "df"
 
@@ -217,7 +253,12 @@ def _stage_hdf5_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) ->
         ghandle.attrs.create("version", data="1.0")
 
         dhandle = ghandle.create_group("data")
-        output = Hdf5ColumnOutput(handle=dhandle, columns=columns, otherable=otherable)
+        output = Hdf5ColumnOutput(
+            handle=dhandle, 
+            columns=columns, 
+            otherable=otherable, 
+            convert_list_to_vector=convert_list_to_vector,
+        )
         for i, col in enumerate(x.get_column_names()):
             _process_column_for_hdf5(x.get_column(col), col, i, output)
 
@@ -277,7 +318,7 @@ def _create_csv_column_metadata(name, data_type):
         raise NotImplementedError("saving a list of " + str(data_type) + " is not supported yet")
 
 
-CsvColumnOutput = namedtuple('CsvColumnOutput', ['contents', 'metadata', 'otherable', 'dir', 'path'])
+CsvColumnOutput = namedtuple('CsvColumnOutput', ['contents', 'metadata', 'otherable', 'dir', 'path', 'convert_list_to_vector'])
 
 
 @singledispatch
@@ -289,12 +330,13 @@ def _format_column_for_csv(x: Any, name: str, index: int, output: CsvColumnOutpu
 
 @_format_column_for_csv.register
 def _format_list_column_for_csv(x: list, name: str, index: int, output: CsvColumnOutput):
-    final_type, has_none = ut._determine_list_type(x)
-    if final_type is None:
-        _format_column_for_csv.registry[object](x, name, index, output)
-    else:
-        output.contents[name] = x
-        output.metadata.append(_create_csv_column_metadata(name, final_type))
+    if output.convert_list_to_vector:
+        final_type, has_none = ut._determine_list_type(x)
+        if final_type is not None:
+            output.contents[name] = x
+            output.metadata.append(_create_csv_column_metadata(name, final_type))
+            return
+    _format_column_for_csv.registry[object](x, name, index, output)
 
 
 @_format_column_for_csv.register
@@ -324,12 +366,19 @@ def _format_Factor_column_for_csv(x: Factor, name: str, index: int, output: CsvC
     output.contents[name] = codes
 
 
-def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> Tuple:
+def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool, convert_list_to_vector: bool) -> Tuple:
     contents = {}
     col_metadata = []
     otherable = []
 
-    output = CsvColumnOutput(contents=contents, metadata=col_metadata, otherable=otherable, dir=dir, path=path)
+    output = CsvColumnOutput(
+        contents=contents, 
+        metadata=col_metadata, 
+        otherable=otherable, 
+        dir=dir, 
+        path=path,
+        convert_list_to_vector=convert_list_to_vector,
+    )
     for i, col in enumerate(x.get_column_names()):
         _format_column_for_csv(x.get_column(col), col, i, output)
 

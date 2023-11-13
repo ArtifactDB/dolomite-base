@@ -77,6 +77,44 @@ def test_data_frame_list():
     assert isinstance(roundtrip2.column("akira"), StringList)
 
 
+def test_data_frame_external_list():
+    df = BiocFrame({
+        "akari": [ 1, 2, 3, 4, 5 ],
+        "aika": [ "sydney", "melbourne", "", "perth", "adelaide" ],
+        "alice": [ True, False, False, True, True ],
+        "ai": [ 2.3, 1.2, 5.2, 3.1, -1.2 ],
+    })
+
+    dir = mkdtemp()
+
+    # Test with CSV.
+    meta = dl.stage_object(df, dir, "foo", convert_list_to_vector=False)
+    assert meta["data_frame"]["columns"][0]["type"] == "other"
+    assert meta["data_frame"]["columns"][1]["type"] == "other"
+    assert meta["data_frame"]["columns"][2]["type"] == "other"
+    assert meta["data_frame"]["columns"][3]["type"] == "other"
+    dl.write_metadata(meta, dir)
+
+    meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
+    roundtrip = dl.load_object(meta2, dir)
+    assert isinstance(roundtrip, BiocFrame)
+    assert roundtrip.column("akari") == df.column("akari")
+    assert roundtrip.column("aika") == df.column("aika")
+    assert roundtrip.column("alice") == df.column("alice")
+    assert roundtrip.column("ai") == df.column("ai")
+
+    # Now for HDF5.
+    meta = dl.stage_object(df, dir, "foo2", mode="hdf5", convert_list_to_vector=False)
+    dl.write_metadata(meta, dir)
+    meta2 = dl.acquire_metadata(dir, "foo2/simple.h5")
+    roundtrip = dl.load_object(meta2, dir)
+    assert isinstance(roundtrip, BiocFrame)
+    assert roundtrip.column("akari") == df.column("akari")
+    assert roundtrip.column("aika") == df.column("aika")
+    assert roundtrip.column("alice") == df.column("alice")
+    assert roundtrip.column("ai") == df.column("ai")
+
+
 def test_data_frame_factor():
     df = BiocFrame({
         "regular": Factor.from_sequence([ "sydney", "melbourne", "", "perth", "adelaide" ]),
