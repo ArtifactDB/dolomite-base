@@ -24,7 +24,7 @@ def stage_data_frame(
     dir: str, 
     path: str, 
     is_child: bool = False, 
-    mode: Optional[Literal["hdf5", "csv"]] = None,
+    format: Optional[Literal["hdf5", "csv"]] = None,
     convert_list_to_vector: Optional[bool] = None,
     **kwargs
 ) -> dict[str, Any]:
@@ -41,6 +41,10 @@ def stage_data_frame(
 
         is_child: Is ``x`` a child of another object?
 
+        format:
+            Format to use for saving the data frame contents, see
+            :py:func:`~choose_data_frame_format`.
+
         convert_list_to_vector: 
             Whether list columns should be converted to typed vectors, see
             :py:func:`~convert_data_frame_list_to_vector`.
@@ -56,9 +60,9 @@ def stage_data_frame(
     if convert_list_to_vector is None:
         convert_list_to_vector = convert_data_frame_list_to_vector()
 
-    if mode == None:
-        mode = choose_data_frame_format()
-    if mode == "csv":
+    if format == None:
+        format = choose_data_frame_format()
+    if format == "csv":
         meta, other = _stage_csv_data_frame(x, dir, path, is_child=is_child, convert_list_to_vector=convert_list_to_vector)
     else:
         meta, other = _stage_hdf5_data_frame(x, dir, path, is_child=is_child, convert_list_to_vector=convert_list_to_vector)

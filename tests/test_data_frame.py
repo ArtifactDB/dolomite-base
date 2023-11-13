@@ -50,7 +50,7 @@ def test_data_frame_list():
     assert isinstance(roundtrip.column("akira"), StringList)
 
     # Test with HDF5.
-    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    meta2 = dl.stage_object(df, dir, "foo2", format="hdf5")
     assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
     dl.write_metadata(meta2, dir)
 
@@ -104,7 +104,7 @@ def test_data_frame_external_list():
     assert roundtrip.column("ai") == df.column("ai")
 
     # Now for HDF5.
-    meta = dl.stage_object(df, dir, "foo2", mode="hdf5", convert_list_to_vector=False)
+    meta = dl.stage_object(df, dir, "foo2", format="hdf5", convert_list_to_vector=False)
     dl.write_metadata(meta, dir)
     meta2 = dl.acquire_metadata(dir, "foo2/simple.h5")
     roundtrip = dl.load_object(meta2, dir)
@@ -144,7 +144,7 @@ def test_data_frame_factor():
     assert roundtrip["ordered"].get_ordered()
 
     # Test with HDF5.
-    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    meta2 = dl.stage_object(df, dir, "foo2", format="hdf5")
     dl.write_metadata(meta2, dir)
 
     meta2 = dl.acquire_metadata(dir, "foo2/simple.h5")
@@ -177,7 +177,7 @@ def test_data_frame_row_names():
     assert df.row_names == roundtrip.row_names
 
     # Test with HDF5.
-    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    meta2 = dl.stage_object(df, dir, "foo2", format="hdf5")
     assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
     dl.write_metadata(meta2, dir)
 
@@ -205,7 +205,7 @@ def test_data_frame_wild_strings():
     assert df.column("lyrics") == roundtrip.column("lyrics")
 
     # Test with HDF5.
-    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    meta2 = dl.stage_object(df, dir, "foo2", format="hdf5")
     assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
     dl.write_metadata(meta2, dir)
 
@@ -267,7 +267,7 @@ def test_data_frame_none():
     assert isinstance(roundtrip.column("akira"), StringList)
 
     # Test with HDF5.
-    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    meta2 = dl.stage_object(df, dir, "foo2", format="hdf5")
     assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
     dl.write_metadata(meta2, dir)
     roundtrip2 = dl.load_object(meta2, dir)
@@ -315,7 +315,7 @@ def test_data_frame_numpy():
     assert (roundtrip.column("athena") == df.column("athena")).all()
 
     # Test with HDF5.
-    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    meta2 = dl.stage_object(df, dir, "foo2", format="hdf5")
     assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
     dl.write_metadata(meta2, dir)
     roundtrip2 = dl.load_object(meta2, dir)
@@ -358,7 +358,7 @@ def test_data_frame_large_integers():
     assert roundtrip.column("athena").dtype == np.float64
 
     # Test with HDF5.
-    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    meta2 = dl.stage_object(df, dir, "foo2", format="hdf5")
     assert meta["data_frame"]["columns"] == meta2["data_frame"]["columns"]
     dl.write_metadata(meta2, dir)
     roundtrip2 = dl.load_object(meta2, dir)
@@ -403,7 +403,7 @@ def test_data_frame_special_floats():
     as_expected_masked(roundtrip.column("chisato"))
 
     # Test with HDF5.
-    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    meta2 = dl.stage_object(df, dir, "foo2", format="hdf5")
     dl.write_metadata(meta2, dir)
 
     roundtrip2 = dl.load_object(meta2, dir)
@@ -442,7 +442,7 @@ def test_data_frame_masked():
     assert (roundtrip.column("aika").mask == df.column("aika").mask).all()
 
     # Test with HDF5.
-    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    meta2 = dl.stage_object(df, dir, "foo2", format="hdf5")
     dl.write_metadata(meta2, dir)
 
     roundtrip2 = dl.load_object(meta2, dir)
@@ -482,7 +482,7 @@ def test_data_frame_empty():
 
     # Same for HDF5.
     df = BiocFrame(number_of_rows=10)
-    meta = dl.stage_object(df, dir, "empty2", mode="hdf5")
+    meta = dl.stage_object(df, dir, "empty2", format="hdf5")
     dl.write_metadata(meta, dir)
 
     meta2 = dl.acquire_metadata(dir, "empty2/simple.h5")
@@ -531,7 +531,7 @@ def test_data_frame_nested():
     assert bsb_df.column("last") == df.column("bsb").column("last")
 
     # Works for HDF5.
-    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    meta2 = dl.stage_object(df, dir, "foo2", format="hdf5")
     dl.write_metadata(meta2, dir)
     roundtrip2 = dl.load_object(meta2, dir)
     assert isinstance(roundtrip2, BiocFrame)
@@ -576,7 +576,7 @@ def test_data_frame_metadata():
     assert roundtrip.get_column_data(with_names = False).get_row_names() is None
 
     # Trying with HDF5.
-    meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
+    meta2 = dl.stage_object(df, dir, "foo2", format="hdf5")
     dl.write_metadata(meta2, dir)
     roundtrip2 = dl.load_object(meta2, dir)
     assert df.metadata == roundtrip2.metadata
