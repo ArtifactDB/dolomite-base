@@ -116,7 +116,8 @@ struct PythonStringVector : public uzuki2::StringVector, public PythonBase {
             if (is_scalar) {
                 return storage[0];
             } else {
-                return storage;
+                pybind11::module bu = pybind11::module::import("biocutils");
+                return bu.attr("StringList")(storage);
             }
         } else {
             // Numpy arrays don't have direct support for names, so we

@@ -1,8 +1,9 @@
 from typing import Any, Tuple, Optional, Literal
 from collections import namedtuple
+from functools import singledispatch
 import os
 from biocframe import BiocFrame
-from biocutils import Factor
+from biocutils import Factor, StringList, get_height
 import numpy as np
 import h5py
 import gzip
@@ -118,85 +119,105 @@ def _select_hdf5_placeholder(current, dtype) -> Tuple:
     return copy, placeholder, dtype
 
 
-def _process_columns_for_hdf5(x: BiocFrame, handle) -> Tuple:
-    columns = []
-    otherable = []
+Hdf5ColumnOutput = namedtuple('Hdf5ColumnOutput', ['handle', 'columns', 'otherable'])
 
-    for i, col in enumerate(x.get_column_names()):
-        current = x.get_column(col)
+
+def _dump_column_to_hdf5(contents, data_type, placeholder, name: str, index: str, output: Hdf5ColumnOutput):
+    if data_type == int:
+        col_meta = { "type": "integer", "name": name }
+        savetype = 'i4'
+    elif data_type == float:
+        col_meta = { "type": "number", "name": name }
+        savetype = 'f8'
+    elif data_type == str:
+        col_meta = { "type": "string", "name": name }
+        savetype = None
+    elif data_type == bool:
+        col_meta = { "type": "boolean", "name": name }
+        savetype = 'i1'
+    else:
+        raise NotImplementedError("saving a list of " + str(data_type) + " is not supported yet")
+
+    output.columns.append(col_meta)
+
+    if savetype: 
+        dhandle = output.handle.create_dataset(str(index), data=contents, dtype=savetype, compression="gzip", chunks=True)
+    else:
+        dhandle = ut._save_fixed_length_strings(output.handle, str(index), contents)
+
+    dhandle.attrs.create("type", data=col_meta["type"])
+    if placeholder:
+        dhandle.attrs.create("missing-value-placeholder", data=placeholder, dtype=savetype)
+
+
+@singledispatch
+def _process_column_for_hdf5(x: Any, name: str, index: int, output: Hdf5ColumnOutput):
+    output.columns.append({ "type": "other", "name": name })
+    output.otherable.append(index)
+
+
+@_process_column_for_hdf5.register
+def _process_list_column_for_hdf5(x: list, name: str, index: int, output: Hdf5ColumnOutput):
+    final_type, has_none = ut._determine_list_type(x)
+    if final_type is None:
+        _process_column_for_hdf5.registry[object](x, name, index, output)
+    else:
         placeholder = None
-        final_type = None
-        is_other = False
+        if has_none:
+            x, placeholder, final_type = _select_hdf5_placeholder(x, final_type)
+        _dump_column_to_hdf5(x, final_type, placeholder, name, index, output)
 
-        if isinstance(current, np.ndarray):
-            final_type = ut._determine_numpy_type(current)
-            if np.ma.is_masked(current):
-                current, placeholder, final_type = _select_hdf5_placeholder(current, final_type)
-        elif isinstance(current, list):
-            final_type, has_none = ut._determine_list_type(current)
-            if final_type is None:
-                is_other = True
-            elif has_none:
-                current, placeholder, final_type = _select_hdf5_placeholder(current, final_type)
-        else:
-            is_other = True
 
-        if is_other:
-            if isinstance(current, Factor):
-                coltype = "factor"
-                ordered = current.get_ordered()
-                columns.append({ "type": coltype, "name": col, "ordered": ordered })
+@_process_column_for_hdf5.register
+def _process_StringList_column_for_hdf5(x: StringList, name: str, index: int, output: Hdf5ColumnOutput):
+    placeholder = None
+    if any(y is None for y in x):
+        x, placeholder = ut._choose_missing_string_placeholder(current)
+    _dump_column_to_hdf5(x, str, placeholder, name, index, output)
 
-                ghandle = handle.create_group(str(i))
-                ghandle.attrs.create("type", data=coltype)
-                ghandle.attrs.create("ordered", data=ordered, dtype="i1")
-                ut._save_fixed_length_strings(ghandle, "levels", current.get_levels())
 
-                curcodes = current.get_codes()
-                dhandle = ghandle.create_dataset("codes", data=curcodes, dtype='i4', compression="gzip", chunks=True)
-                if (curcodes == -1).any():
-                    dhandle.attrs.create("missing-value-placeholder", data=-1, dtype='i4')
-            else:
-                columns.append({ "type": "other", "name": col })
-                otherable.append(i)
-        else:
-            if final_type == int:
-                columns.append({ "type": "integer", "name": col })
-                savetype = 'i4'
-            elif final_type == float:
-                columns.append({ "type": "number", "name": col })
-                savetype = 'f8'
-            elif final_type == str:
-                columns.append({ "type": "string", "name": col })
-                savetype = None
-            elif final_type == bool:
-                columns.append({ "type": "boolean", "name": col })
-                savetype = 'i1'
-            else:
-                raise NotImplementedError("saving a list of " + str(final_type) + " is not supported yet")
+@_process_column_for_hdf5.register
+def _process_numpy_column_for_hdf5(x: np.ndarray, name: str, index: int, output: Hdf5ColumnOutput):
+    final_type = ut._determine_numpy_type(x)
+    placeholder = None
+    if np.ma.is_masked(x):
+        x, placeholder, final_type = _select_hdf5_placeholder(x, final_type)
+    _dump_column_to_hdf5(x, final_type, placeholder, name, index, output)
 
-            if savetype: 
-                dhandle = handle.create_dataset(str(i), data=current, dtype=savetype, compression="gzip", chunks=True)
-            else:
-                dhandle = ut._save_fixed_length_strings(handle, str(i), current)
-            dhandle.attrs.create("type", data=columns[-1]["type"])
-            if placeholder:
-                dhandle.attrs.create("missing-value-placeholder", data=placeholder, dtype=savetype)
 
-    return columns, otherable
+@_process_column_for_hdf5.register
+def _process_factor_column_for_hdf5(x: Factor, name: str, index: int, output: Hdf5ColumnOutput):
+    coltype = "factor"
+    ordered = x.get_ordered()
+    output.columns.append({ "type": coltype, "name": name, "ordered": ordered })
+
+    ghandle = output.handle.create_group(str(index))
+    ghandle.attrs.create("type", data=coltype)
+    ghandle.attrs.create("ordered", data=ordered, dtype="i1")
+    ut._save_fixed_length_strings(ghandle, "levels", x.get_levels())
+
+    curcodes = x.get_codes()
+    dhandle = ghandle.create_dataset("codes", data=curcodes, dtype='i4', compression="gzip", chunks=True)
+    if (curcodes == -1).any():
+        dhandle.attrs.create("missing-value-placeholder", data=-1, dtype='i4')
 
 
 def _stage_hdf5_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> Tuple:
     basename = "simple.h5"
     groupname = "df"
 
+    columns = []
+    otherable = []
     full = os.path.join(dir, path, basename)
     with h5py.File(full, "w") as handle:
         ghandle = handle.create_group(groupname)
         ghandle.attrs.create("row-count", data=x.shape[0], dtype="u8")
         ghandle.attrs.create("version", data="1.0")
+
         dhandle = ghandle.create_group("data")
-        columns, otherable = _process_columns_for_hdf5(x, dhandle)
+        output = Hdf5ColumnOutput(handle=dhandle, columns=columns, otherable=otherable)
+        for i, col in enumerate(x.get_column_names()):
+            _process_column_for_hdf5(x.get_column(col), col, i, output)
 
         ut._save_fixed_length_strings(ghandle, "column_names", x.get_column_names())
         rn = x.get_row_names()
@@ -241,56 +262,85 @@ def _stage_hdf5_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) ->
 ########################################################
 
 
+def _create_csv_column_metadata(name, data_type):
+    if data_type == int:
+        return { "type": "integer", "name": name }
+    elif data_type == float:
+        return { "type": "number", "name": name }
+    elif data_type == str:
+        return { "type": "string", "name": name }
+    elif data_type == bool:
+        return { "type": "boolean", "name": name }
+    else:
+        raise NotImplementedError("saving a list of " + str(data_type) + " is not supported yet")
+
+
+CsvColumnOutput = namedtuple('CsvColumnOutput', ['contents', 'metadata', 'otherable', 'dir', 'path'])
+
+
+@singledispatch
+def _format_column_for_csv(x: Any, name: str, index: int, output: CsvColumnOutput):
+    output.metadata.append({ "type": "other", "name": name })
+    output.contents[name] = np.zeros(get_height(x), np.int8)
+    output.otherable.append(index)
+
+
+@_format_column_for_csv.register
+def _format_list_column_for_csv(x: list, name: str, index: int, output: CsvColumnOutput):
+    final_type, has_none = ut._determine_list_type(x)
+    if final_type is None:
+        _format_column_for_csv.registry[object](x, name, index, output)
+    else:
+        output.contents[name] = x
+        output.metadata.append(_create_csv_column_metadata(name, final_type))
+
+
+@_format_column_for_csv.register
+def _format_StringList_column_for_csv(x: StringList, name: str, index: int, output: CsvColumnOutput):
+    output.contents[name] = x
+    output.metadata.append({ "type": "string", "name": name });
+
+
+@_format_column_for_csv.register
+def _format_NumPy_column_for_csv(x: np.ndarray, name: str, index: int, output: CsvColumnOutput):
+    final_type = ut._determine_numpy_type(x)
+    output.contents[name] = x
+    output.metadata.append(_create_csv_column_metadata(name, final_type))
+
+
+@_format_column_for_csv.register
+def _format_Factor_column_for_csv(x: Factor, name: str, index: int, output: CsvColumnOutput):
+    col_meta = { "type": "factor", "name": name, "ordered": x.get_ordered() }
+    lmeta = stage_object(x.get_levels(), output.dir, output.path + "/levels-" + str(index), is_child = True)
+    col_meta["levels"] = { "resource": write_metadata(lmeta, output.dir) }
+    output.metadata.append(col_meta)
+
+    codes = x.get_codes()
+    is_missing = (codes == -1)
+    if is_missing.any():
+        codes = np.ma.array(codes, mask=is_missing)
+    output.contents[name] = codes
+
+
 def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> Tuple:
-    columns = []
     contents = {}
+    col_metadata = []
     otherable = []
 
-    # TODO: handle dates, date-times, pandas' Categorical factors.
+    output = CsvColumnOutput(contents=contents, metadata=col_metadata, otherable=otherable, dir=dir, path=path)
     for i, col in enumerate(x.get_column_names()):
-        current = x.get_column(col)
-        final_type = bool
-        is_other = False
-
-        if isinstance(current, np.ndarray):
-            final_type = ut._determine_numpy_type(current)
-        elif isinstance(current, list):
-            final_type, has_none = ut._determine_list_type(current)
-            if final_type is None:
-                is_other = True
-        else:
-            is_other = True
-
-        if is_other:
-            if isinstance(current, Factor):
-                columns.append({ "type": "factor", "name": col, "ordered": current.ordered })
-                lmeta = stage_object(current.get_levels(), dir, path + "/levels-" + str(i), is_child = True)
-                columns[-1]["levels"] = { "resource": write_metadata(lmeta, dir) }
-
-                codes = current.get_codes()
-                is_missing = (codes == -1)
-                if is_missing.any():
-                    codes = np.ma.array(codes, mask=is_missing)
-                x = x.set_column(col, codes)
-            else:
-                columns.append({ "type": "other", "name": col })
-                x = x.set_column(col, np.zeros(len(current), np.int8))
-                otherable.append(i)
-        else:
-            if final_type == int:
-                columns.append({ "type": "integer", "name": col })
-            elif final_type == float:
-                columns.append({ "type": "number", "name": col })
-            elif final_type == str:
-                columns.append({ "type": "string", "name": col })
-            elif final_type == bool:
-                columns.append({ "type": "boolean", "name": col })
-            else:
-                raise NotImplementedError("saving a list of " + str(final_type) + " is not supported yet")
+        _format_column_for_csv(x.get_column(col), col, i, output)
 
     basename = "simple.csv.gz"
     full = os.path.join(dir, path, basename)
-    write_csv(x, full, compression="gzip")
+
+    new_df = BiocFrame(
+        contents, 
+        number_of_rows = x.shape[0],
+        column_names = x.get_column_names(),
+        row_names = x.get_row_names(),
+    )
+    write_csv(new_df, full, compression="gzip")
     has_row_names = (x.get_row_names() is not None)
 
     metadata = {
@@ -298,7 +348,7 @@ def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> 
         "path": path + "/" + basename,
         "is_child": is_child,
         "data_frame": {
-            "columns": columns,
+            "columns": col_metadata,
             "row_names": has_row_names,
             "dimensions": list(x.shape),
             "version": 2,
@@ -309,7 +359,7 @@ def _stage_csv_data_frame(x: BiocFrame, dir: str, path: str, is_child: bool) -> 
     }
 
     # Running some validation.
-    inspected = _inspect_columns(columns, dir)
+    inspected = _inspect_columns(col_metadata, dir)
     lib.check_csv_df(
         full, 
         x.shape[0], 

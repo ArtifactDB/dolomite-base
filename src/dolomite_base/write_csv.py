@@ -1,6 +1,8 @@
 from typing import Optional, Any, Literal, Tuple
+from functools import singledispatch
 import numpy as np
 from biocframe import BiocFrame
+from biocutils import Factor, StringList
 import gzip
 
 from . import _utils as ut
@@ -31,6 +33,41 @@ def _quotify_string_or_none(s):
     return _quotify_string(s)
 
 
+@singledispatch
+def _choose_operation(x: Any):
+    final_type, has_none = ut._determine_list_type(x)
+    if final_type is None:
+        raise ValueError("failed to determine element type for '" + type(x).__name + "' column") 
+    if final_type == str:
+        if has_none:
+            return _quotify_string_or_none
+        else:
+            return _quotify_string
+    else:
+        if has_none:
+            return _list_element_to_string
+        else:
+            return str
+
+
+@_choose_operation.register
+def _choose_operation_StringList(x: StringList):
+    return _quotify_string_or_none
+
+
+@_choose_operation.register
+def _choose_operation_Factor(x: Factor):
+    return _quotify_string_or_none
+
+
+@_choose_operation.register
+def _choose_operation_numpy(x: np.ndarray):
+    if np.ma.is_masked(x):
+        return _numpy_element_to_string
+    else:
+        return str
+
+
 def write_csv(x: BiocFrame, path: str, compression: Literal["none", "gzip"] = "none"):
     """Write a :py:class:`~biocframe.BiocFrame.BiocFrame` to a CSV.
     This is intended for use by developers of dolomite extensions.
@@ -50,28 +87,7 @@ def write_csv(x: BiocFrame, path: str, compression: Literal["none", "gzip"] = "n
 
     for i, col in enumerate(x.get_column_names()):
         current = x.column(col)
-        final_type = bool
-        is_other = False
-
-        if isinstance(current, np.ndarray):
-            final_type = ut._determine_numpy_type(current)
-            if np.ma.is_masked(current):
-                operations.append(_numpy_element_to_string)
-            else:
-                operations.append(str)
-        else:
-            if not isinstance(current, list):
-                current = list(current)
-                if len(current) != x.shape[0]:
-                    raise ValueError("failed to coerce column '" + col + "' to a list")
-            final_type, has_none = ut._determine_list_type(current)
-            if final_type is None:
-                raise ValueError("failed to determine type of column '" + col + "'") 
-            if final_type == str:
-                operations.append(_quotify_string_or_none)
-            else:
-                operations.append(_list_element_to_string)
-
+        operations.append(_choose_operation(current))
         columns.append(current)
 
     if compression == "gzip":

@@ -2,7 +2,7 @@ from typing import Any, Union, Optional, Literal
 import numpy as np
 from numpy import ndarray, issubdtype, integer, floating, bool_
 from functools import singledispatch
-from biocutils import Factor
+from biocutils import Factor, StringList
 import os
 import json
 import gzip
@@ -177,36 +177,38 @@ def _stage_simple_list_recursive(x: Any, externals: list, handle):
 
 
 @_stage_simple_list_recursive.register
-def _stage_simple_list_recursive_list(x: list, externals: list, handle):
-    final_type, has_none = ut._determine_list_type(x)
-    if final_type == str: # special handling of a list of strings.
-        if handle is None:
-            return { "type": "string", "values": x }
-        else:
-            if has_none:
-                x, placeholder = ut._choose_missing_string_placeholder(x)
-
-            handle.attrs["uzuki_object"] = "vector"
-            handle.attrs["uzuki_type"] = "string"
-            dset = ut._save_fixed_length_strings(handle, "data", x)
-
-            if has_none:
-               dset.attrs["missing-value-placeholder"] = placeholder
-            return
+def _stage_simple_list_recursive_stringlist(x: StringList, externals: list, handle):
+    if handle is None:
+        return { "type": "string", "values": x }
     else:
-        if handle is None:
-            vals = []
-            collected = { "type": "list", "values": vals }
-            for i, y in enumerate(x):
-                vals.append(_stage_simple_list_recursive(y, externals, None))
-            return collected
-        else:
-            handle.attrs["uzuki_object"] = "list"
-            dhandle = handle.create_group("data")
-            for i, y in enumerate(x):
-                ghandle = dhandle.create_group(str(i))
-                _stage_simple_list_recursive(y, externals, ghandle)
-            return
+        has_none = any(y is None for y in x)
+        if has_none:
+            x, placeholder = ut._choose_missing_string_placeholder(x)
+
+        handle.attrs["uzuki_object"] = "vector"
+        handle.attrs["uzuki_type"] = "string"
+        dset = ut._save_fixed_length_strings(handle, "data", x)
+
+        if has_none:
+           dset.attrs["missing-value-placeholder"] = placeholder
+        return
+
+
+@_stage_simple_list_recursive.register
+def _stage_simple_list_recursive_list(x: list, externals: list, handle):
+    if handle is None:
+        vals = []
+        collected = { "type": "list", "values": vals }
+        for i, y in enumerate(x):
+            vals.append(_stage_simple_list_recursive(y, externals, None))
+        return collected
+    else:
+        handle.attrs["uzuki_object"] = "list"
+        dhandle = handle.create_group("data")
+        for i, y in enumerate(x):
+            ghandle = dhandle.create_group(str(i))
+            _stage_simple_list_recursive(y, externals, ghandle)
+        return
 
 
 @_stage_simple_list_recursive.register
