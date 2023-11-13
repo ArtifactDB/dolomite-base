@@ -173,7 +173,7 @@ def _process_StringList_column_for_hdf5(x: StringList, name: str, index: int, ou
     placeholder = None
     if any(y is None for y in x):
         x, placeholder = ut._choose_missing_string_placeholder(current)
-    _dump_column_to_hdf5(x, str, placeholder, name, output)
+    _dump_column_to_hdf5(x, str, placeholder, name, index, output)
 
 
 @_process_column_for_hdf5.register

@@ -1,5 +1,5 @@
 from biocframe import BiocFrame
-from biocutils import Factor
+from biocutils import Factor, StringList
 import dolomite_base as dl
 import numpy as np
 from tempfile import mkdtemp
@@ -12,6 +12,7 @@ def test_data_frame_list():
         "alice": [ True, False, False, True, True ],
         "ai": [ 2.3, 1.2, 5.2, 3.1, -1.2 ],
         "alicia": [ 5, 2, 1, 3.2, -2 ], # mixed integers and numbers
+        "akira": StringList(["A", "B", "C", "D", "E"]),
     })
 
     dir = mkdtemp()
@@ -23,6 +24,7 @@ def test_data_frame_list():
     assert meta["data_frame"]["columns"][2] == { "type": "boolean", "name": "alice" }
     assert meta["data_frame"]["columns"][3] == { "type": "number", "name": "ai" }
     assert meta["data_frame"]["columns"][4] == { "type": "number", "name": "alicia" }
+    assert meta["data_frame"]["columns"][5] == { "type": "string", "name": "akira" }
     dl.write_metadata(meta, dir)
 
     meta2 = dl.acquire_metadata(dir, "foo/simple.csv.gz")
@@ -33,6 +35,7 @@ def test_data_frame_list():
     assert roundtrip.column("akari").dtype.type == np.int32
 
     assert roundtrip.column("aika") == df.column("aika")
+    assert isinstance(roundtrip.column("aika"), StringList)
 
     assert list(roundtrip.column("alice")) == df.column("alice")
     assert roundtrip.column("alice").dtype.type == np.bool_
@@ -42,6 +45,9 @@ def test_data_frame_list():
 
     assert list(roundtrip.column("alicia")) == df.column("alicia")
     assert roundtrip.column("alicia").dtype.type == np.float64
+
+    assert roundtrip.column("akira") == df.column("akira")
+    assert isinstance(roundtrip.column("akira"), StringList)
 
     # Test with HDF5.
     meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
@@ -54,13 +60,21 @@ def test_data_frame_list():
 
     assert list(roundtrip2.column("akari")) == df.column("akari")
     assert roundtrip2.column("akari").dtype.type == np.int32
+
     assert roundtrip2.column("aika") == df.column("aika")
+    assert isinstance(roundtrip2.column("aika"), StringList)
+
     assert list(roundtrip2.column("alice")) == df.column("alice")
     assert roundtrip2.column("alice").dtype.type == np.bool_
+
     assert list(roundtrip2.column("ai")) == df.column("ai")
     assert roundtrip2.column("ai").dtype.type == np.float64
+
     assert list(roundtrip2.column("alicia")) == df.column("alicia")
     assert roundtrip2.column("alicia").dtype.type == np.float64
+
+    assert roundtrip2.column("akira") == df.column("akira")
+    assert isinstance(roundtrip2.column("akira"), StringList)
 
 
 def test_data_frame_factor():
