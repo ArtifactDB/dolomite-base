@@ -65,6 +65,17 @@ def _create_BiocFrame(expected_rows: int, row_names: Optional[list], columns: li
             child_meta = acquire_metadata(project, curval["resource"]["path"])
             c = alt_load_object(child_meta, project, **kwargs)
 
+            # Dicts don't actually satisfy the BiocFrame contract, so while you
+            # could stuff a dict in there, it'll fail if you want to, e.g.,
+            # slice with repeated rows. So we convert it to a list to be safe.
+            # Besides, the row names of the BiocFrame should override any
+            # names for the individual columns, so we're not losing much here.
+            if isinstance(c, dict):
+                original_len = len(c)
+                c = list(c.values())
+                if len(c) != original_len:
+                    raise ValueError("currently not supporting lists with duplicate names as columns")
+
         elif curval["type"] == "integer":
             if not np.issubdtype(c.dtype, np.integer):
                 c = c.astype(np.int32)

@@ -547,6 +547,15 @@ def test_data_frame_nested():
     assert bsb_df.column("last") == df.column("bsb").column("last")
 
 
+def test_data_frame_dict_to_list():
+    df = BiocFrame({"weird_dict": { "A": 1, "B": 2 } })
+    dir = mkdtemp()
+    meta = dl.stage_object(df, dir, "foo")
+    dl.write_metadata(meta, dir)
+    roundtrip = dl.load_object(meta, dir)
+    assert roundtrip.get_column("weird_dict") == [1,2]
+
+
 def test_data_frame_metadata():
     df = BiocFrame(
         { "foo": [ 1, 3, 5, 7, 9 ] },
