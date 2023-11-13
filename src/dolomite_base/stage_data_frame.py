@@ -67,6 +67,8 @@ def stage_data_frame(
 
     cd = x.get_column_data(with_names=False) 
     if cd is not None and cd.shape[1] > 0:
+        if cd.get_row_names() is not None:
+            cd = cd.set_row_names(None)
         mmeta = alt_stage_object(cd, dir, path + "/column_data", is_child=True)
         meta["data_frame"]["column_data"] = { "resource": write_metadata(mmeta, dir=dir) }
 

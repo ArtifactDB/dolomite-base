@@ -529,6 +529,14 @@ def test_data_frame_metadata():
     assert roundtrip.get_column_data().column("args") == [ 99 ]
     assert isinstance(roundtrip, BiocFrame)
 
+    # Any row names are deliberately stripped out.
+    cd = df.get_column_data()
+    cd2 = cd.set_row_names([ "ARGH" ])
+    df2 = df.set_column_data(cd2)
+    meta = dl.stage_object(df2, dir, "foo-empty")
+    roundtrip = dl.load_object(meta, dir)
+    assert roundtrip.get_column_data(with_names = False).get_row_names() is None
+
     # Trying with HDF5.
     meta2 = dl.stage_object(df, dir, "foo2", mode="hdf5")
     dl.write_metadata(meta2, dir)
