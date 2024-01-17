@@ -287,15 +287,7 @@ pybind11::object load_list_json(std::string path, pybind11::list children) {
     return dynamic_cast<PythonBase*>(parsed.get())->extract();
 }
 
-void validate_list_json(std::string path, size_t n) {
-    uzuki2::json::validate_file(path, n);
-}
-
 pybind11::object load_list_hdf5(std::string path, std::string name, pybind11::list children) {
     auto parsed = uzuki2::hdf5::parse<PythonProvisioner>(path, name, PythonExternals(children));
     return dynamic_cast<PythonBase*>(parsed.get())->extract();
-}
-
-void validate_list_hdf5(std::string path, std::string name, size_t n) {
-    uzuki2::hdf5::validate(path, name, n);
 }
