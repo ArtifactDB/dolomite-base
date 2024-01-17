@@ -1,11 +1,10 @@
-from typing import Any, Optional
 from biocutils import Factor
 import numpy
 import h5py
 import os
 
 
-def read_string_factor(path: str, metadata: Optional[dict] = None, **kwargs) -> Factor:
+def read_string_factor(path: str, metadata: dict, **kwargs) -> Factor:
     """
     Read a string factor from disk. In general, this function should not
     be called directly but instead via
@@ -14,7 +13,7 @@ def read_string_factor(path: str, metadata: Optional[dict] = None, **kwargs) -> 
     Args:
         path: Path to the directory containing the object.
 
-        metadata: Metadata for the object. This is read from the `OBJECT` file if None.
+        metadata: Metadata for the object. 
 
         kwargs: Further arguments, passed to nested objects.
 

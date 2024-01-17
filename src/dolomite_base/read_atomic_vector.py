@@ -1,11 +1,11 @@
-from typing import Any, Union, Optional
+from typing import Union
 from biocutils import StringList
 import numpy
 import h5py
 import os
 import warnings
 
-def read_atomic_vector(path: str, metadata: Optional[dict] = None, **kwargs) -> Union[StringList, numpy.ndarray]:
+def read_atomic_vector(path: str, metadata: dict, **kwargs) -> Union[StringList, numpy.ndarray]:
     """
     Read an atomic vector from disk. In general, this function should not be
     called directly but instead via
@@ -14,7 +14,7 @@ def read_atomic_vector(path: str, metadata: Optional[dict] = None, **kwargs) -> 
     Args:
         path: Path to the directory containing the object.
 
-        metadata: Metadata for the object. This is read from the `OBJECT` file if None.
+        metadata: Metadata for the object.
 
         kwargs: Further arguments, passed to nested objects.
 

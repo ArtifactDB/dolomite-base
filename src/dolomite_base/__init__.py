@@ -18,6 +18,8 @@ finally:
 from .save_object import save_object
 from .save_string_list import save_string_list
 from .save_string_factor import save_string_factor
+from .save_simple_list import save_simple_list, save_simple_dict
 from .read_atomic_vector import read_atomic_vector
 from .read_string_factor import read_string_factor
+from .read_simple_list import read_simple_list
 from .read_object import read_object

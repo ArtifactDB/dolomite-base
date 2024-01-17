@@ -1,7 +1,6 @@
 from typing import Any, Union, Optional, Literal
 import numpy as np
 import warnings
-from numpy import ndarray, issubdtype, integer, floating, bool_
 from functools import singledispatch
 from biocutils import Factor, StringList
 import os
@@ -9,165 +8,92 @@ import json
 import gzip
 import h5py
 
-from .stage_object import stage_object
-from .alt_stage_object import alt_stage_object
-from .write_metadata import write_metadata
-from . import lib_dolomite_base as lib
+from .save_object import save_object, validate_saves
+from .alt_save_object import alt_save_object
 from . import _utils as ut
 
 
-@stage_object.register
-def stage_simple_dict(
-    x: dict,
-    dir: str, 
-    path: str, 
-    is_child: bool = False, 
-    mode: Optional[Literal["hdf5", "json"]] = None,
-    **kwargs
-) -> dict[str, Any]:
+@save_object.register
+@validate_saves
+def save_simple_dict(x: dict, path: str, simple_list_mode: Optional[Literal["hdf5", "json"]] = "json", **kwargs):
     """Method for saving dictionaries (Python analogues to R-style named lists)
     to the corresponding file representations, see
-    :py:meth:`~dolomite_base.stage_object.stage_object` for details.
+    :py:meth:`~dolomite_base.save_object.save_object` for details.
 
     Args:
-        x: Object to be staged.
+        x: Object to be saved.
 
-        dir: Staging directory.
+        path: Path to a directory in which to save the object.
 
-        path: Relative path inside ``dir`` to save the object.
-
-        is_child: Is ``x`` a child of another object?
-
-        mode: Whether to save in HDF5 or JSON mode.
-            If None, defaults to :py:meth:`~choose_simple_list_format`.
+        simple_list_mode: Whether to save in HDF5 or JSON mode.
 
         kwargs: Further arguments, ignored.
 
     Returns:
-        Metadata that can be edited by calling methods and then saved with 
-        :py:meth:`~dolomite_base.write_metadata.write_metadata`.
+        `x` is saved to `path`.
     """
-    return _stage_simple_list_internal(x, dir, path, is_child, mode, **kwargs)
+    _save_simple_list_internal(x, path, simple_list_mode, **kwargs)
+    return
 
 
-@stage_object.register
-def stage_simple_list(
-    x: list,
-    dir: str, 
-    path: str, 
-    is_child: bool = False, 
-    mode: Optional[Literal["hdf5", "json"]] = None,
-    **kwargs
-) -> dict[str, Any]:
+@save_object.register
+@validate_saves
+def save_simple_list(x: list, path: str, simple_list_mode: Optional[Literal["hdf5", "json"]] = "json", **kwargs):
     """Method for saving lists (Python analogues to R-style unnamed lists) to
     the corresponding file representations, see
-    :py:meth:`~dolomite_base.stage_object.stage_object` for details.
+    :py:meth:`~dolomite_base.save_object.save_object` for details.
 
     Args:
-        x: Object to be staged.
+        x: Object to be saved.
 
-        dir: Staging directory.
+        path: Path to a directory in which to save the object.
 
-        path: Relative path inside ``dir`` to save the object.
-
-        is_child: Is ``x`` a child of another object?
-
-        mode: Whether to save in HDF5 or JSON mode.
-            If None, defaults to :py:meth:`~choose_simple_list_format`.
+        simple_list_mode: Whether to save in HDF5 or JSON mode.
 
         kwargs: Further arguments, ignored.
 
     Returns:
-        Metadata that can be edited by calling methods and then saved with 
-        :py:meth:`~dolomite_base.write_metadata.write_metadata`.
+        `x` is saved to `path`.
     """
-    return _stage_simple_list_internal(x, dir, path, is_child, mode, **kwargs)
-
-
-SAVE_LIST_FORMAT = "json"
-
-
-def choose_simple_list_format(format: Optional[Literal["hdf5", "json"]] = None) -> str:
-    """Get or set the format to save a simple list.
-
-    Args:
-        format: Format to save a simple list, either in HDF5 or JSON.
-
-    Return:
-        If ``format`` is not provided, the current format choice is returned.
-        This defaults to `"json"` if no other setting has been provided.
-
-        If ``format`` is provided, it is used to define the format choice,
-        and the previous choice is returned.
-    """
-    global SAVE_LIST_FORMAT
-    if format is None:
-        return SAVE_LIST_FORMAT
-    else:
-        old = SAVE_LIST_FORMAT
-        SAVE_LIST_FORMAT = format
-        return old
+    _save_simple_list_internal(x, path, simple_list_mode, **kwargs)
+    return
 
 
 ##########################################################################
 
 
-def _stage_simple_list_internal(
-    x: Union[dict, list],
-    dir: str, 
-    path: str, 
-    is_child: bool = False, 
-    mode: Optional[Literal["hdf5", "json"]] = None,
-    **kwargs
-) -> dict[str, Any]:
+def _save_simple_list_internal(x: Union[dict, list], path: str, simple_list_mode: Optional[Literal["hdf5", "json"]] = None, **kwargs):
+    os.mkdir(path)
+    with open(os.path.join(path, "OBJECT"), 'w', encoding="utf-8") as handle:
+        format2 = simple_list_mode 
+        if format2 == "json":
+            format2 = "json.gz"
+        handle.write('{ "type": "simple_list", "simple_list": { "version": "1.0", "format": "' + format2 + '" } }')
 
     externals = []
-    os.mkdir(os.path.join(dir, path))
     components = {}
 
-    if mode == None:
-        mode = choose_simple_list_format()
-
-    if mode == "json":
-        transformed = _stage_simple_list_recursive(x, externals, None)
-        transformed["version"] = "1.1"
-
-        newpath = path + "/list.json.gz"
-        opath = os.path.join(dir, newpath)
+    if simple_list_mode == "json":
+        transformed = _save_simple_list_recursive(x, externals, None)
+        transformed["version"] = "1.2"
+        opath = os.path.join(path, "list_contents.json.gz")
         with gzip.open(opath, "wt") as handle:
             json.dump(transformed, handle)
 
-        lib.validate_list_json(opath.encode("UTF8"), len(externals))
-
-        components["$schema"] = "json_simple_list/v1.json"
-        components["path"] = newpath
-        components["json_simple_list"] = { "compression": "gzip" }
     else:
-        newpath = path + "/list.h5"
-        opath = os.path.join(dir, newpath)
-        oname = "uzuki2_list"
+        opath = os.path.join(path, "list_contents.h5")
         with h5py.File(opath, "w") as handle:
-            ghandle = handle.create_group(oname)
-            ghandle.attrs["uzuki_version"] = "1.1"
-            _stage_simple_list_recursive(x, externals, ghandle)
-
-        lib.validate_list_hdf5(opath.encode("UTF8"), oname.encode("UTF8"), len(externals))
-
-        components["$schema"] = "hdf5_simple_list/v1.json"
-        components["path"] = newpath
-        components["hdf5_simple_list"] = { "group": oname }
+            ghandle = handle.create_group("simple_list")
+            ghandle.attrs["uzuki_version"] = "1.3"
+            _save_simple_list_recursive(x, externals, ghandle)
 
     children = []
     for i, ex in enumerate(externals):
-        child_meta = alt_stage_object(ex, dir, path + "/" + str(i))
-        children.append({ "resource": write_metadata(child_meta, dir) })
-    components["simple_list"] = { "children": children }
-    components["is_child"] = is_child
-    return components
-
+        alt_save_object(ex, os.path.join(path, str(i)), **kwargs)
+    return
 
 @singledispatch
-def _stage_simple_list_recursive(x: Any, externals: list, handle):
+def _save_simple_list_recursive(x: Any, externals: list, handle):
     externals.append(x)
     if handle is None:
         return { "type": "external", "index": len(externals) - 1 }
@@ -177,43 +103,51 @@ def _stage_simple_list_recursive(x: Any, externals: list, handle):
         return
 
 
-@_stage_simple_list_recursive.register
-def _stage_simple_list_recursive_stringlist(x: StringList, externals: list, handle):
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_stringlist(x: StringList, externals: list, handle):
+    nms = x.get_names()
+
     if handle is None:
-        return { "type": "string", "values": x }
-    else:
-        has_none = any(y is None for y in x)
-        if has_none:
-            x, placeholder = ut._choose_missing_string_placeholder(x)
+        output = { "type": "string", "values": x.as_list() }
+        if nms is not None:
+            output["names"] = nms
+        return output
 
-        handle.attrs["uzuki_object"] = "vector"
-        handle.attrs["uzuki_type"] = "string"
-        dset = ut._save_fixed_length_strings(handle, "data", x)
+    has_none = any(y is None for y in x)
+    if has_none:
+        x, placeholder = ut._choose_missing_string_placeholder(x)
 
-        if has_none:
-           dset.attrs["missing-value-placeholder"] = placeholder
-        return
+    handle.attrs["uzuki_object"] = "vector"
+    handle.attrs["uzuki_type"] = "string"
+    dset = ut._save_fixed_length_strings(handle, "data", x)
+
+    if has_none:
+       dset.attrs["missing-value-placeholder"] = placeholder
+    if nms is not None:
+        ut._save_fixed_length_strings(handle, "names", nms)
+
+    return
 
 
-@_stage_simple_list_recursive.register
-def _stage_simple_list_recursive_list(x: list, externals: list, handle):
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_list(x: list, externals: list, handle):
     if handle is None:
         vals = []
         collected = { "type": "list", "values": vals }
         for i, y in enumerate(x):
-            vals.append(_stage_simple_list_recursive(y, externals, None))
+            vals.append(_save_simple_list_recursive(y, externals, None))
         return collected
     else:
         handle.attrs["uzuki_object"] = "list"
         dhandle = handle.create_group("data")
         for i, y in enumerate(x):
             ghandle = dhandle.create_group(str(i))
-            _stage_simple_list_recursive(y, externals, ghandle)
+            _save_simple_list_recursive(y, externals, ghandle)
         return
 
 
-@_stage_simple_list_recursive.register
-def _stage_simple_list_recursive_dict(x: dict, externals: list, handle):
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_dict(x: dict, externals: list, handle):
     if handle is None:
         vals = []
         names = []
@@ -222,7 +156,7 @@ def _stage_simple_list_recursive_dict(x: dict, externals: list, handle):
             if not isinstance(k, str):
                 warnings.warn("converting non-string key with value " + str(k) + " to a string", UserWarning)
             names.append(str(k))
-            vals.append(_stage_simple_list_recursive(v, externals, None))
+            vals.append(_save_simple_list_recursive(v, externals, None))
         return collected
     else:
         handle.attrs["uzuki_object"] = "list"
@@ -230,7 +164,7 @@ def _stage_simple_list_recursive_dict(x: dict, externals: list, handle):
         names = []
         for k, v in x.items():
             ghandle = dhandle.create_group(str(len(names)))
-            _stage_simple_list_recursive(v, externals, ghandle)
+            _save_simple_list_recursive(v, externals, ghandle)
             if not isinstance(k, str):
                 warn("converting non-string key with value " + str(k) + " to a string", UserWarning)
             names.append(str(k))
@@ -238,80 +172,80 @@ def _stage_simple_list_recursive_dict(x: dict, externals: list, handle):
         return
 
 
-@_stage_simple_list_recursive.register
-def _stage_simple_list_recursive_bool(x: bool, externals: list, handle):
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_bool(x: bool, externals: list, handle):
     if handle is None:
         return { "type": "boolean", "values": bool(x) }
     else:
-        _stage_scalar_hdf5(handle, x=x, dtype=bool)
+        _save_scalar_hdf5(handle, x=x, dtype=bool)
         return
 
 
-@_stage_simple_list_recursive.register
-def _stage_simple_list_recursive_int(x: int, externals: list, handle):
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_int(x: int, externals: list, handle):
     if ut._is_integer_scalar_within_limit(x):
         if handle is None:
             return { "type": "integer", "values": int(x) }
         else:
-            _stage_scalar_hdf5(handle, x=x, dtype=int)
+            _save_scalar_hdf5(handle, x=x, dtype=int)
             return
     else:
         if handle is None:
             return { "type": "number", "values": x }
         else:
-            _stage_scalar_hdf5(handle, x=x, dtype=float)
+            _save_scalar_hdf5(handle, x=x, dtype=float)
             return
 
 
-@_stage_simple_list_recursive.register
-def _stage_simple_list_recursive_str(x: str, externals: list, handle):
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_str(x: str, externals: list, handle):
     if handle is None:
         return { "type": "string", "values": str(x) }
     else:
-        _stage_scalar_hdf5(handle, x=x, dtype=str)
+        _save_scalar_hdf5(handle, x=x, dtype=str)
         return
 
 
-@_stage_simple_list_recursive.register
-def _stage_simple_list_recursive_float(x: float, externals: list, handle):
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_float(x: float, externals: list, handle):
     if handle is None:
         return { "type": "number", "values": _sanitize_float_json(x) }
     else:
-        _stage_scalar_hdf5(handle, x=x, dtype=float)
+        _save_scalar_hdf5(handle, x=x, dtype=float)
         return
 
 
-@_stage_simple_list_recursive.register
-def _stage_simple_list_recursive_ndarray(x: np.ndarray, externals: list, handle):
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_ndarray(x: np.ndarray, externals: list, handle):
     ndims = len(x.shape)
     if ndims == 0:
         if not np.ma.is_masked(x) or not bool(x.mask):
-            return _stage_simple_list_recursive(x.dtype.type(x), externals, handle)
+            return _save_simple_list_recursive(x.dtype.type(x), externals, handle)
         else:
             final_type = ut._determine_numpy_type(x.dtype.type(x))
             if final_type == int:
                 if handle is None:
                     return { "type": "integer", "values": None }
                 else:
-                    _stage_scalar_hdf5(handle, x=-ut.LIMIT32, dtype=int, missing_placeholder=-ut.LIMIT32)
+                    _save_scalar_hdf5(handle, x=-ut.LIMIT32, dtype=int, missing_placeholder=-ut.LIMIT32)
                     return
             elif final_type == float:
                 if handle is None:
                     return { "type": "number", "values": None }
                 else:
-                    _stage_scalar_hdf5(handle, x=np.NaN, dtype=float, missing_placeholder=np.NaN)
+                    _save_scalar_hdf5(handle, x=np.NaN, dtype=float, missing_placeholder=np.NaN)
                     return
             elif x.dtype == bool_:
                 if handle is None:
                     return { "type": "boolean", "values": None }
                 else:
-                    _stage_scalar_hdf5(handle, x=-1, dtype=bool, missing_placeholder=-1)
+                    _save_scalar_hdf5(handle, x=-1, dtype=bool, missing_placeholder=-1)
                     return
             else:
                 raise NotImplementedError("no staging method for 1D NumPy masked arrays of " + str(x.dtype))
 
     elif ndims != 1:
-        return _stage_simple_list_recursive.registry[Any](x, externals, handle)
+        return _save_simple_list_recursive.registry[Any](x, externals, handle)
     else:
         final_type = ut._determine_numpy_type(x)
         if np.ma.is_masked(x):
@@ -322,24 +256,24 @@ def _stage_simple_list_recursive_ndarray(x: np.ndarray, externals: list, handle)
                     # If there's no valid missing placeholder, we just save it as floating-point.
                     x, placeholder = ut._choose_missing_integer_placeholder(x)
                     if placeholder is not None:
-                        _stage_vector_hdf5(handle, x=x, dtype=int, missing_placeholder=placeholder)
+                        _save_vector_hdf5(handle, x=x, dtype=int, missing_placeholder=placeholder)
                     else:
                         x, placeholder = ut._choose_missing_float_placeholder(x)
-                        _stage_vector_hdf5(handle, x=x, dtype=float, missing_placeholder=placeholder)
+                        _save_vector_hdf5(handle, x=x, dtype=float, missing_placeholder=placeholder)
                     return
             elif final_type == float:
                 if handle is None:
                     return { "type": "number", "values": [_sanitize_masked_float_json(y) for y in x] }
                 else:
                     x, placeholder = ut._choose_missing_float_placeholder(x)
-                    _stage_vector_hdf5(handle, x=x, dtype=float, missing_placeholder=placeholder)
+                    _save_vector_hdf5(handle, x=x, dtype=float, missing_placeholder=placeholder)
                     return
             elif x.dtype == bool_:
                 if handle is None:
                     return { "type": "boolean", "values": [None if np.ma.is_masked(y) else bool(y) for y in x] }
                 else:
                     x, placeholder = ut._choose_missing_boolean_placeholder(x)
-                    _stage_vector_hdf5(handle, x=x, dtype=bool, missing_placeholder=placeholder)
+                    _save_vector_hdf5(handle, x=x, dtype=bool, missing_placeholder=placeholder)
                     return
             else:
                 raise NotImplementedError("no staging method for 1D NumPy masked arrays of " + str(x.dtype))
@@ -348,61 +282,61 @@ def _stage_simple_list_recursive_ndarray(x: np.ndarray, externals: list, handle)
                 if handle is None:
                     return { "type": "integer", "values": [int(y) for y in x] }
                 else:
-                    _stage_vector_hdf5(handle, x=x, dtype=int)
+                    _save_vector_hdf5(handle, x=x, dtype=int)
                     return
             elif final_type == float:
                 if handle is None:
                     return { "type": "number", "values": [_sanitize_float_json(y) for y in x] }
                 else:
-                    _stage_vector_hdf5(handle, x=x, dtype=float)
+                    _save_vector_hdf5(handle, x=x, dtype=float)
                     return
             elif final_type == bool:
                 if handle is None:
                     return { "type": "boolean", "values": [bool(y) for y in x] }
                 else:
-                    _stage_vector_hdf5(handle, x=x, dtype=bool)
+                    _save_vector_hdf5(handle, x=x, dtype=bool)
                     return
             else:
                 raise NotImplementedError("no staging method for 1D NumPy arrays of " + str(x.dtype))
 
 
-@_stage_simple_list_recursive.register
-def _stage_simple_list_recursive_MaskedConstant(x: np.ma.core.MaskedConstant, externals: list, handle):
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_MaskedConstant(x: np.ma.core.MaskedConstant, externals: list, handle):
     if handle is None:
         return { "type": "number", "values": [None]}
     else:
-        _stage_scalar_hdf5(handle, x=np.NaN, dtype=float, missing_placeholder=np.NaN)
+        _save_scalar_hdf5(handle, x=np.NaN, dtype=float, missing_placeholder=np.NaN)
         return
 
 
-@_stage_simple_list_recursive.register
-def _stage_simple_list_recursive_numpy_generic(x: np.generic, externals: list, handle):
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_numpy_generic(x: np.generic, externals: list, handle):
     final_type = ut._determine_numpy_type(x)
 
     if final_type == int:
         if handle is None:
             return { "type": "integer", "values": int(x) }
         else:
-            _stage_scalar_hdf5(handle, x=x, dtype=int)
+            _save_scalar_hdf5(handle, x=x, dtype=int)
             return
     elif final_type == float:
         if handle is None:
             return { "type": "number", "values": _sanitize_float_json(x) }
         else:
-            _stage_scalar_hdf5(handle, x=x, dtype=float)
+            _save_scalar_hdf5(handle, x=x, dtype=float)
             return
     elif final_type == bool:
         if handle is None:
             return { "type": "boolean", "values": bool(x) }
         else:
-            _stage_scalar_hdf5(handle, x=x, dtype=bool)
+            _save_scalar_hdf5(handle, x=x, dtype=bool)
             return 
     else:
         raise NotImplementedError("no staging method for NumPy array scalars of " + str(x.dtype))
 
 
-@_stage_simple_list_recursive.register
-def _stage_simple_list_recursive_factor(x: Factor, externals: list, handle):
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_factor(x: Factor, externals: list, handle):
     if handle is None:
         return { 
             "type": "factor",
@@ -425,8 +359,8 @@ def _stage_simple_list_recursive_factor(x: Factor, externals: list, handle):
         return
 
 
-@_stage_simple_list_recursive.register
-def _stage_simple_list_recursive_none(x: None, externals: list, handle):
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_none(x: None, externals: list, handle):
     if handle is None:
         return { "type": "nothing" }
     else:
@@ -456,7 +390,7 @@ def _sanitize_masked_float_json(x):
 ##########################################################################
 
 
-def _stage_scalar_hdf5(handle, x, dtype, missing_placeholder = None):
+def _save_scalar_hdf5(handle, x, dtype, missing_placeholder = None):
     handle.attrs["uzuki_object"] = "vector"
 
     if dtype == bool:
@@ -479,7 +413,7 @@ def _stage_scalar_hdf5(handle, x, dtype, missing_placeholder = None):
         dhandle.attrs.create("missing-value-placeholder", data=missing_placeholder, dtype=savetype)
 
 
-def _stage_vector_hdf5(handle, x, dtype, missing_placeholder = None):
+def _save_vector_hdf5(handle, x, dtype, missing_placeholder = None):
     handle.attrs["uzuki_object"] = "vector"
 
     if dtype == bool:

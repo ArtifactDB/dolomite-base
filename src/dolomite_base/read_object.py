@@ -5,7 +5,8 @@ import json
 
 registry = {
     "atomic_vector": "dolomite_base.read_atomic_vector",
-    "string_factor": "dolomite_base.read_string_factor"
+    "string_factor": "dolomite_base.read_string_factor",
+    "simple_list": "dolomite_base.read_simple_list"
 }
 
 
