@@ -9,7 +9,7 @@ def save_object(x: Any, path: str, **kwargs):
     should define methods for this generic to stage different object classes.
 
     Arguments:
-        x: Object to be staged.
+        x: Object to be saved.
 
         path: Path to the output directory.
 
@@ -18,7 +18,7 @@ def save_object(x: Any, path: str, **kwargs):
     Returns:
         `x` is saved to `path`.
     """
-    raise NotImplementedError("'stage_object' is not implemented for " + str(type(x)))
+    raise NotImplementedError("'save_object' is not implemented for " + str(type(x)))
 
 
 def validate_saves(fn):
