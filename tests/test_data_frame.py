@@ -21,23 +21,23 @@ def test_data_frame_list():
     roundtrip = dl.read_object(dir)
     assert isinstance(roundtrip, BiocFrame)
 
-    assert list(roundtrip.column("akari")) == df.column("akari")
-    assert roundtrip.column("akari").dtype.type == np.int32
+    assert list(roundtrip.get_column("akari")) == df.get_column("akari")
+    assert roundtrip.get_column("akari").dtype.type == np.int32
 
-    assert isinstance(roundtrip.column("aika"), StringList)
-    assert roundtrip.column("aika").as_list() == df.column("aika")
+    assert isinstance(roundtrip.get_column("aika"), StringList)
+    assert roundtrip.get_column("aika").as_list() == df.get_column("aika")
 
-    assert list(roundtrip.column("alice")) == df.column("alice")
-    assert roundtrip.column("alice").dtype.type == np.bool_
+    assert list(roundtrip.get_column("alice")) == df.get_column("alice")
+    assert roundtrip.get_column("alice").dtype.type == np.bool_
 
-    assert list(roundtrip.column("ai")) == df.column("ai")
-    assert roundtrip.column("ai").dtype.type == np.float64
+    assert list(roundtrip.get_column("ai")) == df.get_column("ai")
+    assert roundtrip.get_column("ai").dtype.type == np.float64
 
-    assert list(roundtrip.column("alicia")) == df.column("alicia")
-    assert roundtrip.column("alicia").dtype.type == np.float64
+    assert list(roundtrip.get_column("alicia")) == df.get_column("alicia")
+    assert roundtrip.get_column("alicia").dtype.type == np.float64
 
-    assert roundtrip.column("akira") == df.column("akira")
-    assert isinstance(roundtrip.column("akira"), StringList)
+    assert roundtrip.get_column("akira") == df.get_column("akira")
+    assert isinstance(roundtrip.get_column("akira"), StringList)
 
 
 def test_data_frame_external_list():
@@ -54,10 +54,10 @@ def test_data_frame_external_list():
 
     roundtrip = dl.read_object(dir)
     assert isinstance(roundtrip, BiocFrame)
-    assert roundtrip.column("akari") == df.column("akari")
-    assert roundtrip.column("aika") == df.column("aika")
-    assert roundtrip.column("alice") == df.column("alice")
-    assert roundtrip.column("ai") == df.column("ai")
+    assert roundtrip.get_column("akari") == df.get_column("akari")
+    assert roundtrip.get_column("aika") == df.get_column("aika")
+    assert roundtrip.get_column("alice") == df.get_column("alice")
+    assert roundtrip.get_column("ai") == df.get_column("ai")
 
 
 def test_data_frame_factor():
@@ -103,7 +103,7 @@ def test_data_frame_wild_strings():
     roundtrip = dl.read_object(dir)
 
     assert df.row_names == roundtrip.row_names
-    assert df.column("lyrics") == roundtrip.column("lyrics").as_list()
+    assert df.get_column("lyrics") == roundtrip.get_column("lyrics").as_list()
 
 
 def test_data_frame_none():
@@ -128,22 +128,22 @@ def test_data_frame_none():
     dl.save_object(df, dir)
     roundtrip = dl.read_object(dir)
 
-    compare_masked_to_list(df.column("akari"), roundtrip.column("akari"))
-    assert roundtrip.column("akari").dtype.type == np.int32
+    compare_masked_to_list(df.get_column("akari"), roundtrip.get_column("akari"))
+    assert roundtrip.get_column("akari").dtype.type == np.int32
 
-    assert roundtrip.column("aika").as_list() == df.column("aika")
-    assert isinstance(roundtrip.column("aika"), StringList)
+    assert roundtrip.get_column("aika").as_list() == df.get_column("aika")
+    assert isinstance(roundtrip.get_column("aika"), StringList)
 
-    compare_masked_to_list(df.column("alice"), roundtrip.column("alice"))
-    assert roundtrip.column("alice").dtype.type == np.bool_
+    compare_masked_to_list(df.get_column("alice"), roundtrip.get_column("alice"))
+    assert roundtrip.get_column("alice").dtype.type == np.bool_
 
-    compare_masked_to_list(df.column("ai"), roundtrip.column("ai"))
-    assert roundtrip.column("ai").dtype.type == np.float64
+    compare_masked_to_list(df.get_column("ai"), roundtrip.get_column("ai"))
+    assert roundtrip.get_column("ai").dtype.type == np.float64
 
-    assert roundtrip.column("aria") == df.column("aria")
+    assert roundtrip.get_column("aria") == df.get_column("aria")
 
-    assert roundtrip.column("akira").as_list() == df.column("akira")
-    assert isinstance(roundtrip.column("akira"), StringList)
+    assert roundtrip.get_column("akira").as_list() == df.get_column("akira")
+    assert isinstance(roundtrip.get_column("akira"), StringList)
 
 
 def test_data_frame_numpy():
@@ -157,10 +157,10 @@ def test_data_frame_numpy():
     dl.save_object(df, dir)
     roundtrip = dl.read_object(dir)
 
-    assert (roundtrip.column("alicia") == df.column("alicia")).all()
-    assert roundtrip.column("alicia").dtype == np.int32
-    assert (roundtrip.column("akira") == df.column("akira")).all()
-    assert (roundtrip.column("athena") == df.column("athena")).all()
+    assert (roundtrip.get_column("alicia") == df.get_column("alicia")).all()
+    assert roundtrip.get_column("alicia").dtype == np.int32
+    assert (roundtrip.get_column("akira") == df.get_column("akira")).all()
+    assert (roundtrip.get_column("athena") == df.get_column("athena")).all()
 
 
 def test_data_frame_large_integers():
@@ -175,14 +175,14 @@ def test_data_frame_large_integers():
     dl.save_object(df, dir)
     roundtrip = dl.read_object(dir)
 
-    assert (roundtrip.column("alicia") == df.column("alicia")).all()
-    assert roundtrip.column("alicia").dtype == np.int32
-    assert (roundtrip.column("akira") == df.column("akira")).all()
-    assert roundtrip.column("akira").dtype == np.float64
-    assert (roundtrip.column("alice") == df.column("alice")).all()
-    assert roundtrip.column("alice").dtype == np.int32
-    assert (roundtrip.column("athena") == df.column("athena")).all()
-    assert roundtrip.column("athena").dtype == np.float64
+    assert (roundtrip.get_column("alicia") == df.get_column("alicia")).all()
+    assert roundtrip.get_column("alicia").dtype == np.int32
+    assert (roundtrip.get_column("akira") == df.get_column("akira")).all()
+    assert roundtrip.get_column("akira").dtype == np.float64
+    assert (roundtrip.get_column("alice") == df.get_column("alice")).all()
+    assert roundtrip.get_column("alice").dtype == np.int32
+    assert (roundtrip.get_column("athena") == df.get_column("athena")).all()
+    assert roundtrip.get_column("athena").dtype == np.float64
 
 
 def test_data_frame_special_floats():
@@ -207,9 +207,9 @@ def test_data_frame_special_floats():
     roundtrip = dl.read_object(dir)
 
     assert isinstance(roundtrip, BiocFrame)
-    as_expected(roundtrip.column("sumire"))
-    as_expected(roundtrip.column("kanon"))
-    as_expected_masked(roundtrip.column("chisato"))
+    as_expected(roundtrip.get_column("sumire"))
+    as_expected(roundtrip.get_column("kanon"))
+    as_expected_masked(roundtrip.get_column("chisato"))
 
 
 def test_data_frame_masked():
@@ -225,13 +225,13 @@ def test_data_frame_masked():
     roundtrip = dl.read_object(dir)
 
     assert isinstance(roundtrip, BiocFrame)
-    assert (roundtrip.column("alicia") == df.column("alicia")).all()
-    assert (roundtrip.column("alicia").mask == df.column("alicia").mask).all()
-    assert (roundtrip.column("akira") == df.column("akira")).all()
-    assert (roundtrip.column("akira").mask == df.column("akira").mask).all()
-    assert (roundtrip.column("athena") == df.column("athena")).all()
-    assert (roundtrip.column("athena").mask == df.column("athena").mask).all()
-    assert (roundtrip.column("aika").mask == df.column("aika").mask).all()
+    assert (roundtrip.get_column("alicia") == df.get_column("alicia")).all()
+    assert (roundtrip.get_column("alicia").mask == df.get_column("alicia").mask).all()
+    assert (roundtrip.get_column("akira") == df.get_column("akira")).all()
+    assert (roundtrip.get_column("akira").mask == df.get_column("akira").mask).all()
+    assert (roundtrip.get_column("athena") == df.get_column("athena")).all()
+    assert (roundtrip.get_column("athena").mask == df.get_column("athena").mask).all()
+    assert (roundtrip.get_column("aika").mask == df.get_column("aika").mask).all()
 
 
 def test_data_frame_empty():
@@ -273,16 +273,16 @@ def test_data_frame_nested():
     roundtrip = dl.read_object(dir)
     assert isinstance(roundtrip, BiocFrame)
 
-    liella_df = roundtrip.column("liella")
+    liella_df = roundtrip.get_column("liella")
     assert isinstance(liella_df, BiocFrame)
-    assert liella_df.column("first").as_list() == df.column("liella").column("first")
-    assert liella_df.column("last").as_list() == df.column("liella").column("last")
-    assert list(liella_df.column("best")) == df.column("liella").column("best")
+    assert liella_df.get_column("first").as_list() == df.get_column("liella").get_column("first")
+    assert liella_df.get_column("last").as_list() == df.get_column("liella").get_column("last")
+    assert list(liella_df.get_column("best")) == df.get_column("liella").get_column("best")
 
-    bsb_df = roundtrip.column("bsb")
+    bsb_df = roundtrip.get_column("bsb")
     assert isinstance(bsb_df, BiocFrame)
-    assert bsb_df.column("first").as_list() == df.column("bsb").column("first")
-    assert bsb_df.column("last").as_list() == df.column("bsb").column("last")
+    assert bsb_df.get_column("first").as_list() == df.get_column("bsb").get_column("first")
+    assert bsb_df.get_column("last").as_list() == df.get_column("bsb").get_column("last")
 
 
 def test_data_frame_dict_to_list():
@@ -304,7 +304,7 @@ def test_data_frame_metadata():
     dl.save_object(df, dir)
     roundtrip = dl.read_object(dir)
     assert df.metadata == roundtrip.metadata
-    assert roundtrip.get_column_data().column("args") == [ 99 ]
+    assert roundtrip.get_column_data().get_column("args") == [ 99 ]
     assert isinstance(roundtrip, BiocFrame)
 
     # Any row names are deliberately stripped out.
