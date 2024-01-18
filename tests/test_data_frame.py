@@ -3,6 +3,7 @@ from biocutils import Factor, StringList
 import dolomite_base as dl
 import numpy as np
 import os
+import h5py
 from tempfile import mkdtemp
 
 
@@ -160,7 +161,21 @@ def test_data_frame_numpy():
     assert (roundtrip.get_column("alicia") == df.get_column("alicia")).all()
     assert roundtrip.get_column("alicia").dtype == np.int32
     assert (roundtrip.get_column("akira") == df.get_column("akira")).all()
+    assert roundtrip.get_column("akira").dtype == np.bool_
     assert (roundtrip.get_column("athena") == df.get_column("athena")).all()
+    assert roundtrip.get_column("athena").dtype == np.float64
+
+    # Coerces integers to floats.
+    with h5py.File(os.path.join(dir, "basic_columns.h5"), "a") as handle:
+        ghandle = handle["data_frame"]
+        dhandle = ghandle["data"]
+        xhandle = dhandle["0"]
+        del xhandle.attrs["type"]
+        xhandle.attrs.create("type", data="number")
+
+    roundtrip = dl.read_object(dir)
+    assert (roundtrip.get_column("alicia") == df.get_column("alicia")).all()
+    assert roundtrip.get_column("alicia").dtype == np.float64
 
 
 def test_data_frame_large_integers():
