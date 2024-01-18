@@ -41,10 +41,10 @@ def test_atomic_numpy_vector_simple():
     na = (numpy.random.rand(10) * 1000).astype(numpy.int32)
     with h5py.File(os.path.join(dir, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("atomic_vector")
-        ghandle.attrs["type"] = "float"
+        ghandle.attrs["type"] = "number"
         dhandle = ghandle.create_dataset("values", data=na, dtype="i4")
 
-    roundtrip = dl.read_atomic_vector(dir)
+    roundtrip = dl.read_object(dir)
     assert isinstance(roundtrip, numpy.ndarray)
     assert roundtrip.dtype == numpy.float64
     assert (na == roundtrip).all()
@@ -56,7 +56,7 @@ def test_atomic_numpy_vector_simple():
         ghandle.attrs["type"] = "boolean"
         dhandle = ghandle.create_dataset("values", data=na, dtype="i1")
 
-    roundtrip = dl.read_atomic_vector(dir)
+    roundtrip = dl.read_object(dir)
     assert roundtrip.dtype == numpy.bool_
     assert (na == roundtrip).all()
 
@@ -67,7 +67,7 @@ def test_atomic_numpy_vector_simple():
         ghandle.attrs["type"] = "integer"
         dhandle = ghandle.create_dataset("values", data=na, dtype="u2")
 
-    roundtrip = dl.read_atomic_vector(dir)
+    roundtrip = dl.read_object(dir)
     assert roundtrip.dtype == numpy.uint16
     assert (na == roundtrip).all()
 
@@ -82,11 +82,11 @@ def test_atomic_numpy_vector_masked():
     na = numpy.random.rand(10) 
     with h5py.File(os.path.join(dir, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("atomic_vector")
-        ghandle.attrs["type"] = "float"
+        ghandle.attrs["type"] = "number"
         dhandle = ghandle.create_dataset("values", data=na, dtype="f8")
         dhandle.attrs["missing-value-placeholder"] = na[0]
 
-    roundtrip = dl.read_atomic_vector(dir)
+    roundtrip = dl.read_object(dir)
     assert isinstance(roundtrip, numpy.ma.MaskedArray)
     assert roundtrip.dtype == numpy.float64
     assert (roundtrip.mask == (na == na[0])).all()
@@ -96,11 +96,11 @@ def test_atomic_numpy_vector_masked():
     na[9] = numpy.NaN
     with h5py.File(os.path.join(dir, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("atomic_vector")
-        ghandle.attrs["type"] = "float"
+        ghandle.attrs["type"] = "number"
         dhandle = ghandle.create_dataset("values", data=na, dtype="f8")
         dhandle.attrs["missing-value-placeholder"] = numpy.NaN
 
-    roundtrip = dl.read_atomic_vector(dir)
+    roundtrip = dl.read_object(dir)
     assert isinstance(roundtrip, numpy.ma.MaskedArray)
     assert roundtrip.dtype == numpy.float64
     assert (roundtrip.mask == numpy.isnan(na)).all()
