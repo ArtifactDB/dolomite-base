@@ -40,7 +40,7 @@ def save_string_factor(x: Factor, path: str, **kwargs):
             codes = codes.astype(numpy.uint32, copy=True)
             codes[is_missing] = nlevels
 
-        dhandle = ghandle.create_dataset("codes", data=codes, dtype="u4")
+        dhandle = ghandle.create_dataset("codes", data=codes, dtype="u4", compression="gzip", chunks=True)
         if has_missing:
             dhandle.attrs.create("missing-value-placeholder", data=nlevels, dtype="u4")
 

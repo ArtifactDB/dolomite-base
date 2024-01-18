@@ -1,4 +1,4 @@
-from typing import Any, Union, Optional, Literal
+from typing import Any, Union, Literal
 import numpy as np
 import warnings
 from functools import singledispatch
@@ -15,7 +15,7 @@ from . import _utils as ut
 
 @save_object.register
 @validate_saves
-def save_simple_dict(x: dict, path: str, simple_list_mode: Optional[Literal["hdf5", "json"]] = "json", **kwargs):
+def save_simple_dict(x: dict, path: str, simple_list_mode: Literal["hdf5", "json"] = "json", **kwargs):
     """Method for saving dictionaries (Python analogues to R-style named lists)
     to the corresponding file representations, see
     :py:meth:`~dolomite_base.save_object.save_object` for details.
@@ -38,7 +38,7 @@ def save_simple_dict(x: dict, path: str, simple_list_mode: Optional[Literal["hdf
 
 @save_object.register
 @validate_saves
-def save_simple_list(x: list, path: str, simple_list_mode: Optional[Literal["hdf5", "json"]] = "json", **kwargs):
+def save_simple_list(x: list, path: str, simple_list_mode: Literal["hdf5", "json"] = "json", **kwargs):
     """Method for saving lists (Python analogues to R-style unnamed lists) to
     the corresponding file representations, see
     :py:meth:`~dolomite_base.save_object.save_object` for details.
@@ -62,7 +62,7 @@ def save_simple_list(x: list, path: str, simple_list_mode: Optional[Literal["hdf
 ##########################################################################
 
 
-def _save_simple_list_internal(x: Union[dict, list], path: str, simple_list_mode: Optional[Literal["hdf5", "json"]] = None, **kwargs):
+def _save_simple_list_internal(x: Union[dict, list], path: str, simple_list_mode: Literal["hdf5", "json"] = None, **kwargs):
     os.mkdir(path)
     with open(os.path.join(path, "OBJECT"), 'w', encoding="utf-8") as handle:
         format2 = simple_list_mode 
@@ -91,6 +91,7 @@ def _save_simple_list_internal(x: Union[dict, list], path: str, simple_list_mode
     for i, ex in enumerate(externals):
         alt_save_object(ex, os.path.join(path, str(i)), **kwargs)
     return
+
 
 @singledispatch
 def _save_simple_list_recursive(x: Any, externals: list, handle):
@@ -219,10 +220,11 @@ def _save_simple_list_recursive_float(x: float, externals: list, handle):
 def _save_simple_list_recursive_ndarray(x: np.ndarray, externals: list, handle):
     ndims = len(x.shape)
     if ndims == 0:
-        if not np.ma.is_masked(x) or not bool(x.mask):
-            return _save_simple_list_recursive(x.dtype.type(x), externals, handle)
+        x_scalar = x[()]
+        if not ut._is_actually_masked(x):
+            return _save_simple_list_recursive(x_scalar, externals, handle)
         else:
-            final_type = ut._determine_numpy_type(x.dtype.type(x))
+            final_type = ut._determine_save_type(x_scalar)
             if final_type == int:
                 if handle is None:
                     return { "type": "integer", "values": None }
@@ -245,19 +247,14 @@ def _save_simple_list_recursive_ndarray(x: np.ndarray, externals: list, handle):
                 raise NotImplementedError("no staging method for NumPy masked scalars of " + str(x.dtype))
 
     elif ndims == 1:
-        final_type = ut._determine_numpy_type(x)
-        if np.ma.is_masked(x):
+        final_type = ut._determine_save_type(x)
+        if ut._is_actually_masked(x):
             if final_type == int:
                 if handle is None:
                     return { "type": "integer", "values": [None if np.ma.is_masked(y) else int(y) for y in x] }
                 else:
-                    # If there's no valid missing placeholder, we just save it as floating-point.
-                    x, placeholder = ut._choose_missing_integer_placeholder(x)
-                    if placeholder is not None:
-                        _save_vector_hdf5(handle, x=x, dtype=int, missing_placeholder=placeholder)
-                    else:
-                        x, placeholder = ut._choose_missing_float_placeholder(x)
-                        _save_vector_hdf5(handle, x=x, dtype=float, missing_placeholder=placeholder)
+                    x, placeholder, final_type = ut._choose_missing_integer_placeholder(x)
+                    _save_vector_hdf5(handle, x=x, dtype=final_type, missing_placeholder=placeholder)
                     return
             elif final_type == float:
                 if handle is None:
@@ -300,6 +297,7 @@ def _save_simple_list_recursive_ndarray(x: np.ndarray, externals: list, handle):
     else:
         return _save_simple_list_recursive.registry[Any](x, externals, handle)
 
+
 @_save_simple_list_recursive.register
 def _save_simple_list_recursive_MaskedConstant(x: np.ma.core.MaskedConstant, externals: list, handle):
     if handle is None:
@@ -311,7 +309,7 @@ def _save_simple_list_recursive_MaskedConstant(x: np.ma.core.MaskedConstant, ext
 
 @_save_simple_list_recursive.register
 def _save_simple_list_recursive_numpy_generic(x: np.generic, externals: list, handle):
-    final_type = ut._determine_numpy_type(x)
+    final_type = ut._determine_save_type(x)
 
     if final_type == int:
         if handle is None:

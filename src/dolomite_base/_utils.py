@@ -1,6 +1,7 @@
 from numpy import ndarray
 import numpy
 from typing import Union, Sequence, Tuple
+from biocutils import StringList
 from . import lib_dolomite_base as lib
 
 
@@ -24,39 +25,7 @@ def _is_integer_vector_within_limit(x: Sequence[int]) -> bool:
     return True
 
 
-def _determine_list_type(x: list) -> Tuple:
-    all_types = set()
-    has_none = False
-    for y in x:
-        if isinstance(y, numpy.generic):
-            if numpy.issubdtype(y.dtype.type, numpy.integer):
-                all_types.add(int)
-            elif numpy.issubdtype(y.dtype.type, numpy.floating):
-                all_types.add(float)
-            else:
-                all_types.add(type(y))
-        elif _is_missing_scalar(y):
-            has_none = True
-        else:
-            all_types.add(type(y))
-
-    final_type = None
-    if len(all_types) == 1:
-        final_type = list(all_types)[0]
-        if final_type == int:
-            if not _is_integer_vector_within_limit(x):
-                final_type = float 
-        elif final_type != str and final_type != bool and final_type != float:
-            final_type = None
-    elif len(all_types) == 2 and int in all_types and float in all_types:
-        final_type = float
-    elif len(all_types) == 0: # if all None, this is the fallback.
-        final_type = str
-
-    return final_type, has_none
-
-
-def _determine_numpy_type(x: Union[numpy.ndarray, numpy.generic]):
+def _determine_save_type(x: Union[numpy.ndarray, numpy.generic]):
     dt = x.dtype.type
     if issubclass(dt, numpy.integer):
         okay = False
@@ -76,49 +45,48 @@ def _determine_numpy_type(x: Union[numpy.ndarray, numpy.generic]):
         raise NotImplementedError("saving a NumPy array of " + str(x.dtype) + " is not supported yet")
 
 
-def _funnel_to_mask(x, dtype) -> Tuple:
-    if isinstance(x, numpy.ma.MaskedArray):
-        copy = x.data.astype(dtype) # must be a copy, as we'll be mutating it.
-        mask = x.mask.astype(numpy.uint8) # use uint8 to avoid problems with ambiguous bool typing.
-    else:
-        copy = numpy.zeros(len(x), dtype=dtype)
-        mask = numpy.zeros(len(x), dtype=numpy.uint8)
-        for i, y in enumerate(x):
-            if _is_missing_scalar(y):
-                mask[i] = 1
-            else:
-                copy[i] = y
-
-    return copy, mask
+def _is_actually_masked(x: numpy.ndarray):
+    if not numpy.ma.is_masked(x):
+        return False
+    if isinstance(x.mask, bool):
+        return x.mask
+    if isinstance(x.mask, numpy.ndarray):
+        return x.mask.any()
+    return True
 
 
-def _choose_missing_integer_placeholder(x: Sequence) -> Tuple:
-    copy, mask = _funnel_to_mask(x, dtype=numpy.int32)
+def _choose_missing_integer_placeholder(x: numpy.ma.MaskedArray) -> Tuple:
+    copy = x.data.astype(numpy.int32) # make a copy as we'll be mutating it in C++.
+    mask = x.mask.astype(numpy.uint8) # use uint8 to avoid problems with ambiguous bool typing.
+
     okay, placeholder = lib.choose_missing_integer_placeholder(copy, mask)
     if okay:
-        return copy, placeholder
-    else:
-        return None, None
+        return copy, placeholder, int
+
+    # In the rare case that it's not okay, we just convert it to a float, which
+    # gives us some more room to save placeholders.
+    copy, placeholder = _choose_missing_float_placeholder(x)
+    return copy, placeholder, float
 
 
-def _choose_missing_float_placeholder(x: Sequence) -> Tuple:
-    copy, mask = _funnel_to_mask(x, dtype=numpy.float64)
+def _choose_missing_float_placeholder(x: numpy.ma.MaskedArray) -> Tuple:
+    copy = x.data.astype(numpy.float64) # make a copy as we'll be mutating it in C++.
+    mask = x.mask.astype(numpy.uint8) # use uint8 to avoid problems with ambiguous bool typing.
+
     okay, placeholder = lib.choose_missing_float_placeholder(copy, mask)
     if not okay:
         raise ValueError("failed to find an appropriate floating-point missing value placeholder")
     return copy, placeholder
 
 
-def _choose_missing_boolean_placeholder(x: Sequence) -> Tuple:
-    copy, mask = _funnel_to_mask(x, dtype=numpy.int8)
+def _choose_missing_boolean_placeholder(x: numpy.ma.MaskedArray) -> Tuple:
+    copy = x.data.astype(numpy.int8) 
     placeholder = numpy.int8(-1)
-    for i, m in enumerate(mask):
-        if m:
-            copy[i] = placeholder
+    copy[x.mask] = placeholder
     return copy, placeholder
 
 
-def _choose_missing_string_placeholder(x: Sequence) -> Tuple:
+def _choose_missing_string_placeholder(x: StringList) -> Tuple:
     present = set(x)
     placeholder = "NA"
     while placeholder in present:
@@ -130,18 +98,6 @@ def _choose_missing_string_placeholder(x: Sequence) -> Tuple:
             copy[j] = placeholder 
 
     return copy, placeholder
-
-
-def _is_gzip_compressed(meta, parent_name):
-    if parent_name in meta:
-        x = meta[parent_name]
-        if "compression" in x:
-            method = x["compression"]
-            if method == "gzip":
-                return True
-            elif method != "none":
-                raise NotImplementedError(method + " decompression is not yet supported for '" + parent_name + "'")
-    return False
 
 
 def _save_fixed_length_strings(handle, name: str, strings: list[str]):

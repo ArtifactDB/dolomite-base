@@ -56,7 +56,7 @@ def read_atomic_vector(path: str, metadata: dict, **kwargs) -> Union[StringList,
 
         if vectype == "boolean":
             output = output.astype(numpy.bool_)
-        elif vectype == "float":
+        elif vectype == "number":
             if not numpy.issubdtype(output.dtype, numpy.floating):
                 output = output.astype(numpy.double)
 
