@@ -235,18 +235,16 @@ def _save_simple_list_recursive_ndarray(x: np.ndarray, externals: list, handle):
                 else:
                     _save_scalar_hdf5(handle, x=np.NaN, dtype=float, missing_placeholder=np.NaN)
                     return
-            elif x.dtype == bool_:
+            elif final_type == bool:
                 if handle is None:
                     return { "type": "boolean", "values": None }
                 else:
                     _save_scalar_hdf5(handle, x=-1, dtype=bool, missing_placeholder=-1)
                     return
             else:
-                raise NotImplementedError("no staging method for 1D NumPy masked arrays of " + str(x.dtype))
+                raise NotImplementedError("no staging method for NumPy masked scalars of " + str(x.dtype))
 
-    elif ndims != 1:
-        return _save_simple_list_recursive.registry[Any](x, externals, handle)
-    else:
+    elif ndims == 1:
         final_type = ut._determine_numpy_type(x)
         if np.ma.is_masked(x):
             if final_type == int:
@@ -268,7 +266,7 @@ def _save_simple_list_recursive_ndarray(x: np.ndarray, externals: list, handle):
                     x, placeholder = ut._choose_missing_float_placeholder(x)
                     _save_vector_hdf5(handle, x=x, dtype=float, missing_placeholder=placeholder)
                     return
-            elif x.dtype == bool_:
+            elif final_type == bool:
                 if handle is None:
                     return { "type": "boolean", "values": [None if np.ma.is_masked(y) else bool(y) for y in x] }
                 else:
@@ -299,6 +297,8 @@ def _save_simple_list_recursive_ndarray(x: np.ndarray, externals: list, handle):
             else:
                 raise NotImplementedError("no staging method for 1D NumPy arrays of " + str(x.dtype))
 
+    else:
+        return _save_simple_list_recursive.registry[Any](x, externals, handle)
 
 @_save_simple_list_recursive.register
 def _save_simple_list_recursive_MaskedConstant(x: np.ma.core.MaskedConstant, externals: list, handle):
@@ -341,7 +341,7 @@ def _save_simple_list_recursive_factor(x: Factor, externals: list, handle):
         return { 
             "type": "factor",
             "values": [(None if y == -1 else int(y)) for y in x.get_codes()],
-            "levels": x.get_levels(),
+            "levels": x.get_levels().as_list(),
             "ordered": x.get_ordered(),
         }
 
@@ -351,9 +351,9 @@ def _save_simple_list_recursive_factor(x: Factor, externals: list, handle):
 
         dhandle = handle.create_dataset("data", data=x.get_codes(), dtype="i4", compression="gzip", chunks=True)
         if (x.get_codes() == -1).any():
-            dhandle.attrs["missing-value-placeholder"] = -1
+            dhandle.attrs.create("missing-value-placeholder", data=-1, dtype="i4")
 
-        ut._save_fixed_length_strings(handle, "levels", x.get_levels())
+        ut._save_fixed_length_strings(handle, "levels", x.get_levels().as_list())
         if x.get_ordered():
             handle.create_dataset("ordered", data=x.get_ordered(), dtype="i1")
         return
