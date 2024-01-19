@@ -30,7 +30,7 @@ def save_string_factor(x: Factor, path: str, **kwargs):
 
     with h5py.File(os.path.join(path, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("string_factor")
-        ut._save_fixed_length_strings(ghandle, "levels", x.get_levels())
+        ut.save_fixed_length_strings(ghandle, "levels", x.get_levels())
 
         codes = x.get_codes()
         is_missing = codes == -1
@@ -46,7 +46,7 @@ def save_string_factor(x: Factor, path: str, **kwargs):
 
         nms = x.get_names()
         if not nms is None:
-            ut._save_fixed_length_strings(ghandle, "names", nms)
+            ut.save_fixed_length_strings(ghandle, "names", nms.as_list())
 
         if x.get_ordered():
             ghandle.create_dataset("ordered", data=1, dtype="i8")

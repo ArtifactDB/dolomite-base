@@ -197,12 +197,74 @@ def _process_column_for_hdf5(x: Any, index: int, output: Hdf5ColumnOutput):
 def _process_list_column_for_hdf5(x: list, index: int, output: Hdf5ColumnOutput):
     if output.convert_list_to_vector:
         final_type, has_none = _determine_list_type(x)
-        if final_type is not None:
+
+        if final_type == str:
             placeholder = None
             if has_none:
-                x, placeholder, final_type = _convert_list_with_missingness(x, final_type)
-            _dump_column_to_hdf5(x, final_type, placeholder, index, output)
+                x, placeholder = ut.choose_missing_string_placeholder(x) 
+            dhandle = ut.save_fixed_length_strings(output.handle, str(index), x)
+            dhandle.attrs["type"] = "string"
+            dhandle.attrs["_python_original_type"] = "list"
+            if placeholder:
+                dhandle.attrs.create("missing-value-placeholder", data=placeholder)
+
             return
+
+        elif final_type == int:
+            if ut._is_integer_vector_within_limit(x):
+                placeholder = None
+                if has_none:
+                    x, mask = ut.list_to_numpy_mask(x, numpy.int32)
+                    x, placeholder = ut.choose_missing_integer_placeholder(x, mask, copy=False) 
+                dhandle = output.handle.create_dataset(str(index), data=x, dtype="i4", compression="gzip", chunks=True)
+                dhandle.attrs.create("type", data="integer")
+                dhandle.attrs["_python_original_type"] = "list"
+                if placeholder:
+                    dhandle.attrs.create("missing-value-placeholder", data=placeholder, dtype="i4")
+                return
+            else:
+                placeholder = None
+                if has_none:
+                    x, mask = ut.list_to_numpy_mask(x, numpy.float64)
+                    x, placeholder = ut.choose_missing_integer_placeholder(x, mask, copy=False) 
+                dhandle = output.handle.create_dataset(str(index), data=x, dtype="f8", compression="gzip", chunks=True)
+                dhandle.attrs.create("type", data="number")
+                dhandle.attrs["_python_original_type"] = "list"
+                if placeholder:
+                    dhandle.attrs.create("missing-value-placeholder", data=placeholder, dtype="f8")
+                return
+
+        elif final_type == float:
+            placeholder = None
+            if has_none:
+                x, mask = ut.list_to_numpy_mask(x, numpy.float64)
+                x, placeholder = ut.choose_missing_float_placeholder(x, mask, copy=False) 
+
+            dhandle = ut.save_fixed_length_strings(output.handle, str(index), x)
+            dhandle.attrs.create("type", data="integer")
+            dhandle.attrs["_python_original_type"] = "list"
+            if placeholder:
+                dhandle.attrs.create("missing-value-placeholder", data=placeholder)
+            return
+
+        elif final_type == bool:
+            placeholder = None
+            if has_none:
+                x, mask = ut.list_to_numpy_mask(x, numpy.float64)
+                x, placeholder = ut.choose_missing_float_placeholder(x, mask, copy=False) 
+
+            dhandle = ut.save_fixed_length_strings(output.handle, str(index), x)
+            dhandle.attrs.create("type", data="integer")
+            dhandle.attrs["_python_original_type"] = "list"
+            if placeholder:
+                dhandle.attrs.create("missing-value-placeholder", data=placeholder)
+            return
+
+
+
+
+
+
 
     _process_column_for_hdf5.registry[object](x, index, output)
 
@@ -211,8 +273,20 @@ def _process_list_column_for_hdf5(x: list, index: int, output: Hdf5ColumnOutput)
 def _process_StringList_column_for_hdf5(x: StringList, index: int, output: Hdf5ColumnOutput):
     placeholder = None
     if any(y is None for y in x):
+        x, placeholder = ut.choose_missing_string_placeholder(current)
+    dhandle = ut.save_fixed_length_strings(output.handle, str(index), x)
+    dhandle.attrs.create("type", data="string")
+    if placeholder:
+        dhandle.attrs.create("missing-value-placeholder", data=placeholder)
+
+
+@_process_column_for_hdf5.register
+def _process_StringList_column_for_hdf5(x: StringList, index: int, output: Hdf5ColumnOutput):
+    placeholder = None
+    if any(y is None for y in x):
         x, placeholder = ut._choose_missing_string_placeholder(current)
     _dump_column_to_hdf5(x, str, placeholder, index, output)
+
 
 
 @_process_column_for_hdf5.register
@@ -243,7 +317,3 @@ def _process_factor_column_for_hdf5(x: Factor, index: int, output: Hdf5ColumnOut
     dhandle = ghandle.create_dataset("codes", data=codes, dtype='u4', compression="gzip", chunks=True)
     if has_missing:
         dhandle.attrs.create("missing-value-placeholder", data=nlevels, dtype='u4')
-
-
-def _save_hdf5_data_frame(x: BiocFrame, path: str, convert_list_to_vector: bool) -> list:
-    return otherable

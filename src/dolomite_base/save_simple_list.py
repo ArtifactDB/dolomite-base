@@ -11,6 +11,7 @@ import h5py
 from .save_object import save_object, validate_saves
 from .alt_save_object import alt_save_object
 from . import _utils as ut
+from . import write_to_hdf5 as write
 
 
 @save_object.register
@@ -133,124 +134,79 @@ def _save_simple_list_recursive_Any(x: Any, externals: list, handle):
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_string_list(x: StringList, externals: list, handle):
+def _save_simple_list_recursive_StringList(x: StringList, externals: list, handle):
     nms = x.get_names()
-    x = x.as_list()
 
     if handle is None:
-        output = { "type": "string", "values": x }
+        output = { "type": "string", "values": x.as_list() }
         if nms is not None:
             output["names"] = nms.as_list()
         return output
-
-    has_none = any(y is None for y in x)
-    if has_none:
-        x, placeholder = ut.choose_missing_string_placeholder(x)
 
     handle.attrs["uzuki_object"] = "vector"
     handle.attrs["uzuki_type"] = "string"
-    dset = ut.save_fixed_length_strings(handle, "data", x)
-
-    if has_none:
-       dset.attrs["missing-value-placeholder"] = placeholder
+    write.write_StringList_to_hdf5(handle, "data", x)
     if nms is not None:
         ut.save_fixed_length_strings(handle, "names", nms.as_list())
     return
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_integer_list(x: IntegerList, externals: list, handle):
+def _save_simple_list_recursive_IntegerList(x: IntegerList, externals: list, handle):
     nms = x.get_names()
-    x = x.as_list()
-
-    final_type = "integer"
-    if not ut._is_integer_vector_within_limit(x):
-        final_type = "number"
 
     if handle is None:
-        output = { "type": final_type, "values": x }
+        final_type = "integer"
+        if not ut._is_integer_vector_within_limit(x):
+            final_type = "number"
+        output = { "type": final_type, "values": x.as_list() }
         if nms is not None:
             output["names"] = nms.as_list()
         return output
-
-    has_none = any(y is None for y in x)
-    if has_none:
-        x, mask = ut.list_to_numpy_with_mask(x, numpy.int32)
-        x, placeholder = ut.choose_missing_integer_placeholder(x, mask, copy=False)
-        if numpy.issubdtype(x.dtype, numpy.floating):
-            final_type = "number"
-    else:
-        if has_none:
-            x, mask = ut.list_to_numpy_with_mask(x, numpy.float64)
-            placeholder = numpy.NaN
-            x[mask] = placeholder
-
-    if final_type == "number":
-        dtype = "f8"
-    else:
-        dtype = "i4"
 
     handle.attrs["uzuki_object"] = "vector"
-    handle.attrs["uzuki_type"] = final_type
-    dset = handle.create_dataset("data", data=x, dtype=dtype, compression="gzip", chunks=True)
-
-    if has_none:
-       dset.attrs["missing-value-placeholder"] = placeholder
+    dset = write.write_IntegerList_to_hdf5(handle, "data", x)
+    if np.issubdtype(dset, np.floating):
+        handle.attrs["uzuki_type"] = "number"
+    else:
+        handle.attrs["uzuki_type"] = "integer"
     if nms is not None:
         ut.save_fixed_length_strings(handle, "names", nms.as_list())
     return
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_float_list(x: FloatList, externals: list, handle):
+def _save_simple_list_recursive_FloatList(x: FloatList, externals: list, handle):
     nms = x.get_names()
-    x = x.as_list()
 
     if handle is None:
-        x = [ _sanitize_masked_float_json(y) for y in x ]
-        output = { "type": "number", "values": x }
+        xcopy = [ _sanitize_masked_float_json(y) for y in x.as_list() ]
+        output = { "type": "number", "values": xcopy }
         if nms is not None:
             output["names"] = nms.as_list()
         return output
-
-    has_none = any(y is None for y in x)
-    if has_none:
-        x, mask = ut.list_to_numpy_with_mask(x, numpy.float64)
-        x, placeholder = ut.choose_missing_float_placeholder(x, mask, copy=False)
 
     handle.attrs["uzuki_object"] = "vector"
     handle.attrs["uzuki_type"] = "number"
-    dset = handle.create_dataset("data", data=x, dtype="f8", compression="gzip", chunks=True)
-
-    if has_none:
-       dset.attrs["missing-value-placeholder"] = placeholder
+    write.write_FloatList_to_hdf5(handle, "data", x)
     if nms is not None:
         ut.save_fixed_length_strings(handle, "names", nms.as_list())
     return
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_boolean_list(x: BooleanList, externals: list, handle):
+def _save_simple_list_recursive_BooleanList(x: BooleanList, externals: list, handle):
     nms = x.get_names()
-    x = x.as_list()
 
     if handle is None:
-        output = { "type": "boolean", "values": x }
+        output = { "type": "boolean", "values": x.as_list() }
         if nms is not None:
             output["names"] = nms.as_list()
         return output
 
-    has_none = any(y is None for y in x)
-    if has_none:
-        x, mask = ut.list_to_numpy_with_mask(x, numpy.int8, mask_dtype=numpy.bool_)
-        x, placeholder = ut.choose_missing_boolean_placeholder(x, mask, copy=False)
-
     handle.attrs["uzuki_object"] = "vector"
     handle.attrs["uzuki_type"] = "boolean"
-    dset = handle.create_dataset("data", data=x, dtype="i1", compression="gzip", chunks=True)
-
-    if has_none:
-       dset.attrs["missing-value-placeholder"] = placeholder
+    write.write_BooleanList_to_hdf5(handle, "data", x)
     if nms is not None:
         ut.save_fixed_length_strings(handle, "names", nms.as_list())
     return
