@@ -145,7 +145,7 @@ def _save_simple_list_recursive_StringList(x: StringList, externals: list, handl
 
     handle.attrs["uzuki_object"] = "vector"
     handle.attrs["uzuki_type"] = "string"
-    write.write_StringList_to_hdf5(handle, "data", x)
+    write.write_string_list_to_hdf5(handle, "data", x.as_list())
     if nms is not None:
         ut.save_fixed_length_strings(handle, "names", nms.as_list())
     return
@@ -157,7 +157,7 @@ def _save_simple_list_recursive_IntegerList(x: IntegerList, externals: list, han
 
     if handle is None:
         final_type = "integer"
-        if not ut._is_integer_vector_within_limit(x):
+        if ut.sequence_exceeds_int32(x):
             final_type = "number"
         output = { "type": final_type, "values": x.as_list() }
         if nms is not None:
@@ -165,7 +165,7 @@ def _save_simple_list_recursive_IntegerList(x: IntegerList, externals: list, han
         return output
 
     handle.attrs["uzuki_object"] = "vector"
-    dset = write.write_IntegerList_to_hdf5(handle, "data", x)
+    dset = write.write_integer_list_to_hdf5(handle, "data", x.as_list())
     if np.issubdtype(dset, np.floating):
         handle.attrs["uzuki_type"] = "number"
     else:
@@ -188,7 +188,7 @@ def _save_simple_list_recursive_FloatList(x: FloatList, externals: list, handle)
 
     handle.attrs["uzuki_object"] = "vector"
     handle.attrs["uzuki_type"] = "number"
-    write.write_FloatList_to_hdf5(handle, "data", x)
+    write.write_float_list_to_hdf5(handle, "data", x.as_list())
     if nms is not None:
         ut.save_fixed_length_strings(handle, "names", nms.as_list())
     return
@@ -206,7 +206,7 @@ def _save_simple_list_recursive_BooleanList(x: BooleanList, externals: list, han
 
     handle.attrs["uzuki_object"] = "vector"
     handle.attrs["uzuki_type"] = "boolean"
-    write.write_BooleanList_to_hdf5(handle, "data", x)
+    write.write_boolean_list_to_hdf5(handle, "data", x.as_list())
     if nms is not None:
         ut.save_fixed_length_strings(handle, "names", nms.as_list())
     return
@@ -287,7 +287,7 @@ def _save_simple_list_recursive_bool(x: bool, externals: list, handle):
 
 @_save_simple_list_recursive.register
 def _save_simple_list_recursive_int(x: int, externals: list, handle):
-    if ut._is_integer_scalar_within_limit(x):
+    if not ut.scalar_exceeds_int32(x):
         if handle is None:
             return { "type": "integer", "values": int(x) }
         else:
@@ -338,7 +338,16 @@ def _save_simple_list_recursive_MaskedConstant(x: np.ndarray, externals: list, h
 
 @_save_simple_list_recursive.register
 def _save_simple_list_recursive_numpy_generic(x: np.generic, externals: list, handle):
-    final_type = ut._determine_save_type(x)
+    final_type = None
+    if np.issubdtype(x.dtype, np.integer):
+        if not ut.scalar_exceeds_int32(x):
+            final_type = int
+        else:
+            final_type = float
+    elif np.issubdtype(x.dtype, np.floating):
+        final_type = float
+    elif x.dtype == np.bool_:
+        final_type = bool
 
     if final_type == int:
         if handle is None:
@@ -417,7 +426,7 @@ def _sanitize_float_json(x):
 
 
 def _sanitize_masked_float_json(x):
-    if ut._is_missing_scalar(x):
+    if x is None:
         return None
     return _sanitize_float_json(x)
 
