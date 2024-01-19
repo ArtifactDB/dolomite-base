@@ -99,7 +99,7 @@ def read_data_frame(path: str, metadata: dict, **kwargs) -> BiocFrame:
 
     other_dir = os.path.join(path, "other_annotations")
     if os.path.exists(other_dir):
-        df.set_metadata(alt_read_object(other_dir, **kwargs), in_place=True)
+        df.set_metadata(alt_read_object(other_dir, **kwargs).as_dict(), in_place=True)
 
     mcol_dir = os.path.join(path, "column_annotations")
     if os.path.exists(mcol_dir):

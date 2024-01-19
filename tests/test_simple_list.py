@@ -2,7 +2,7 @@ import dolomite_base as dl
 import numpy as np
 from tempfile import mkdtemp
 from biocframe import BiocFrame
-from biocutils import Factor, StringList
+from biocutils import Factor, StringList, NamedList
 import os
 
 
@@ -24,15 +24,16 @@ def test_simple_list_basic():
 
     # Stage as JSON.
     dir = os.path.join(mkdtemp(), "json")
-    dl.save_object(everything, dir)
+    dl.save_object(everything, dir, simple_list_mode="json")
     assert os.path.exists(os.path.join(dir, "list_contents.json.gz"))
 
-    roundtrip = dl.read_object(dir, simple_list_mode="json")
+    roundtrip = dl.read_object(dir)
+    assert isinstance(roundtrip, NamedList)
     assert everything["i_am_a_string"] == roundtrip["i_am_a_string"]
     assert everything["i_am_a_number"] == roundtrip["i_am_a_number"]
     assert everything["i_am_a_integer"] == roundtrip["i_am_a_integer"]
     assert everything["i_am_a_boolean"] == roundtrip["i_am_a_boolean"]
-    assert everything["i_am_a_list"] == roundtrip["i_am_a_list"]
+    assert everything["i_am_a_list"] == roundtrip["i_am_a_list"].as_list()
     assert everything["i_am_nothing"] == roundtrip["i_am_nothing"]
 
     assert everything["i_am_a_dict"]["string"] == roundtrip["i_am_a_dict"]["string"]
@@ -46,11 +47,12 @@ def test_simple_list_basic():
     assert os.path.exists(os.path.join(dir, "list_contents.h5"))
 
     roundtrip = dl.read_object(dir)
+    assert isinstance(roundtrip, NamedList)
     assert everything["i_am_a_string"] == roundtrip["i_am_a_string"]
     assert everything["i_am_a_number"] == roundtrip["i_am_a_number"]
     assert everything["i_am_a_integer"] == roundtrip["i_am_a_integer"]
     assert everything["i_am_a_boolean"] == roundtrip["i_am_a_boolean"]
-    assert everything["i_am_a_list"] == roundtrip["i_am_a_list"]
+    assert everything["i_am_a_list"] == roundtrip["i_am_a_list"].as_list()
     assert everything["i_am_nothing"] == roundtrip["i_am_nothing"]
 
     assert everything["i_am_a_dict"]["string"] == roundtrip["i_am_a_dict"]["string"]
@@ -60,9 +62,57 @@ def test_simple_list_basic():
     assert (everything["i_am_a_dict"]["bool"] == roundtrip["i_am_a_dict"]["bool"]).all()
 
 
+def test_simple_list_unnamed():
+    everything = [ "foo", 1, 2, False, None ]
+
+    # Stage as JSON.
+    dir = os.path.join(mkdtemp(), "json")
+    dl.save_object(everything, dir, simple_list_mode="json")
+
+    roundtrip = dl.read_object(dir)
+    assert isinstance(roundtrip, NamedList)
+    assert roundtrip.get_names() is None
+    assert roundtrip.as_list() == everything
+
+    # Stage as HDF5.
+    dir = os.path.join(mkdtemp(), "hdf5 ")
+    dl.save_object(everything, dir, simple_list_mode="hdf5")
+
+    roundtrip = dl.read_object(dir)
+    assert isinstance(roundtrip, NamedList)
+    assert roundtrip.get_names() is None
+    assert roundtrip.as_list() == everything
+
+
+def test_simple_list_NamedList():
+    everything = NamedList([NamedList([ "foo", 1, 2, False, None ]), "FOO"], names=["A", ""])
+
+    # Stage as JSON.
+    dir = os.path.join(mkdtemp(), "json")
+    dl.save_object(everything, dir, simple_list_mode="json")
+
+    roundtrip = dl.read_object(dir)
+    assert isinstance(roundtrip, NamedList)
+    assert roundtrip.get_names().as_list() == ["A", ""]
+    assert roundtrip[""] == "FOO"
+    assert isinstance(roundtrip["A"], NamedList)
+    assert roundtrip["A"] == everything["A"]
+
+    # Stage as HDF5.
+    dir = os.path.join(mkdtemp(), "hdf5 ")
+    dl.save_object(everything, dir, simple_list_mode="hdf5")
+
+    roundtrip = dl.read_object(dir)
+    assert isinstance(roundtrip, NamedList)
+    assert roundtrip.get_names().as_list() == ["A", ""]
+    assert roundtrip[""] == "FOO"
+    assert isinstance(roundtrip["A"], NamedList)
+    assert roundtrip["A"] == everything["A"]
+
+
 def test_simple_list_masking():
     everything = {
-        "string": [ None, "b", "c", "d" "e" ],
+        "string": StringList([ None, "b", "c", "d" "e" ]),
         "float": np.ma.array(np.random.rand(5), mask=np.array([False, True, False, False, False])),
         "int": np.ma.array((np.random.rand(5) * 10).astype(np.int32), mask=np.array([False, False, True, False, False])),
         "bool": np.ma.array(np.random.rand(5) > 0.5, mask=np.array([False, False, False, True, False]))

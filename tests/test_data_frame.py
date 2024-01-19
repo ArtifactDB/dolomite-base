@@ -55,10 +55,10 @@ def test_data_frame_external_list():
 
     roundtrip = dl.read_object(dir)
     assert isinstance(roundtrip, BiocFrame)
-    assert roundtrip.get_column("akari") == df.get_column("akari")
-    assert roundtrip.get_column("aika") == df.get_column("aika")
-    assert roundtrip.get_column("alice") == df.get_column("alice")
-    assert roundtrip.get_column("ai") == df.get_column("ai")
+    assert roundtrip.get_column("akari").as_list() == df.get_column("akari")
+    assert roundtrip.get_column("aika").as_list() == df.get_column("aika")
+    assert roundtrip.get_column("alice").as_list() == df.get_column("alice")
+    assert roundtrip.get_column("ai").as_list() == df.get_column("ai")
 
 
 def test_data_frame_factor():
@@ -141,7 +141,7 @@ def test_data_frame_none():
     compare_masked_to_list(df.get_column("ai"), roundtrip.get_column("ai"))
     assert roundtrip.get_column("ai").dtype.type == np.float64
 
-    assert roundtrip.get_column("aria") == df.get_column("aria")
+    assert roundtrip.get_column("aria").as_list() == df.get_column("aria")
 
     assert roundtrip.get_column("akira").as_list() == df.get_column("akira")
     assert isinstance(roundtrip.get_column("akira"), StringList)
@@ -300,14 +300,6 @@ def test_data_frame_nested():
     assert bsb_df.get_column("last").as_list() == df.get_column("bsb").get_column("last")
 
 
-def test_data_frame_dict_to_list():
-    df = BiocFrame({"weird_dict": { "A": 1, "B": 2 } })
-    dir = os.path.join(mkdtemp(), "foo")
-    dl.save_object(df, dir)
-    roundtrip = dl.read_object(dir)
-    assert roundtrip.get_column("weird_dict") == [1,2]
-
-
 def test_data_frame_metadata():
     df = BiocFrame(
         { "foo": [ 1, 3, 5, 7, 9 ] },
@@ -318,6 +310,7 @@ def test_data_frame_metadata():
     dir = os.path.join(mkdtemp(), "foo")
     dl.save_object(df, dir)
     roundtrip = dl.read_object(dir)
+    roundtrip.metadata["b"] = roundtrip.metadata["b"].as_list()
     assert df.metadata == roundtrip.metadata
     assert roundtrip.get_column_data().get_column("args") == [ 99 ]
     assert isinstance(roundtrip, BiocFrame)

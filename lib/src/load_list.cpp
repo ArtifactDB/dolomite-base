@@ -203,20 +203,18 @@ struct PythonList : public uzuki2::List, public PythonBase {
     }
 
     pybind11::object extract() const {
+        pybind11::module bu = pybind11::module::import("biocutils");
         if (!has_names) {
-            return values;
+            return bu.attr("NamedList")(values);
         } else {
-            pybind11::dict output;
-            for (size_t i = 0, end = names.size(); i < end; ++i) {
-                output[names[i].c_str()] = values[i];
-            }
-            return output;
+            using namespace pybind11::literals;
+            return bu.attr("NamedList")(values, "names"_a = names);
         }
     }
 
     pybind11::list values;
     bool has_names = false;
-    std::vector<std::string> names;
+    pybind11::list names;
 };
 
 /** Provisioner. **/

@@ -19,7 +19,7 @@ from .save_object import save_object
 from .validate_object import validate_object
 from .save_string_list import save_string_list
 from .save_string_factor import save_string_factor
-from .save_simple_list import save_simple_list, save_simple_dict
+from .save_simple_list import save_simple_list_from_list, save_simple_list_from_dict, save_simple_list_from_NamedList
 from .save_data_frame import save_data_frame
 from .read_atomic_vector import read_atomic_vector
 from .read_string_factor import read_string_factor

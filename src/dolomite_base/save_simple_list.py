@@ -2,7 +2,7 @@ from typing import Any, Union, Literal
 import numpy as np
 import warnings
 from functools import singledispatch
-from biocutils import Factor, StringList
+from biocutils import Factor, StringList, NamedList
 import os
 import json
 import gzip
@@ -15,7 +15,7 @@ from . import _utils as ut
 
 @save_object.register
 @validate_saves
-def save_simple_dict(x: dict, path: str, simple_list_mode: Literal["hdf5", "json"] = "json", **kwargs):
+def save_simple_list_from_dict(x: dict, path: str, simple_list_mode: Literal["hdf5", "json"] = "json", **kwargs):
     """Method for saving dictionaries (Python analogues to R-style named lists)
     to the corresponding file representations, see
     :py:meth:`~dolomite_base.save_object.save_object` for details.
@@ -38,7 +38,7 @@ def save_simple_dict(x: dict, path: str, simple_list_mode: Literal["hdf5", "json
 
 @save_object.register
 @validate_saves
-def save_simple_list(x: list, path: str, simple_list_mode: Literal["hdf5", "json"] = "json", **kwargs):
+def save_simple_list_from_list(x: list, path: str, simple_list_mode: Literal["hdf5", "json"] = "json", **kwargs):
     """Method for saving lists (Python analogues to R-style unnamed lists) to
     the corresponding file representations, see
     :py:meth:`~dolomite_base.save_object.save_object` for details.
@@ -59,10 +59,32 @@ def save_simple_list(x: list, path: str, simple_list_mode: Literal["hdf5", "json
     return
 
 
+@save_object.register
+@validate_saves
+def save_simple_list_from_NamedList(x: NamedList, path: str, simple_list_mode: Literal["hdf5", "json"] = "json", **kwargs):
+    """Method for saving a NamedList to its corresponding file representation,
+    see :py:meth:`~dolomite_base.save_object.save_object` for details.
+
+    Args:
+        x: Object to be saved.
+
+        path: Path to a directory in which to save the object.
+
+        simple_list_mode: Whether to save in HDF5 or JSON mode.
+
+        kwargs: Further arguments, ignored.
+
+    Returns:
+        `x` is saved to `path`.
+    """
+    _save_simple_list_internal(x, path, simple_list_mode, **kwargs)
+    return
+
+
 ##########################################################################
 
 
-def _save_simple_list_internal(x: Union[dict, list], path: str, simple_list_mode: Literal["hdf5", "json"] = None, **kwargs):
+def _save_simple_list_internal(x: Union[dict, list, NamedList], path: str, simple_list_mode: Literal["hdf5", "json"] = None, **kwargs):
     os.mkdir(path)
     with open(os.path.join(path, "OBJECT"), 'w', encoding="utf-8") as handle:
         format2 = simple_list_mode 
@@ -171,7 +193,28 @@ def _save_simple_list_recursive_dict(x: dict, externals: list, handle):
             if not isinstance(k, str):
                 warn("converting non-string key with value " + str(k) + " to a string", UserWarning)
             names.append(str(k))
-        handle.create_dataset("names", data=names, compression="gzip", chunks=True)
+        ut._save_fixed_length_strings(handle, "names", names)
+        return
+
+
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_NamedList(x: NamedList, externals: list, handle):
+    if x.get_names() is None:
+        return _save_simple_list_recursive_list(x.as_list(), externals, handle)
+
+    if handle is None:
+        vals = []
+        collected = { "type": "list", "values": vals, "names": x.get_names().as_list() }
+        for v in x.as_list():
+            vals.append(_save_simple_list_recursive(v, externals, None))
+        return collected
+    else:
+        handle.attrs["uzuki_object"] = "list"
+        dhandle = handle.create_group("data")
+        for i, v in enumerate(x.as_list()):
+            ghandle = dhandle.create_group(str(i))
+            _save_simple_list_recursive(v, externals, ghandle)
+        ut._save_fixed_length_strings(handle, "names", x.get_names().as_list())
         return
 
 
