@@ -23,12 +23,11 @@ struct PythonNumpyVector : public Base, public PythonBase {
     }
 
     void set(size_t i, T val) {
-        storage.mutable_at(i) = val;
+        storage[i] = val;
     }
 
     void set_missing(size_t i) {
-        storage.mutable_at(i) = 0;
-        missing.push_back(i);
+        storage[i] = pybind11::none();
     }
 
     void set_name(size_t i, std::string n) {
@@ -38,53 +37,32 @@ struct PythonNumpyVector : public Base, public PythonBase {
     pybind11::object extract() const {
         if (names.empty()) {
             if (is_scalar) {
-                pybind11::module np = pybind11::module::import("numpy");
-                if (!missing.empty()) {
-                    pybind11::module ma = np.attr("ma");
-                    return ma.attr("masked");
-                } else {
-                    return pybind11::cast(storage.at(0));
-                }
-
+                return storage[0];
             } else {
-                if (missing.empty()) {
-                    return storage;
+                pybind11::module bu = pybind11::module::import("biocutils");
+                if constexpr(std::is_same<T, int32_t>::value) {
+                    return bu.attr("IntegerList")(storage);
+                } else if constexpr(std::is_same<T, bool>::value) {
+                    return bu.attr("BooleanList")(storage);
                 } else {
-                    return mask_numpy_array(storage, missing);
+                    return bu.attr("FloatList")(storage);
                 }
             }
-
         } else {
-            // Numpy arrays don't have direct support for names, so we
-            // just convert it into a dict.
-            pybind11::dict output;
-            pybind11::module np = pybind11::module::import("numpy");
-
-            if (missing.empty()) {
-                for (size_t i = 0, end = storage.size(); i < end; ++i) {
-                    output[names[i].c_str()] = pybind11::cast(storage.at(i));
-                }
+            pybind11::module bu = pybind11::module::import("biocutils");
+            using namespace pybind11::literals;
+            if constexpr(std::is_same<T, int32_t>::value) {
+                return bu.attr("IntegerList")(storage, "names"_a = names);
+            } else if constexpr(std::is_same<T, bool>::value) {
+                return bu.attr("BooleanList")(storage, "names"_a = names);
             } else {
-                std::unordered_set<size_t> all_missing(missing.begin(), missing.end());
-                pybind11::module ma = np.attr("ma");
-                pybind11::object masked = ma.attr("masked");
-
-                for (size_t i = 0, end = storage.size(); i < end; ++i) {
-                    if (all_missing.find(i) == all_missing.end()) {
-                        output[names[i].c_str()] = pybind11::cast(storage.at(i));
-                    } else {
-                        output[names[i].c_str()] = masked;
-                    }
-                }
+                return bu.attr("FloatList")(storage, "names"_a = names);
             }
-
-            return output;
         }
     }
 
-    pybind11::array_t<T> storage;
-    std::vector<std::string> names;
-    std::vector<size_t> missing;
+    pybind11::list storage;
+    pybind11::list names;
     bool is_scalar;
 };
 

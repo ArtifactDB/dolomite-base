@@ -42,7 +42,7 @@ def save_atomic_vector_from_string_list(x: StringList, path: str, **kwargs):
         if has_none:
            dset.attrs["missing-value-placeholder"] = placeholder
         if not nms is None:
-            ut.save_fixed_length_strings(ghandle, "names", nms)
+            ut.save_fixed_length_strings(ghandle, "names", nms.as_list())
 
     return
 
@@ -101,7 +101,7 @@ def save_atomic_vector_from_integer_list(x: IntegerList, path: str, **kwargs):
         if has_none:
            dset.attrs.create("missing-value-placeholder", placeholder, dtype=dtype)
         if not nms is None:
-            ut.save_fixed_length_strings(ghandle, "names", nms)
+            ut.save_fixed_length_strings(ghandle, "names", nms.as_list())
         if final_type == float:
             dset.attrs.create("_python_original_type", "biocutils.IntegerList")
 
@@ -145,7 +145,7 @@ def save_atomic_vector_from_float_list(x: FloatList, path: str, **kwargs):
         if has_none:
            dset.attrs.create("missing-value-placeholder", placeholder, dtype="f8")
         if not nms is None:
-            ut.save_fixed_length_strings(ghandle, "names", nms)
+            ut.save_fixed_length_strings(ghandle, "names", nms.as_list())
 
     return
 
@@ -187,6 +187,6 @@ def save_atomic_vector_from_boolean_list(x: BooleanList, path: str, **kwargs):
         if has_none:
            dset.attrs.create("missing-value-placeholder", placeholder, dtype="i1")
         if not nms is None:
-            ut.save_fixed_length_strings(ghandle, "names", nms)
+            ut.save_fixed_length_strings(ghandle, "names", nms.as_list())
 
     return

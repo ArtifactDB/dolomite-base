@@ -2,7 +2,7 @@ from typing import Any, Union, Literal
 import numpy as np
 import warnings
 from functools import singledispatch
-from biocutils import Factor, StringList, NamedList
+from biocutils import Factor, StringList, NamedList, IntegerList, BooleanList, FloatList
 import os
 import json
 import gzip
@@ -119,6 +119,10 @@ def _save_simple_list_internal(x: Union[dict, list, NamedList], path: str, simpl
 
 @singledispatch
 def _save_simple_list_recursive(x: Any, externals: list, handle):
+    _save_simple_list_recursive_Any(x, externals, handle)
+
+
+def _save_simple_list_recursive_Any(x: Any, externals: list, handle):
     externals.append(x)
     if handle is None:
         return { "type": "external", "index": len(externals) - 1 }
@@ -129,28 +133,126 @@ def _save_simple_list_recursive(x: Any, externals: list, handle):
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_stringlist(x: StringList, externals: list, handle):
+def _save_simple_list_recursive_string_list(x: StringList, externals: list, handle):
     nms = x.get_names()
+    x = x.as_list()
 
     if handle is None:
-        output = { "type": "string", "values": x.as_list() }
+        output = { "type": "string", "values": x }
         if nms is not None:
             output["names"] = nms.as_list()
         return output
 
     has_none = any(y is None for y in x)
     if has_none:
-        x, placeholder = ut._choose_missing_string_placeholder(x)
+        x, placeholder = ut.choose_missing_string_placeholder(x)
 
     handle.attrs["uzuki_object"] = "vector"
     handle.attrs["uzuki_type"] = "string"
-    dset = ut._save_fixed_length_strings(handle, "data", x)
+    dset = ut.save_fixed_length_strings(handle, "data", x)
 
     if has_none:
        dset.attrs["missing-value-placeholder"] = placeholder
     if nms is not None:
-        ut._save_fixed_length_strings(handle, "names", nms.as_list())
+        ut.save_fixed_length_strings(handle, "names", nms.as_list())
+    return
 
+
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_integer_list(x: IntegerList, externals: list, handle):
+    nms = x.get_names()
+    x = x.as_list()
+
+    final_type = "integer"
+    if not ut._is_integer_vector_within_limit(x):
+        final_type = "number"
+
+    if handle is None:
+        output = { "type": final_type, "values": x }
+        if nms is not None:
+            output["names"] = nms.as_list()
+        return output
+
+    has_none = any(y is None for y in x)
+    if has_none:
+        x, mask = ut.list_to_numpy_with_mask(x, numpy.int32)
+        x, placeholder = ut.choose_missing_integer_placeholder(x, mask, copy=False)
+        if numpy.issubdtype(x.dtype, numpy.floating):
+            final_type = "number"
+    else:
+        if has_none:
+            x, mask = ut.list_to_numpy_with_mask(x, numpy.float64)
+            placeholder = numpy.NaN
+            x[mask] = placeholder
+
+    if final_type == "number":
+        dtype = "f8"
+    else:
+        dtype = "i4"
+
+    handle.attrs["uzuki_object"] = "vector"
+    handle.attrs["uzuki_type"] = final_type
+    dset = handle.create_dataset("data", data=x, dtype=dtype, compression="gzip", chunks=True)
+
+    if has_none:
+       dset.attrs["missing-value-placeholder"] = placeholder
+    if nms is not None:
+        ut.save_fixed_length_strings(handle, "names", nms.as_list())
+    return
+
+
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_float_list(x: FloatList, externals: list, handle):
+    nms = x.get_names()
+    x = x.as_list()
+
+    if handle is None:
+        x = [ _sanitize_masked_float_json(y) for y in x ]
+        output = { "type": "number", "values": x }
+        if nms is not None:
+            output["names"] = nms.as_list()
+        return output
+
+    has_none = any(y is None for y in x)
+    if has_none:
+        x, mask = ut.list_to_numpy_with_mask(x, numpy.float64)
+        x, placeholder = ut.choose_missing_float_placeholder(x, mask, copy=False)
+
+    handle.attrs["uzuki_object"] = "vector"
+    handle.attrs["uzuki_type"] = "number"
+    dset = handle.create_dataset("data", data=x, dtype="f8", compression="gzip", chunks=True)
+
+    if has_none:
+       dset.attrs["missing-value-placeholder"] = placeholder
+    if nms is not None:
+        ut.save_fixed_length_strings(handle, "names", nms.as_list())
+    return
+
+
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_boolean_list(x: BooleanList, externals: list, handle):
+    nms = x.get_names()
+    x = x.as_list()
+
+    if handle is None:
+        output = { "type": "boolean", "values": x }
+        if nms is not None:
+            output["names"] = nms.as_list()
+        return output
+
+    has_none = any(y is None for y in x)
+    if has_none:
+        x, mask = ut.list_to_numpy_with_mask(x, numpy.int8, mask_dtype=numpy.bool_)
+        x, placeholder = ut.choose_missing_boolean_placeholder(x, mask, copy=False)
+
+    handle.attrs["uzuki_object"] = "vector"
+    handle.attrs["uzuki_type"] = "boolean"
+    dset = handle.create_dataset("data", data=x, dtype="i1", compression="gzip", chunks=True)
+
+    if has_none:
+       dset.attrs["missing-value-placeholder"] = placeholder
+    if nms is not None:
+        ut.save_fixed_length_strings(handle, "names", nms.as_list())
     return
 
 
@@ -193,7 +295,7 @@ def _save_simple_list_recursive_dict(x: dict, externals: list, handle):
             if not isinstance(k, str):
                 warn("converting non-string key with value " + str(k) + " to a string", UserWarning)
             names.append(str(k))
-        ut._save_fixed_length_strings(handle, "names", names)
+        ut.save_fixed_length_strings(handle, "names", names)
         return
 
 
@@ -214,7 +316,7 @@ def _save_simple_list_recursive_NamedList(x: NamedList, externals: list, handle)
         for i, v in enumerate(x.as_list()):
             ghandle = dhandle.create_group(str(i))
             _save_simple_list_recursive(v, externals, ghandle)
-        ut._save_fixed_length_strings(handle, "names", x.get_names().as_list())
+        ut.save_fixed_length_strings(handle, "names", x.get_names().as_list())
         return
 
 
@@ -262,94 +364,20 @@ def _save_simple_list_recursive_float(x: float, externals: list, handle):
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_ndarray(x: np.ndarray, externals: list, handle):
-    ndims = len(x.shape)
-    if ndims == 0:
-        x_scalar = x[()]
-        if not ut._is_actually_masked(x):
-            return _save_simple_list_recursive(x_scalar, externals, handle)
-        else:
-            final_type = ut._determine_save_type(x_scalar)
-            if final_type == int:
-                if handle is None:
-                    return { "type": "integer", "values": None }
-                else:
-                    _save_scalar_hdf5(handle, x=-ut.LIMIT32, dtype=int, missing_placeholder=-ut.LIMIT32)
-                    return
-            elif final_type == float:
-                if handle is None:
-                    return { "type": "number", "values": None }
-                else:
-                    _save_scalar_hdf5(handle, x=np.NaN, dtype=float, missing_placeholder=np.NaN)
-                    return
-            elif final_type == bool:
-                if handle is None:
-                    return { "type": "boolean", "values": None }
-                else:
-                    _save_scalar_hdf5(handle, x=-1, dtype=bool, missing_placeholder=-1)
-                    return
-            else:
-                raise NotImplementedError("no staging method for NumPy masked scalars of " + str(x.dtype))
-
-    elif ndims == 1:
-        final_type = ut._determine_save_type(x)
-        if ut._is_actually_masked(x):
-            if final_type == int:
-                if handle is None:
-                    return { "type": "integer", "values": [None if np.ma.is_masked(y) else int(y) for y in x] }
-                else:
-                    x, placeholder, final_type = ut._choose_missing_integer_placeholder(x)
-                    _save_vector_hdf5(handle, x=x, dtype=final_type, missing_placeholder=placeholder)
-                    return
-            elif final_type == float:
-                if handle is None:
-                    return { "type": "number", "values": [_sanitize_masked_float_json(y) for y in x] }
-                else:
-                    x, placeholder = ut._choose_missing_float_placeholder(x)
-                    _save_vector_hdf5(handle, x=x, dtype=float, missing_placeholder=placeholder)
-                    return
-            elif final_type == bool:
-                if handle is None:
-                    return { "type": "boolean", "values": [None if np.ma.is_masked(y) else bool(y) for y in x] }
-                else:
-                    x, placeholder = ut._choose_missing_boolean_placeholder(x)
-                    _save_vector_hdf5(handle, x=x, dtype=bool, missing_placeholder=placeholder)
-                    return
-            else:
-                raise NotImplementedError("no staging method for 1D NumPy masked arrays of " + str(x.dtype))
-        else:
-            if final_type == int:
-                if handle is None:
-                    return { "type": "integer", "values": [int(y) for y in x] }
-                else:
-                    _save_vector_hdf5(handle, x=x, dtype=int)
-                    return
-            elif final_type == float:
-                if handle is None:
-                    return { "type": "number", "values": [_sanitize_float_json(y) for y in x] }
-                else:
-                    _save_vector_hdf5(handle, x=x, dtype=float)
-                    return
-            elif final_type == bool:
-                if handle is None:
-                    return { "type": "boolean", "values": [bool(y) for y in x] }
-                else:
-                    _save_vector_hdf5(handle, x=x, dtype=bool)
-                    return
-            else:
-                raise NotImplementedError("no staging method for 1D NumPy arrays of " + str(x.dtype))
-
-    else:
-        return _save_simple_list_recursive.registry[Any](x, externals, handle)
-
-
-@_save_simple_list_recursive.register
 def _save_simple_list_recursive_MaskedConstant(x: np.ma.core.MaskedConstant, externals: list, handle):
     if handle is None:
-        return { "type": "number", "values": [None]}
+        return { "type": "number", "values": None}
     else:
         _save_scalar_hdf5(handle, x=np.NaN, dtype=float, missing_placeholder=np.NaN)
         return
+
+
+@_save_simple_list_recursive.register
+def _save_simple_list_recursive_MaskedConstant(x: np.ndarray, externals: list, handle):
+    if len(x.shape) == 0:
+        return _save_simple_list_recursive(x[()], externals, handle)
+    else:
+        return _save_simple_list_recursive_Any(x, externals, handle)
 
 
 @_save_simple_list_recursive.register
@@ -401,12 +429,12 @@ def _save_simple_list_recursive_factor(x: Factor, externals: list, handle):
         if (x.get_codes() == -1).any():
             dhandle.attrs.create("missing-value-placeholder", data=-1, dtype="i4")
 
-        ut._save_fixed_length_strings(handle, "levels", x.get_levels().as_list())
+        ut.save_fixed_length_strings(handle, "levels", x.get_levels().as_list())
         if x.get_ordered():
             handle.create_dataset("ordered", data=x.get_ordered(), dtype="i1")
 
         if not nms is None:
-            ut._save_fixed_length_strings(handle, "names", nms.as_list())
+            ut.save_fixed_length_strings(handle, "names", nms.as_list())
         return
 
 
@@ -433,7 +461,7 @@ def _sanitize_float_json(x):
 
 
 def _sanitize_masked_float_json(x):
-    if np.ma.is_masked(x):
+    if ut._is_missing_scalar(x):
         return None
     return _sanitize_float_json(x)
 
@@ -460,25 +488,5 @@ def _save_scalar_hdf5(handle, x, dtype, missing_placeholder = None):
         raise NotImplementedError("no staging method for scalars of " + str(dtype))
 
     dhandle = handle.create_dataset("data", data=x, dtype=savetype)
-    if missing_placeholder:
-        dhandle.attrs.create("missing-value-placeholder", data=missing_placeholder, dtype=savetype)
-
-
-def _save_vector_hdf5(handle, x, dtype, missing_placeholder = None):
-    handle.attrs["uzuki_object"] = "vector"
-
-    if dtype == bool:
-        handle.attrs["uzuki_type"] = "boolean"
-        savetype = "i1"
-    elif dtype == int:
-        handle.attrs["uzuki_type"] = "integer"
-        savetype = 'i4'
-    elif dtype == float:
-        handle.attrs["uzuki_type"] = "number"
-        savetype = "f8"
-    else:
-        raise NotImplementedError("no staging method for vectors of " + str(dtype))
-
-    dhandle = handle.create_dataset("data", data=x, dtype=savetype, compression="gzip", chunks=True)
     if missing_placeholder:
         dhandle.attrs.create("missing-value-placeholder", data=missing_placeholder, dtype=savetype)
