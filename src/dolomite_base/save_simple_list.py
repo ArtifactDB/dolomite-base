@@ -120,7 +120,7 @@ def _save_simple_list_internal(x: Union[dict, list, NamedList], path: str, simpl
 
 @singledispatch
 def _save_simple_list_recursive(x: Any, externals: list, handle):
-    _save_simple_list_recursive_Any(x, externals, handle)
+    return _save_simple_list_recursive_Any(x, externals, handle)
 
 
 def _save_simple_list_recursive_Any(x: Any, externals: list, handle):
