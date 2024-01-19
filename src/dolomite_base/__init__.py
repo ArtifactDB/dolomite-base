@@ -16,6 +16,7 @@ finally:
     del version, PackageNotFoundError
 
 from .save_object import save_object
+from .validate_object import validate_object
 from .save_string_list import save_string_list
 from .save_string_factor import save_string_factor
 from .save_simple_list import save_simple_list, save_simple_dict

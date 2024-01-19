@@ -1,6 +1,6 @@
 from typing import Any
 from functools import singledispatch, wraps
-from . import lib_dolomite_base as lib
+from .validate_object import validate_object
 
 
 @singledispatch
@@ -25,6 +25,6 @@ def validate_saves(fn):
     @wraps(fn)
     def wrapper(x, path, **kwargs):
         out = fn(x, path, **kwargs)
-        lib.validate(path)
+        validate_object(path)
         return out
     return wrapper
