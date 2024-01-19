@@ -120,19 +120,14 @@ struct PythonStringVector : public uzuki2::StringVector, public PythonBase {
                 return bu.attr("StringList")(storage);
             }
         } else {
-            // Numpy arrays don't have direct support for names, so we
-            // just convert it into a dict.
-            pybind11::dict output;
-            for (size_t i = 0, end = storage.size(); i < end; ++i) {
-                output[names[i].c_str()] = storage[i];
-            }
-            return output;
+            pybind11::module bu = pybind11::module::import("biocutils");
+            using namespace pybind11::literals;
+            return bu.attr("StringList")(storage, "names"_a = names);
         }
     }
 
     pybind11::list storage;
-    std::vector<std::string> names;
-    std::vector<size_t> missing;
+    pybind11::list names;
     bool is_scalar;
 };
 
@@ -160,28 +155,17 @@ struct PythonFactor : public uzuki2::Factor, public PythonBase {
     }
 
     pybind11::object extract() const {
-        if (names.empty()) {
-            pybind11::module bu = pybind11::module::import("biocutils");
-            using namespace pybind11::literals;
+        pybind11::module bu = pybind11::module::import("biocutils");
+        using namespace pybind11::literals;
+        if (names.size() == 0) {
             return bu.attr("Factor")(storage, levels, "ordered"_a = ordered);
-
         } else {
-            // Factor doesn't have direct support for names, so we
-            // just convert it into a dict.
-            pybind11::dict output;
-            for (size_t i = 0, end = storage.size(); i < end; ++i) {
-                if (storage.at(i) >= 0) {
-                    output[names[i].c_str()] = levels[storage.at(i)];
-                } else {
-                    output[names[i].c_str()] = pybind11::none();
-                }
-            }
-            return output;
+            return bu.attr("Factor")(storage, levels, "ordered"_a = ordered, "names"_a = names);
         }
     }
 
     pybind11::array_t<int32_t> storage;
-    std::vector<std::string> names;
+    pybind11::list names;
     bool is_scalar;
     pybind11::list levels;
     bool ordered;

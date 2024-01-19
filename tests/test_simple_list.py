@@ -318,3 +318,31 @@ def test_simple_list_factor():
     assert list(roundtrip["missing"]) == list(everything["missing"])
     assert list(roundtrip["ordered"]) == list(everything["ordered"])
     assert roundtrip["ordered"].get_ordered()
+
+
+def test_simple_list_named():
+    everything = {
+        "factor": Factor.from_sequence([ "sydney", "brisbane", "sydney", "melbourne"]),
+        "string": StringList(["Aria", "Akari", "Akira", "Aika"], names=["1", "2", "3", "4"])
+    }
+    everything["factor"].set_names(["A", "B", "C", "D"], in_place=True) # TODO: enable this in the constructor.
+
+    # Stage as JSON.
+    dir = os.path.join(mkdtemp(), "json")
+    meta = dl.save_object(everything, dir, simple_list_mode="json")
+
+    roundtrip = dl.read_object(dir)
+    assert list(roundtrip["factor"]) == list(everything["factor"])
+    assert roundtrip["factor"].get_names() == everything["factor"].get_names()
+    assert list(roundtrip["string"]) == list(everything["string"])
+    assert roundtrip["string"].get_names() == everything["string"].get_names()
+
+    # Stage as HDF5.
+    dir = os.path.join(mkdtemp(), "hdf5")
+    meta = dl.save_object(everything, dir, simple_list_mode="hdf5")
+
+    roundtrip = dl.read_object(dir)
+    assert list(roundtrip["factor"]) == list(everything["factor"])
+    assert roundtrip["factor"].get_names() == everything["factor"].get_names()
+    assert list(roundtrip["string"]) == list(everything["string"])
+    assert roundtrip["string"].get_names() == everything["string"].get_names()

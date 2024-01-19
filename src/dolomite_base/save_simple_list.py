@@ -111,7 +111,7 @@ def _save_simple_list_recursive_stringlist(x: StringList, externals: list, handl
     if handle is None:
         output = { "type": "string", "values": x.as_list() }
         if nms is not None:
-            output["names"] = nms
+            output["names"] = nms.as_list()
         return output
 
     has_none = any(y is None for y in x)
@@ -125,7 +125,7 @@ def _save_simple_list_recursive_stringlist(x: StringList, externals: list, handl
     if has_none:
        dset.attrs["missing-value-placeholder"] = placeholder
     if nms is not None:
-        ut._save_fixed_length_strings(handle, "names", nms)
+        ut._save_fixed_length_strings(handle, "names", nms.as_list())
 
     return
 
@@ -335,13 +335,18 @@ def _save_simple_list_recursive_numpy_generic(x: np.generic, externals: list, ha
 
 @_save_simple_list_recursive.register
 def _save_simple_list_recursive_factor(x: Factor, externals: list, handle):
+    nms = x.get_names()
+
     if handle is None:
-        return { 
+        output = { 
             "type": "factor",
             "values": [(None if y == -1 else int(y)) for y in x.get_codes()],
             "levels": x.get_levels().as_list(),
             "ordered": x.get_ordered(),
         }
+        if not nms is None:
+            output["names"] = nms.as_list()
+        return output
 
     else:
         handle.attrs["uzuki_object"] = "vector"
@@ -354,6 +359,9 @@ def _save_simple_list_recursive_factor(x: Factor, externals: list, handle):
         ut._save_fixed_length_strings(handle, "levels", x.get_levels().as_list())
         if x.get_ordered():
             handle.create_dataset("ordered", data=x.get_ordered(), dtype="i1")
+
+        if not nms is None:
+            ut._save_fixed_length_strings(handle, "names", nms.as_list())
         return
 
 
