@@ -259,33 +259,30 @@ def test_simple_list_special_float():
     assert np.ma.is_masked(roundtrip["e"][2])
 
 
-#def test_simple_list_external():
-#    everything = {
-#        "a": BiocFrame({ "a_1": [ 1, 2, 3 ], "a_2": [ "A", "B", "C" ] }),
-#        "b": BiocFrame(number_of_rows=10),
-#    }
-#
-#    dir = mkdtemp()
-#
-#    # Stage as JSON.
-#    meta = dl.save_object(everything, dir, "foo")
-#    dl.write_metadata(meta, dir)
-#
-#    roundtrip = dl.load_json_simple_list(meta, dir)
-#    assert roundtrip["a"].column_names == [ "a_1", "a_2" ]
-#    assert roundtrip["a"].shape[0] == 3
-#    assert roundtrip["b"].column_names == []
-#    assert roundtrip["b"].shape[0] == 10
-#
-#    # Stage as HDF5.
-#    meta = dl.save_object(everything, dir, "foo2", mode="hdf5")
-#    dl.write_metadata(meta, dir)
-#
-#    roundtrip = dl.load_object(meta, dir)
-#    assert roundtrip["a"].column_names == [ "a_1", "a_2" ]
-#    assert roundtrip["a"].shape[0] == 3
-#    assert roundtrip["b"].column_names == []
-#    assert roundtrip["b"].shape[0] == 10
+def test_simple_list_external():
+    everything = {
+        "a": BiocFrame({ "a_1": [ 1, 2, 3 ], "a_2": [ "A", "B", "C" ] }),
+        "b": BiocFrame(number_of_rows=10),
+    }
+
+
+    # Stage as JSON.
+    dir = os.path.join(mkdtemp(), "json")
+    dl.save_object(everything, dir, simple_list_mode='json')
+    roundtrip = dl.read_object(dir)
+    assert roundtrip["a"].get_column_names().as_list() == [ "a_1", "a_2" ]
+    assert roundtrip["a"].shape[0] == 3
+    assert roundtrip["b"].get_column_names().as_list() == []
+    assert roundtrip["b"].shape[0] == 10
+
+    # Stage as HDF5.
+    dir = os.path.join(mkdtemp(), "hdf5")
+    dl.save_object(everything, dir, simple_list_mode="hdf5")
+    roundtrip = dl.read_object(dir)
+    assert roundtrip["a"].get_column_names().as_list() == [ "a_1", "a_2" ]
+    assert roundtrip["a"].shape[0] == 3
+    assert roundtrip["b"].get_column_names().as_list() == []
+    assert roundtrip["b"].shape[0] == 10
 
 
 def test_simple_list_factor():

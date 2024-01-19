@@ -87,9 +87,11 @@ def _save_simple_list_internal(x: Union[dict, list], path: str, simple_list_mode
             ghandle.attrs["uzuki_version"] = "1.3"
             _save_simple_list_recursive(x, externals, ghandle)
 
-    children = []
-    for i, ex in enumerate(externals):
-        alt_save_object(ex, os.path.join(path, str(i)), **kwargs)
+    if len(externals):
+        exdir = os.path.join(path, "other_contents")
+        os.mkdir(exdir)
+        for i, ex in enumerate(externals):
+            alt_save_object(ex, os.path.join(exdir, str(i)), **kwargs)
     return
 
 
