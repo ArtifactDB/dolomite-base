@@ -17,7 +17,7 @@ finally:
 
 from .save_object import save_object
 from .validate_object import validate_object
-from .save_string_list import save_string_list
+from .save_atomic_vector import save_atomic_vector_from_string_list, save_atomic_vector_from_integer_list, save_atomic_vector_from_float_list, save_atomic_vector_from_boolean_list
 from .save_string_factor import save_string_factor
 from .save_simple_list import save_simple_list_from_list, save_simple_list_from_dict, save_simple_list_from_NamedList
 from .save_data_frame import save_data_frame

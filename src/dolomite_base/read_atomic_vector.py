@@ -1,5 +1,5 @@
 from typing import Union
-from biocutils import StringList
+from biocutils import StringList, IntegerList, FloatList, BooleanList
 import numpy
 import h5py
 import os
@@ -38,29 +38,32 @@ def read_atomic_vector(path: str, metadata: dict, **kwargs) -> Union[StringList,
                 for i, x in enumerate(output):
                     if x == placeholder:
                         output[i] = None
+        else:
+            values = dhandle[:]
+            if not has_none:
+                output = values
+            else:
+                output = [None] * values.shape[0]
+                placeholder = dhandle.attrs["missing-value-placeholder"]
+                if numpy.isnan(placeholder):
+                    for i, x in enumerate(values):
+                        if not numpy.isnan(x):
+                            output[i] = x
+                else:
+                    for i, x in enumerate(values):
+                        if x != placeholder:
+                            output[i] = x
 
-            if has_names:
-                output.set_names([a.decode() for a in ghandle["names"][:]], in_place=True)
-            return output
+            if vectype == "integer":
+                output = IntegerList(output)
+            elif vectype == "number":
+                if "_python_original_type" in dhandle.attrs and dhandle.attrs["_python_original_type"] == "biocutils.IntegerList":
+                    output = IntegerList(output)
+                else:
+                    output = FloatList(output)
+            elif vectype == "boolean":
+                output = BooleanList(output)
 
         if has_names:
-            warnings.warn("skipping names when reading a numeric 'atomic_vector'")
-
-        output = dhandle[:]
-        if has_none:
-            placeholder = dhandle.attrs["missing-value-placeholder"]
-            if numpy.isnan(placeholder):
-                mask = numpy.isnan(output)
-            else:
-                mask = (output == placeholder)
-
-        if vectype == "boolean":
-            output = output.astype(numpy.bool_)
-        elif vectype == "number":
-            if not numpy.issubdtype(output.dtype, numpy.floating):
-                output = output.astype(numpy.double)
-
-        if has_none:
-            return numpy.ma.MaskedArray(output, mask=mask)
-        else:
-            return output
+            output.set_names([a.decode() for a in ghandle["names"][:]], in_place=True)
+        return output
