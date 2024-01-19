@@ -123,7 +123,7 @@ def _choose_NamedList_subclass(values: Sequence, curtype: str) -> NamedList:
     if curtype == "boolean":
         return BooleanList(values)
     elif curtype == "number":
-        return NumberList(values)
+        return FloatList(values)
     else:
         return IntegerList(values)
 

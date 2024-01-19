@@ -1,5 +1,5 @@
 from biocframe import BiocFrame
-from biocutils import Factor, StringList
+from biocutils import Factor, StringList, IntegerList, BooleanList, FloatList
 import dolomite_base as dl
 import numpy as np
 import os
@@ -176,6 +176,41 @@ def test_data_frame_numpy():
     roundtrip = dl.read_object(dir)
     assert (roundtrip.get_column("alicia") == df.get_column("alicia")).all()
     assert roundtrip.get_column("alicia").dtype == np.float64
+
+
+def test_data_frame_no_numpy():
+    df = BiocFrame({
+        "alicia": np.array([ 1, 2, 3, 4, 5 ]),
+        "akira": np.array([ True, True, False, False, True ]),
+        "athena": np.array([ 2.3, 2.3, 5.2, 32, -1.2 ]),
+    })
+
+    dir = os.path.join(mkdtemp(), "foo")
+    dl.save_object(df, dir)
+    roundtrip = dl.read_object(dir, data_frame_represent_column_as_1darray=False)
+
+    assert isinstance(roundtrip.get_column("alicia"), IntegerList)
+    assert roundtrip.get_column("alicia").as_list() == list(df.get_column("alicia"))
+    assert isinstance(roundtrip.get_column("akira"), BooleanList)
+    assert roundtrip.get_column("akira").as_list() == list(df.get_column("akira"))
+    assert isinstance(roundtrip.get_column("athena"), FloatList)
+    assert roundtrip.get_column("athena").as_list() == list(df.get_column("athena"))
+
+
+def test_data_frame_NamedList():
+    df = BiocFrame({
+        "alicia": IntegerList([ 1, 2, 3, 4, 5 ]),
+        "akira": BooleanList([ True, True, False, False, True ]),
+        "athena": FloatList([ 2.3, 2.3, 5.2, 32, -1.2 ]),
+    })
+
+    dir = os.path.join(mkdtemp(), "foo")
+    dl.save_object(df, dir)
+    roundtrip = dl.read_object(dir, data_frame_represent_column_as_1darray=False)
+
+    assert roundtrip.get_column("alicia") == df.get_column("alicia")
+    assert roundtrip.get_column("akira") == df.get_column("akira")
+    assert roundtrip.get_column("athena") == df.get_column("athena")
 
 
 def test_data_frame_large_integers():
