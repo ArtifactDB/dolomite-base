@@ -16,9 +16,11 @@ def read_atomic_vector(path: str, metadata: dict, atomic_vector_use_numeric_1dar
     :py:meth:`~dolomite_base.read_object.read_object`.
 
     Args:
-        path: Path to the directory containing the object.
+        path: 
+            Path to the directory containing the object.
 
-        metadata: Metadata for the object.
+        metadata: 
+            Metadata for the object.
 
         atomic_vector_use_numeric_1darray: 
             Whether numeric vectors should be represented as 1-dimensional
@@ -27,7 +29,8 @@ def read_atomic_vector(path: str, metadata: dict, atomic_vector_use_numeric_1dar
             We set this to ``False`` by default to ensure that we can load
             names via :py:class:`~biocutils.NamedList.NamedList` subclasses.
 
-        kwargs: Further arguments, passed to nested objects.
+        kwargs: 
+            Further arguments, passed to nested objects.
 
     Returns:
         An atomic vector, represented as a

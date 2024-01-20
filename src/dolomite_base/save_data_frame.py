@@ -1,4 +1,4 @@
-from typing import Any, Tuple, Optional, Literal, Sequence
+from typing import Any, Dict
 from collections import namedtuple
 from functools import singledispatch
 import os
@@ -6,7 +6,6 @@ from biocframe import BiocFrame
 from biocutils import Factor, StringList, IntegerList, BooleanList, FloatList
 import numpy
 import h5py
-import gzip
 
 from .save_object import save_object
 from .alt_save_object import alt_save_object
@@ -22,15 +21,17 @@ def save_data_frame(
     data_frame_convert_list_to_vector: bool = True, 
     data_frame_convert_1darray_to_vector: bool = True, 
     **kwargs
-) -> dict[str, Any]:
+) -> Dict[str, Any]:
     """Method for saving :py:class:`~biocframe.BiocFrame.BiocFrame`
     objects to the corresponding file representations, see
     :py:meth:`~dolomite_base.save_object.save_object` for details.
 
     Args:
-        x: Object to be saved.
+        x: 
+            Object to be saved.
 
-        path: Path to a directory in which to save ``x``.
+        path: 
+            Path to a directory in which to save ``x``.
 
         data_frame_convert_list_to_vector: 
             If a column is a regular Python list where all entries are of the

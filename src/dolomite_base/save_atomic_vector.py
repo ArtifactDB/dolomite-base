@@ -1,11 +1,9 @@
-from typing import Any
 from biocutils import StringList, IntegerList, FloatList, BooleanList
 import os
 import h5py
 import numpy
 
 from .save_object import save_object, validate_saves
-from . import _utils_misc as ut
 from . import _utils_string as strings
 from . import _utils_vector as write
 
@@ -18,11 +16,14 @@ def save_atomic_vector_from_string_list(x: StringList, path: str, **kwargs):
     :py:meth:`~dolomite_base.save_object.save_object` for details.
 
     Args:
-        x: Object to be saved.
+        x: 
+            Object to be saved.
 
-        path: Path to save the object.
+        path: 
+            Path to save the object.
 
-        kwargs: Further arguments, ignored.
+        kwargs: 
+            Further arguments, ignored.
 
     Returns:
         `x` is saved to `path`.
@@ -36,7 +37,7 @@ def save_atomic_vector_from_string_list(x: StringList, path: str, **kwargs):
         ghandle.attrs["type"] = "string"
         write.write_string_list_to_hdf5(ghandle, "values", x.as_list())
         nms = x.get_names()
-        if not nms is None:
+        if nms is not None:
             strings.save_fixed_length_strings(ghandle, "names", nms.as_list())
 
     return
@@ -50,11 +51,14 @@ def save_atomic_vector_from_integer_list(x: IntegerList, path: str, **kwargs):
     :py:meth:`~dolomite_base.save_object.save_object` for details.
 
     Args:
-        x: Object to be saved.
+        x: 
+            Object to be saved.
 
-        path: Path to save the object.
+        path: 
+            Path to save the object.
 
-        kwargs: Further arguments, ignored.
+        kwargs: 
+            Further arguments, ignored.
 
     Returns:
         `x` is saved to `path`.
@@ -74,7 +78,7 @@ def save_atomic_vector_from_integer_list(x: IntegerList, path: str, **kwargs):
             ghandle.attrs["type"] = "integer"
 
         nms = x.get_names()
-        if not nms is None:
+        if nms is not None:
             strings.save_fixed_length_strings(ghandle, "names", nms.as_list())
 
     return
@@ -88,11 +92,14 @@ def save_atomic_vector_from_float_list(x: FloatList, path: str, **kwargs):
     :py:meth:`~dolomite_base.save_object.save_object` for details.
 
     Args:
-        x: Object to be saved.
+        x: 
+            Object to be saved.
 
-        path: Path to save the object.
+        path: 
+            Path to save the object.
 
-        kwargs: Further arguments, ignored.
+        kwargs: 
+            Further arguments, ignored.
 
     Returns:
         `x` is saved to `path`.
@@ -106,7 +113,7 @@ def save_atomic_vector_from_float_list(x: FloatList, path: str, **kwargs):
         ghandle.attrs["type"] = "number"
         write.write_float_list_to_hdf5(ghandle, "values", x.as_list())
         nms = x.get_names()
-        if not nms is None:
+        if nms is not None:
             strings.save_fixed_length_strings(ghandle, "names", nms.as_list())
 
     return
@@ -120,11 +127,14 @@ def save_atomic_vector_from_boolean_list(x: BooleanList, path: str, **kwargs):
     :py:meth:`~dolomite_base.save_object.save_object` for details.
 
     Args:
-        x: Object to be saved.
+        x: 
+            Object to be saved.
 
-        path: Path to save the object.
+        path: 
+            Path to save the object.
 
-        kwargs: Further arguments, ignored.
+        kwargs: 
+            Further arguments, ignored.
 
     Returns:
         `x` is saved to `path`.
@@ -138,7 +148,7 @@ def save_atomic_vector_from_boolean_list(x: BooleanList, path: str, **kwargs):
         ghandle.attrs["type"] = "boolean"
         write.write_boolean_list_to_hdf5(ghandle, "values", x.as_list())
         nms = x.get_names()
-        if not nms is None:
+        if nms is not None:
             strings.save_fixed_length_strings(ghandle, "names", nms.as_list())
 
     return

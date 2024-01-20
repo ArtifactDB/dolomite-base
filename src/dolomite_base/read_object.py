@@ -15,11 +15,14 @@ def read_object(path: str, metadata: Optional[dict] = None, **kwargs) -> Any:
     """Read an object from its on-disk representation.
 
     Args:
-        path: Path to a directory containing the object.
+        path: 
+            Path to a directory containing the object.
 
-        metadata: Metadata for the object. This is read from the `OBJECT` file if None.
+        metadata: 
+            Metadata for the object. This is read from the `OBJECT` file if None.
 
-        kwargs: Further arguments, passed to individual methods.
+        kwargs: 
+            Further arguments, passed to individual methods.
 
     Returns:
         Some kind of object.

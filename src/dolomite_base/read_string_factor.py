@@ -1,5 +1,4 @@
 from biocutils import Factor
-import numpy
 import h5py
 import os
 
@@ -8,17 +7,21 @@ from . import _utils_string as strings
 
 
 def read_string_factor(path: str, metadata: dict, **kwargs) -> Factor:
-    """
-    Read a string factor from disk. In general, this function should not
-    be called directly but instead via
+    """Read a string factor from disk. 
+    
+    In general, this function should not be called directly 
+    but instead via
     :py:meth:`~dolomite_base.load_object.load_object`.
 
     Args:
-        path: Path to the directory containing the object.
+        path: 
+            Path to the directory containing the object.
 
-        metadata: Metadata for the object. 
+        metadata: 
+            Metadata for the object. 
 
-        kwargs: Further arguments, passed to nested objects.
+        kwargs: 
+            Further arguments, passed to nested objects.
 
     Returns:
         A :py:class:`~biocutils.Factor.Factor` object.

@@ -1,6 +1,6 @@
 from typing import Any, Union, Literal
 import numpy as np
-import warnings
+from warnings import warn
 from functools import singledispatch
 from biocutils import Factor, StringList, NamedList, IntegerList, BooleanList, FloatList
 import os
@@ -23,13 +23,17 @@ def save_simple_list_from_dict(x: dict, path: str, simple_list_mode: Literal["hd
     :py:meth:`~dolomite_base.save_object.save_object` for details.
 
     Args:
-        x: Object to be saved.
+        x: 
+            Object to be saved.
 
-        path: Path to a directory in which to save the object.
+        path: 
+            Path to a directory in which to save the object.
 
-        simple_list_mode: Whether to save in HDF5 or JSON mode.
+        simple_list_mode: 
+            Whether to save in HDF5 or JSON mode.
 
-        kwargs: Further arguments, ignored.
+        kwargs: 
+            Further arguments, ignored.
 
     Returns:
         `x` is saved to `path`.
@@ -46,13 +50,17 @@ def save_simple_list_from_list(x: list, path: str, simple_list_mode: Literal["hd
     :py:meth:`~dolomite_base.save_object.save_object` for details.
 
     Args:
-        x: Object to be saved.
+        x: 
+            Object to be saved.
 
-        path: Path to a directory in which to save the object.
+        path: 
+            Path to a directory in which to save the object.
 
-        simple_list_mode: Whether to save in HDF5 or JSON mode.
+        simple_list_mode: 
+            Whether to save in HDF5 or JSON mode.
 
-        kwargs: Further arguments, ignored.
+        kwargs: 
+            Further arguments, ignored.
 
     Returns:
         `x` is saved to `path`.
@@ -68,13 +76,17 @@ def save_simple_list_from_NamedList(x: NamedList, path: str, simple_list_mode: L
     see :py:meth:`~dolomite_base.save_object.save_object` for details.
 
     Args:
-        x: Object to be saved.
+        x: 
+            Object to be saved.
 
-        path: Path to a directory in which to save the object.
+        path: 
+            Path to a directory in which to save the object.
 
-        simple_list_mode: Whether to save in HDF5 or JSON mode.
+        simple_list_mode: 
+            Whether to save in HDF5 or JSON mode.
 
-        kwargs: Further arguments, ignored.
+        kwargs: 
+            Further arguments, ignored.
 
     Returns:
         `x` is saved to `path`.
@@ -95,7 +107,6 @@ def _save_simple_list_internal(x: Union[dict, list, NamedList], path: str, simpl
         handle.write('{ "type": "simple_list", "simple_list": { "version": "1.0", "format": "' + format2 + '" } }')
 
     externals = []
-    components = {}
 
     if simple_list_mode == "json":
         transformed = _save_simple_list_recursive(x, externals, None)
@@ -238,7 +249,7 @@ def _save_simple_list_recursive_dict(x: dict, externals: list, handle):
         collected = { "type": "list", "values": vals, "names": names }
         for k, v in x.items():
             if not isinstance(k, str):
-                warnings.warn("converting non-string key with value " + str(k) + " to a string", UserWarning)
+                warn("converting non-string key with value " + str(k) + " to a string", UserWarning)
             names.append(str(k))
             vals.append(_save_simple_list_recursive(v, externals, None))
         return collected
@@ -383,7 +394,7 @@ def _save_simple_list_recursive_factor(x: Factor, externals: list, handle):
             "levels": x.get_levels().as_list(),
             "ordered": x.get_ordered(),
         }
-        if not nms is None:
+        if nms is not None:
             output["names"] = nms.as_list()
         return output
 
@@ -399,7 +410,7 @@ def _save_simple_list_recursive_factor(x: Factor, externals: list, handle):
         if x.get_ordered():
             handle.create_dataset("ordered", data=x.get_ordered(), dtype="i1")
 
-        if not nms is None:
+        if nms is not None:
             strings.save_fixed_length_strings(handle, "names", nms.as_list())
         return
 
