@@ -1,11 +1,12 @@
 from typing import Union
-from biocutils import StringList, IntegerList, FloatList, BooleanList
+from biocutils import StringList, IntegerList, FloatList, BooleanList, NamedList
 import numpy
 import h5py
 import os
 import warnings
 
-from .load_vector_from_hdf5 import load_vector_from_hdf5
+from ._utils_vector import load_vector_from_hdf5
+
 
 def read_atomic_vector(path: str, metadata: dict, atomic_vector_use_numeric_1darray: bool = False, **kwargs) -> Union[StringList, IntegerList, FloatList, BooleanList, numpy.ndarray]:
     """
@@ -39,11 +40,11 @@ def read_atomic_vector(path: str, metadata: dict, atomic_vector_use_numeric_1dar
         ghandle = handle["atomic_vector"]
         vectype = ghandle.attrs["type"]
         dhandle = ghandle["values"]
-        values = load_vector_from_hdf5(dhandle, vectype, atomic_vector_use_numeric_1darray)
+        output = load_vector_from_hdf5(dhandle, vectype, atomic_vector_use_numeric_1darray)
 
         if "names" in ghandle:
-            if isinstance(values, NamedList):
-                output.set_names([a.decode() for a in ghandle["names"][:]], in_place=True)
+            if isinstance(output, NamedList):
+                output.set_names([a.decode() for a in ghandle["names"]], in_place=True)
             else:
                 warnings.warn("skipping names when reading atomic vectors as 1-dimensional NumPy arrays")
         return output

@@ -5,8 +5,9 @@ import h5py
 import numpy
 
 from .save_object import save_object, validate_saves
-from . import _utils as ut
-from . import write_to_hdf5 as write
+from . import _utils_misc as ut
+from . import _utils_vector as write
+
 
 @save_object.register
 @validate_saves

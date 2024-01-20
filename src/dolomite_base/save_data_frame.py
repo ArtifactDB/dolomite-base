@@ -10,9 +10,9 @@ import gzip
 
 from .save_object import save_object
 from .alt_save_object import alt_save_object
-from . import _utils as ut
-from . import write_to_hdf5 as write
-from ._utils_factor import _save_factor_to_hdf5
+from . import _utils_misc as ut
+from . import _utils_vector as write
+from ._utils_factor import save_factor_to_hdf5
 
 
 @save_object.register

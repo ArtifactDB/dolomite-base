@@ -10,8 +10,8 @@ import h5py
 
 from .save_object import save_object, validate_saves
 from .alt_save_object import alt_save_object
-from . import _utils as ut
-from . import write_to_hdf5 as write
+from . import _utils_misc as ut
+from . import _utils_vector as write
 
 
 @save_object.register

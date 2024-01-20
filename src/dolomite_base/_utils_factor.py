@@ -4,13 +4,16 @@ from typing import Union, Sequence, Tuple
 from biocutils import Factor
 import h5py
 
-def _save_factor_to_hdf5(handle: h5py.Group, f: Factor):
+from . import _utils_misc as ut
+
+
+def save_factor_to_hdf5(handle: h5py.Group, f: Factor):
     ut.save_fixed_length_strings(handle, "levels", f.get_levels())
 
     codes = f.get_codes()
     is_missing = codes == -1
     has_missing = is_missing.any()
-    nlevels = len(x.get_levels())
+    nlevels = len(f.get_levels())
     if has_missing:
         codes = codes.astype(numpy.uint32, copy=True)
         codes[is_missing] = nlevels
@@ -20,10 +23,10 @@ def _save_factor_to_hdf5(handle: h5py.Group, f: Factor):
         dhandle.attrs.create("missing-value-placeholder", data=nlevels, dtype="u4")
 
     if f.get_ordered():
-        handle.attrs.create("ordered", data=1, dtype="i8")
+        handle.attrs.create("ordered", data=1, dtype="i1")
 
 
-def _load_factor_from_hdf5(handle: h5py.Group):
+def load_factor_from_hdf5(handle: h5py.Group):
     chandle = handle["codes"]
     codes = chandle[:]
     if "missing-value-placeholder" in chandle.attrs:
@@ -31,9 +34,9 @@ def _load_factor_from_hdf5(handle: h5py.Group):
         codes[codes == placeholder] = -1
 
     ordered = False
-    if "ordered" in ghandle.attrs:
-        ordered = ghandle.attrs["ordered"][()] != 0
+    if "ordered" in handle.attrs:
+        ordered = handle.attrs["ordered"][()] != 0
     
     codes = codes.astype(numpy.int32, copy=False)
-    levels = [a.decode() for a in ghandle["levels"]]
+    levels = [a.decode() for a in handle["levels"]]
     return Factor(codes, levels, ordered = ordered)

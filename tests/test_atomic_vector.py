@@ -51,7 +51,7 @@ def test_integer_list_large():
     dir = os.path.join(mkdtemp(), "temp")
     dl.save_object(sl, dir)
     roundtrip = dl.read_object(dir)
-    assert isinstance(roundtrip, IntegerList)
+    assert isinstance(roundtrip, FloatList)
     assert roundtrip == sl
 
 

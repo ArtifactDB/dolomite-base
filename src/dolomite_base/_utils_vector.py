@@ -1,10 +1,10 @@
-from typing import Sequence
-from functools import singledispatch
+from typing import Sequence, Union
 import numpy
 import h5py
 from biocutils import StringList, IntegerList, FloatList, BooleanList
+
 from . import choose_missing_placeholder as ch
-from . import _utils as ut
+from . import _utils_misc as ut
 
 
 def _list_to_numpy_with_mask(x: Sequence, x_dtype, mask_dtype = numpy.uint8) -> numpy.ndarray:
@@ -132,7 +132,7 @@ def write_MaskedArray_to_hdf5(handle: h5py.Group, name: str, x: numpy.ma.MaskedA
     return dset
 
 
-def load_vector_from_hdf5(handle: h5py.Dataset, curtype: str, convert_to_1darray: bool) -> Union[NamedList, numpy.ndarray]:
+def load_vector_from_hdf5(handle: h5py.Dataset, curtype: str, convert_to_1darray: bool) -> Union[StringList, IntegerList, FloatList, BooleanList, numpy.ndarray]:
     values = handle[:]
     if curtype == "string":
         values = StringList(v.decode('UTF8') for v in values)
@@ -153,15 +153,15 @@ def load_vector_from_hdf5(handle: h5py.Dataset, curtype: str, convert_to_1darray
         if convert_to_1darray:
             return numpy.ma.MaskedArray(_coerce_numpy_type(values, curtype), mask=mask)
         else:
-            values = []
+            output = []
             for i, y in enumerate(values):
                 if mask[i]:
-                    values.append(None)
+                    output.append(None)
                 else:
-                    values.append(y)
-            return = _choose_NamedList_subclass(values, curtype)
+                    output.append(y)
+            return _choose_NamedList_subclass(output, curtype)
 
-    if convert_to_1d_array:
+    if convert_to_1darray:
         return _coerce_numpy_type(values, curtype)
     else:
         return _choose_NamedList_subclass(values, curtype)
@@ -176,12 +176,10 @@ def _coerce_numpy_type(values: numpy.ndarray, curtype: str) -> numpy.ndarray:
     return values
 
 
-def _choose_NamedList_subclass(values: Sequence, curtype: str) -> NamedList:
+def _choose_NamedList_subclass(values: Sequence, curtype: str) -> Union[IntegerList, FloatList, BooleanList]:
     if curtype == "boolean":
         return BooleanList(values)
     elif curtype == "number":
         return FloatList(values)
     else:
         return IntegerList(values)
-
-

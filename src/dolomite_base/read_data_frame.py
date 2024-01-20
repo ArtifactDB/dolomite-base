@@ -6,7 +6,9 @@ import h5py
 import os
 
 from .alt_read_object import alt_read_object
-from .load_vector_from_hdf5 import load_vector_from_hdf5
+from ._utils_vector import load_vector_from_hdf5
+from ._utils_factor import load_factor_from_hdf5 
+
 
 def read_data_frame(path: str, metadata: dict, data_frame_represent_column_as_1darray : bool = True, **kwargs) -> BiocFrame:
     """Load a data frame from a HDF5 file. In general, this function should not
@@ -50,7 +52,7 @@ def read_data_frame(path: str, metadata: dict, data_frame_represent_column_as_1d
                 xhandle = dhandle[name]
                 curtype = xhandle.attrs["type"]
                 if curtype == "factor":
-                    contents[col] = _load_factor_from_hdf5(xhandle)
+                    contents[col] = load_factor_from_hdf5(xhandle)
                 else:
                     contents[col] = load_vector_from_hdf5(xhandle, curtype, data_frame_represent_column_as_1darray)
 
