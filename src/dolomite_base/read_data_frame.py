@@ -6,6 +6,7 @@ import h5py
 import os
 
 from .alt_read_object import alt_read_object
+from .load_vector_from_hdf5 import load_vector_from_hdf5
 
 def read_data_frame(path: str, metadata: dict, data_frame_represent_column_as_1darray : bool = True, **kwargs) -> BiocFrame:
     """Load a data frame from a HDF5 file. In general, this function should not
@@ -18,8 +19,10 @@ def read_data_frame(path: str, metadata: dict, data_frame_represent_column_as_1d
 
         data_frame_represent_column_as_1darray: 
             Whether numeric columns should be represented as 1-dimensional
-            NumPy arrays. This is more efficient than regular Python lists
-            but discards the distinction between vectors and 1-D arrays.
+            NumPy arrays. This is more efficient than regular Python lists but
+            discards the distinction between vectors and 1-D arrays. Usually
+            this is not an important difference, but nonetheless, users can set
+            this flag to ``False`` to load columns as (typed) lists instead.
 
         kwargs: Further arguments, passed to nested objects.
 
@@ -43,59 +46,13 @@ def read_data_frame(path: str, metadata: dict, data_frame_represent_column_as_1d
             name = str(i)
             if name not in dhandle:
                 contents[col] = alt_read_object(os.path.join(path, "other_columns", name), **kwargs)
-                continue
-
-            xhandle = dhandle[name]
-            curtype = xhandle.attrs["type"]
-
-            if curtype == "factor":
-                chandle = xhandle["codes"]
-                codes = chandle[:].astype(numpy.int32)
-                if "missing-value-placeholder" in chandle.attrs:
-                    placeholder = chandle.attrs["missing-value-placeholder"]
-                    codes[codes == placeholder] = -1
-
-                ordered = False
-                if "ordered" in xhandle.attrs:
-                    ordered = xhandle.attrs["ordered"][()] != 0
-
-                levels = StringList(v.decode("UTF8") for v in xhandle["levels"])
-                contents[col] = Factor(codes, levels, ordered=ordered)
-                continue
-
-            values = xhandle[:]
-            if curtype == "string":
-                values = StringList(v.decode('UTF8') for v in values)
-                if "missing-value-placeholder" in xhandle.attrs:
-                    placeholder = xhandle.attrs["missing-value-placeholder"]
-                    for j, y in enumerate(values):
-                        if y == placeholder:
-                            values[j] = None
-                contents[col] = values
-                continue
-
-            if "missing-value-placeholder" in xhandle.attrs:
-                placeholder = xhandle.attrs["missing-value-placeholder"]
-                if numpy.isnan(placeholder):
-                    mask = numpy.isnan(values)
-                else:
-                    mask = (values == placeholder)
-                if data_frame_represent_column_as_1darray:
-                    contents[col] = numpy.ma.MaskedArray(_coerce_numpy_type(values, curtype), mask=mask)
-                else:
-                    values = []
-                    for i, y in enumerate(values):
-                        if mask[i]:
-                            values.append(None)
-                        else:
-                            values.append(y)
-                    contents[col] = _choose_NamedList_subclass(values, curtype)
-                continue
-
-            if data_frame_represent_column_as_1darray:
-                contents[col] = _coerce_numpy_type(values, curtype)
             else:
-                contents[col] = _choose_NamedList_subclass(values, curtype)
+                xhandle = dhandle[name]
+                curtype = xhandle.attrs["type"]
+                if curtype == "factor":
+                    contents[col] = _load_factor_from_hdf5(xhandle)
+                else:
+                    contents[col] = load_vector_from_hdf5(xhandle, curtype, data_frame_represent_column_as_1darray)
 
     df = BiocFrame(contents, number_of_rows=expected_rows, row_names=row_names, column_names=column_names)
 
@@ -108,22 +65,3 @@ def read_data_frame(path: str, metadata: dict, data_frame_represent_column_as_1d
         df.set_column_data(alt_read_object(mcol_dir, **kwargs), in_place=True)
 
     return df
-
-
-def _coerce_numpy_type(values: numpy.ndarray, curtype: str) -> numpy.ndarray:
-    if curtype == "boolean":
-        return values.astype(numpy.bool_)
-    elif curtype == "number":
-        if not numpy.issubdtype(values.dtype, numpy.floating):
-            return values.astype(numpy.double)
-    return values
-
-
-def _choose_NamedList_subclass(values: Sequence, curtype: str) -> NamedList:
-    if curtype == "boolean":
-        return BooleanList(values)
-    elif curtype == "number":
-        return FloatList(values)
-    else:
-        return IntegerList(values)
-

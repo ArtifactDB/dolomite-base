@@ -3,6 +3,8 @@ import numpy
 import h5py
 import os
 
+from ._utils_factor import _load_factor_from_hdf5
+
 
 def read_string_factor(path: str, metadata: dict, **kwargs) -> Factor:
     """
@@ -23,21 +25,7 @@ def read_string_factor(path: str, metadata: dict, **kwargs) -> Factor:
 
     with h5py.File(os.path.join(path, "contents.h5"), "r") as handle:
         ghandle = handle["string_factor"]
-
-        chandle = ghandle["codes"]
-        codes = chandle[:].astype(numpy.int32)
-        if "missing-value-placeholder" in chandle.attrs:
-            placeholder = chandle.attrs["missing-value-placeholder"]
-            codes[codes == placeholder] = -1
-
-        levels = [a.decode() for a in ghandle["levels"][:]]
-
-        ordered = False
-        if "ordered" in ghandle:
-            ordered = ghandle["ordered"][()] != 0
-
-        output = Factor(codes, levels, ordered = ordered)
+        output = _load_factor_from_hdf5(ghandle)
         if "names" in ghandle:
             output.set_names([a.decode() for a in ghandle["names"][:]], in_place=True)
-
         return output

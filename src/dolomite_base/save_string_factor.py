@@ -6,6 +6,7 @@ import numpy
 
 from .save_object import save_object, validate_saves
 from . import _utils as ut
+from ._utils_factor import _save_factor_to_hdf5
 
 @save_object.register
 @validate_saves
@@ -30,23 +31,8 @@ def save_string_factor(x: Factor, path: str, **kwargs):
 
     with h5py.File(os.path.join(path, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("string_factor")
-        ut.save_fixed_length_strings(ghandle, "levels", x.get_levels())
-
-        codes = x.get_codes()
-        is_missing = codes == -1
-        has_missing = is_missing.any()
-        nlevels = len(x.get_levels())
-        if has_missing:
-            codes = codes.astype(numpy.uint32, copy=True)
-            codes[is_missing] = nlevels
-
-        dhandle = ghandle.create_dataset("codes", data=codes, dtype="u4", compression="gzip", chunks=True)
-        if has_missing:
-            dhandle.attrs.create("missing-value-placeholder", data=nlevels, dtype="u4")
-
+        _save_factor_to_hdf5(ghandle, x)
         nms = x.get_names()
         if not nms is None:
             ut.save_fixed_length_strings(ghandle, "names", nms.as_list())
 
-        if x.get_ordered():
-            ghandle.create_dataset("ordered", data=1, dtype="i8")

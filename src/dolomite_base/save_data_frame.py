@@ -12,6 +12,7 @@ from .save_object import save_object
 from .alt_save_object import alt_save_object
 from . import _utils as ut
 from . import write_to_hdf5 as write
+from ._utils_factor import _save_factor_to_hdf5
 
 
 @save_object.register
@@ -32,17 +33,21 @@ def save_data_frame(
         path: Path to a directory in which to save ``x``.
 
         data_frame_convert_list_to_vector: 
-            Whether a column that is a regular Python list should be converted
-            into a typed vector for saving, if all entries are of the same
-            basic type (integer, string, float, boolean) or None. This is more
-            efficient but changes the representation of the data. If ``False``,
-            a list column is saved as an external object instead.
+            If a column is a regular Python list where all entries are of the
+            same basic type (integer, string, float, boolean) or None, should
+            it be converted to a typed vector in the on-disk representation?
+            This avoids creating a separate file to store this column but
+            changes the class of the column when the ``BiocFrame`` is read back
+            into a Python session. If ``False``, the list is saved as an
+            external object instead.
 
         data_frame_convert_1darray_to_vector: 
-            Whether data frame columns that are 1D NumPy arrays should be saved
-            as typed vectors. This avoids creating a separate file for each
-            column but discards the distinction between 1D arrays and vectors.
-            If ``False``, a NumPy array is saved as an external object instead.
+            If a column is a 1D NumPy array, should it be saved as a typed
+            vector? This avoids creating a separate file for the column but
+            discards the distinction between 1D arrays and vectors. Usually
+            this is not an important difference, but nonetheless, users can
+            set this flag to ``False`` to save all 1D NumPy arrays as an 
+            external "dense array" object instead.
 
         kwargs: 
             Further arguments, passed to internal
@@ -228,18 +233,5 @@ def _process_MaskedArray_column_for_hdf5(x: numpy.ma.MaskedArray, index: int, ou
 def _process_factor_column_for_hdf5(x: Factor, index: int, output: Hdf5ColumnOutput):
     ghandle = output.handle.create_group(str(index))
     ghandle.attrs.create("type", data="factor")
-    ghandle.attrs.create("ordered", data=x.get_ordered(), dtype="i1")
-    ut.save_fixed_length_strings(ghandle, "levels", x.get_levels())
-
-    codes = x.get_codes()
-    is_missing = codes == -1
-    has_missing = is_missing.any()
-    nlevels = len(x.get_levels())
-    if has_missing:
-        codes = codes.astype(numpy.uint32, copy=True)
-        codes[is_missing] = nlevels
-
-    dhandle = ghandle.create_dataset("codes", data=codes, dtype='u4', compression="gzip", chunks=True)
-    if has_missing:
-        dhandle.attrs.create("missing-value-placeholder", data=nlevels, dtype='u4')
+    save_factor_to_hdf5(ghandle, x)
     return
