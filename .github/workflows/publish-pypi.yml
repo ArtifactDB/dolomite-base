@@ -1,7 +1,7 @@
 name: Publish to PyPI
 
 on:
-  create:
+  push:
     tags:
       - "*"
   workflow_dispatch:
