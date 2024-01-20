@@ -6,7 +6,8 @@ def validate_object(path: str):
     using validators based on the **takane** specifications.
 
     Args:
-        path: Path to the directory containing the object's representation.
+        path: 
+            Path to the directory containing the object's representation.
 
     Raise:
         Error if the validation fails.

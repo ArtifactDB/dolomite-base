@@ -4,13 +4,19 @@ from . import lib_dolomite_base as lib
 
 
 def choose_missing_integer_placeholder(x: numpy.ndarray, mask: numpy.ndarray, copy: bool = True) -> Tuple:
-    """
-    Choose a missing placeholder for integer arrays.
+    """Choose a missing placeholder for integer arrays.
 
     Args:
-        x: An integer array.
-        mask: An array of the same shape as ``x``, indicating which elements are masked.
-        copy: Whether to make a copy of ``x``. If ``False``, this function may mutate it in-place.
+        x: 
+            An integer array.
+        
+        mask: 
+            An array of the same shape as ``x``, indicating 
+            which elements are masked.
+        
+        copy: 
+            Whether to make a copy of ``x``. 
+            If ``False``, this function may mutate it in-place.
 
     Returns:
         A tuple containing an int32 array with the contents of ``x``, where all
@@ -31,13 +37,19 @@ def choose_missing_integer_placeholder(x: numpy.ndarray, mask: numpy.ndarray, co
 
 
 def choose_missing_float_placeholder(x: numpy.ndarray, mask: numpy.ndarray, copy: bool = True) -> Tuple:
-    """
-    Choose a missing placeholder for float arrays.
+    """Choose a missing placeholder for float arrays.
 
     Args:
-        x: A floating-point array.
-        mask: An array of the same shape as ``x``, indicating which elements are masked.
-        copy: Whether to make a copy of ``x``. If ``False``, this function may mutate it in-place.
+        x: 
+            A floating-point array.
+        
+        mask: 
+            An array of the same shape as ``x``, 
+            indicating which elements are masked.
+        
+        copy: 
+            Whether to make a copy of ``x``. 
+            If ``False``, this function may mutate it in-place.
 
     Returns:
         A tuple containing a float64 array with the contents of ``x`` where all
@@ -52,13 +64,19 @@ def choose_missing_float_placeholder(x: numpy.ndarray, mask: numpy.ndarray, copy
 
 
 def choose_missing_boolean_placeholder(x: numpy.ndarray, mask: numpy.ndarray, copy: bool = True):
-    """
-    Choose a missing placeholder for boolean arrays.
+    """Choose a missing placeholder for boolean arrays.
 
     Args:
-        x: A boolean array (or any numeric array to be interpreted as boolean).
-        mask: An array of the same shape as ``x``, indicating which elements are masked.
-        copy: Whether to make a copy of ``x``. If ``False``, this function may mutate it in-place.
+        x: 
+            A boolean array (or any numeric array to be interpreted as boolean).
+        
+        mask: 
+            An array of the same shape as ``x``, 
+            indicating which elements are masked.
+        
+        copy: 
+            Whether to make a copy of ``x``. 
+            If ``False``, this function may mutate it in-place.
 
     Returns:
         A tuple containing an int8 array with the contents of ``x``, where all
@@ -74,12 +92,15 @@ def choose_missing_boolean_placeholder(x: numpy.ndarray, mask: numpy.ndarray, co
 
 
 def choose_missing_string_placeholder(x: Sequence, copy: bool = True) -> Tuple:
-    """
-    Choose a missing placeholder for string sequences.
+    """Choose a missing placeholder for string sequences.
 
     Args:
-        x: A sequence of strings or Nones.
-        copy: Whether to make a copy of ``x``. If ``False``, this function may mutate it in-place.
+        x: 
+            A sequence of strings or Nones.
+        
+        copy: 
+            Whether to make a copy of ``x``. 
+            If ``False``, this function may mutate it in-place.
 
     Returns:
         A tuple containing a list of strings with the contents of ``x`` where

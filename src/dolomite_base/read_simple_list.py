@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Union
 import os
 
 from .alt_read_object import alt_read_object
@@ -11,11 +11,14 @@ def read_simple_list(path: str, metadata: dict, **kwargs) -> Union[dict, list]:
     instead via :py:meth:`~dolomite_base.read_object.read_object`.
 
     Args:
-        path: Path to the directory containing the object.
+        path: 
+            Path to the directory containing the object.
 
-        metadata: Metadata for the object.
+        metadata: 
+            Metadata for the object.
     
-        kwargs: Further arguments, passed to nested objects.
+        kwargs: 
+            Further arguments, passed to nested objects.
 
     Returns:
         A list or dictionary.

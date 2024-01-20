@@ -1,7 +1,4 @@
-from typing import Any, Optional, Sequence
 from biocframe import BiocFrame
-from biocutils import Factor, StringList, IntegerList, FloatList, BooleanList, NamedList
-import numpy
 import h5py
 import os
 
@@ -16,9 +13,11 @@ def read_data_frame(path: str, metadata: dict, data_frame_represent_column_as_1d
     be called directly but instead via :py:meth:`~dolomite_base.read_object.read_object`.
 
     Args:
-        path: Path to the directory containing the object.
+        path: 
+            Path to the directory containing the object.
 
-        metadata: Metadata for the object.
+        metadata: 
+            Metadata for the object.
 
         data_frame_represent_column_as_1darray: 
             Whether numeric columns should be represented as 1-dimensional

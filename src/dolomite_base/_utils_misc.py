@@ -1,10 +1,3 @@
-from numpy import ndarray
-import numpy
-from typing import Union, Sequence, Tuple
-from biocutils import StringList, IntegerList, FloatList, BooleanList, NamedList
-import h5py
-
-
 LIMIT32 = 2**31
 
 

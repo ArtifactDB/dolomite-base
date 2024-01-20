@@ -1,8 +1,6 @@
-from typing import Any
 from biocutils import Factor
 import os
 import h5py
-import numpy
 
 from .save_object import save_object, validate_saves
 from . import _utils_string as strings
@@ -16,11 +14,14 @@ def save_string_factor(x: Factor, path: str, **kwargs):
     :py:meth:`~dolomite_base.save_object.save_object` for details.
 
     Args:
-        x: Object to be saved.
+        x: 
+            Object to be saved.
 
-        path: Path to save the object.
+        path: 
+            Path to save the object.
 
-        kwargs: Further arguments, ignored.
+        kwargs: 
+            Further arguments, ignored.
 
     Returns:
         `x` is saved to `path`.

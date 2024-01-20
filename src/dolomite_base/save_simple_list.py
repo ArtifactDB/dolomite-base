@@ -23,13 +23,17 @@ def save_simple_list_from_dict(x: dict, path: str, simple_list_mode: Literal["hd
     :py:meth:`~dolomite_base.save_object.save_object` for details.
 
     Args:
-        x: Object to be saved.
+        x: 
+            Object to be saved.
 
-        path: Path to a directory in which to save the object.
+        path: 
+            Path to a directory in which to save the object.
 
-        simple_list_mode: Whether to save in HDF5 or JSON mode.
+        simple_list_mode: 
+            Whether to save in HDF5 or JSON mode.
 
-        kwargs: Further arguments, ignored.
+        kwargs: 
+            Further arguments, ignored.
 
     Returns:
         `x` is saved to `path`.
@@ -46,13 +50,17 @@ def save_simple_list_from_list(x: list, path: str, simple_list_mode: Literal["hd
     :py:meth:`~dolomite_base.save_object.save_object` for details.
 
     Args:
-        x: Object to be saved.
+        x: 
+            Object to be saved.
 
-        path: Path to a directory in which to save the object.
+        path: 
+            Path to a directory in which to save the object.
 
-        simple_list_mode: Whether to save in HDF5 or JSON mode.
+        simple_list_mode: 
+            Whether to save in HDF5 or JSON mode.
 
-        kwargs: Further arguments, ignored.
+        kwargs: 
+            Further arguments, ignored.
 
     Returns:
         `x` is saved to `path`.
@@ -68,13 +76,17 @@ def save_simple_list_from_NamedList(x: NamedList, path: str, simple_list_mode: L
     see :py:meth:`~dolomite_base.save_object.save_object` for details.
 
     Args:
-        x: Object to be saved.
+        x: 
+            Object to be saved.
 
-        path: Path to a directory in which to save the object.
+        path: 
+            Path to a directory in which to save the object.
 
-        simple_list_mode: Whether to save in HDF5 or JSON mode.
+        simple_list_mode: 
+            Whether to save in HDF5 or JSON mode.
 
-        kwargs: Further arguments, ignored.
+        kwargs: 
+            Further arguments, ignored.
 
     Returns:
         `x` is saved to `path`.
