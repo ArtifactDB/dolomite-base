@@ -4,6 +4,7 @@ import h5py
 import os
 
 from ._utils_factor import load_factor_from_hdf5
+from . import _utils_string as strings
 
 
 def read_string_factor(path: str, metadata: dict, **kwargs) -> Factor:
@@ -27,5 +28,5 @@ def read_string_factor(path: str, metadata: dict, **kwargs) -> Factor:
         ghandle = handle["string_factor"]
         output = load_factor_from_hdf5(ghandle)
         if "names" in ghandle:
-            output.set_names([a.decode() for a in ghandle["names"][:]], in_place=True)
+            output.set_names(strings.load_string_vector_from_hdf5(ghandle["names"]), in_place=True)
         return output

@@ -4,11 +4,11 @@ from typing import Union, Sequence, Tuple
 from biocutils import Factor
 import h5py
 
-from . import _utils_misc as ut
+from . import _utils_string as strings
 
 
 def save_factor_to_hdf5(handle: h5py.Group, f: Factor):
-    ut.save_fixed_length_strings(handle, "levels", f.get_levels())
+    strings.save_fixed_length_strings(handle, "levels", f.get_levels())
 
     codes = f.get_codes()
     is_missing = codes == -1
@@ -38,5 +38,5 @@ def load_factor_from_hdf5(handle: h5py.Group):
         ordered = handle.attrs["ordered"][()] != 0
     
     codes = codes.astype(numpy.int32, copy=False)
-    levels = [a.decode() for a in handle["levels"]]
+    levels = strings.load_string_vector_from_hdf5(handle["levels"])
     return Factor(codes, levels, ordered = ordered)

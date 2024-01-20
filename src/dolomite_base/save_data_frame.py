@@ -10,7 +10,7 @@ import gzip
 
 from .save_object import save_object
 from .alt_save_object import alt_save_object
-from . import _utils_misc as ut
+from . import _utils_string as strings
 from . import _utils_vector as write
 from ._utils_factor import save_factor_to_hdf5
 
@@ -75,10 +75,10 @@ def save_data_frame(
         for i in range(x.shape[1]):
             _process_column_for_hdf5(x.get_column(i), i, output)
 
-        ut.save_fixed_length_strings(ghandle, "column_names", x.get_column_names())
+        strings.save_fixed_length_strings(ghandle, "column_names", x.get_column_names())
         rn = x.get_row_names()
         if rn is not None:
-            ut.save_fixed_length_strings(ghandle, "row_names", rn)
+            strings.save_fixed_length_strings(ghandle, "row_names", rn)
 
     if len(other):
         other_dir = os.path.join(path, "other_columns")

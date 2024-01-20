@@ -5,7 +5,7 @@ import h5py
 import numpy
 
 from .save_object import save_object, validate_saves
-from . import _utils_misc as ut
+from . import _utils_string as strings
 from ._utils_factor import save_factor_to_hdf5
 
 @save_object.register
@@ -34,5 +34,4 @@ def save_string_factor(x: Factor, path: str, **kwargs):
         save_factor_to_hdf5(ghandle, x)
         nms = x.get_names()
         if not nms is None:
-            ut.save_fixed_length_strings(ghandle, "names", nms.as_list())
-
+            strings.save_fixed_length_strings(ghandle, "names", nms.as_list())

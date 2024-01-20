@@ -6,6 +6,7 @@ import os
 import warnings
 
 from ._utils_vector import load_vector_from_hdf5
+from . import _utils_string as strings
 
 
 def read_atomic_vector(path: str, metadata: dict, atomic_vector_use_numeric_1darray: bool = False, **kwargs) -> Union[StringList, IntegerList, FloatList, BooleanList, numpy.ndarray]:
@@ -38,13 +39,13 @@ def read_atomic_vector(path: str, metadata: dict, atomic_vector_use_numeric_1dar
 
     with h5py.File(os.path.join(path, "contents.h5"), "r") as handle:
         ghandle = handle["atomic_vector"]
-        vectype = ghandle.attrs["type"]
+        vectype = strings.load_scalar_string_attribute_from_hdf5(ghandle, "type")
         dhandle = ghandle["values"]
         output = load_vector_from_hdf5(dhandle, vectype, atomic_vector_use_numeric_1darray)
 
         if "names" in ghandle:
             if isinstance(output, NamedList):
-                output.set_names([a.decode() for a in ghandle["names"]], in_place=True)
+                output.set_names(strings.load_string_vector_from_hdf5(ghandle["names"]), in_place=True)
             else:
                 warnings.warn("skipping names when reading atomic vectors as 1-dimensional NumPy arrays")
         return output

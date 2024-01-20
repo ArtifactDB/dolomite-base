@@ -4,7 +4,8 @@ import h5py
 from biocutils import StringList, IntegerList, FloatList, BooleanList
 
 from . import choose_missing_placeholder as ch
-from . import _utils_misc as ut
+from . import _utils_misc as misc
+from . import _utils_string as strings
 
 
 def _list_to_numpy_with_mask(x: Sequence, x_dtype, mask_dtype = numpy.uint8) -> numpy.ndarray:
@@ -25,7 +26,7 @@ def write_string_list_to_hdf5(handle: h5py.Group, name: str, x: list) -> h5py.Da
     if has_none:
         x, placeholder = ch.choose_missing_string_placeholder(x)
 
-    dset = ut.save_fixed_length_strings(handle, name, x)
+    dset = strings.save_fixed_length_strings(handle, name, x)
     if has_none:
         dset.attrs["missing-value-placeholder"] = placeholder
     return dset
@@ -35,7 +36,7 @@ def write_integer_list_to_hdf5(handle: h5py.Group, name: str, x: list) -> h5py.D
     has_none = any(y is None for y in x)
 
     final_type = int
-    if ut.sequence_exceeds_int32(x):
+    if misc.sequence_exceeds_int32(x):
         final_type = float
         if has_none:
             x, mask = _list_to_numpy_with_mask(x, numpy.float64)
@@ -89,7 +90,7 @@ def write_ndarray_to_hdf5(handle: h5py.Group, name: str, x: numpy.ndarray) -> h5
     elif x.dtype == numpy.bool_:
         dset = handle.create_dataset(name, data=x, dtype="i1", compression="gzip", chunks=True)
     else:
-        if ut.sequence_exceeds_int32(x, check_none=False):
+        if misc.sequence_exceeds_int32(x, check_none=False):
             dset = handle.create_dataset(name, data=x, dtype="f8", compression="gzip", chunks=True)
         else:
             dset = handle.create_dataset(name, data=x, dtype="i4", compression="gzip", chunks=True)
@@ -111,7 +112,7 @@ def write_MaskedArray_to_hdf5(handle: h5py.Group, name: str, x: numpy.ma.MaskedA
         dset.attrs.create("missing-value-placeholder", placeholder, dtype="i1")
     else:
         final_type = int
-        if ut.sequence_exceeds_int32(x):
+        if misc.sequence_exceeds_int32(x):
             final_type = float
             placeholder = numpy.NaN
             x = x.data.astype(numpy.float64)
@@ -133,16 +134,16 @@ def write_MaskedArray_to_hdf5(handle: h5py.Group, name: str, x: numpy.ma.MaskedA
 
 
 def load_vector_from_hdf5(handle: h5py.Dataset, curtype: str, convert_to_1darray: bool) -> Union[StringList, IntegerList, FloatList, BooleanList, numpy.ndarray]:
-    values = handle[:]
     if curtype == "string":
-        values = StringList(v.decode('UTF8') for v in values)
+        values = StringList(strings.load_string_vector_from_hdf5(handle))
         if "missing-value-placeholder" in handle.attrs:
-            placeholder = handle.attrs["missing-value-placeholder"]
+            placeholder = strings.load_scalar_string_attribute_from_hdf5(handle, "missing-value-placeholder")
             for j, y in enumerate(values):
                 if y == placeholder:
                     values[j] = None
         return values
 
+    values = handle[:]
     if "missing-value-placeholder" in handle.attrs:
         placeholder = handle.attrs["missing-value-placeholder"]
         if numpy.isnan(placeholder):

@@ -6,6 +6,7 @@ import h5py
 import os
 
 from .alt_read_object import alt_read_object
+from . import _utils_string as strings
 from ._utils_vector import load_vector_from_hdf5
 from ._utils_factor import load_factor_from_hdf5 
 
@@ -39,9 +40,9 @@ def read_data_frame(path: str, metadata: dict, data_frame_represent_column_as_1d
     with h5py.File(os.path.join(path, "basic_columns.h5"), "r") as handle:
         ghandle = handle["data_frame"]
         expected_rows = ghandle.attrs["row-count"][()]
-        column_names = [v.decode() for v in ghandle["column_names"]]
+        column_names = strings.load_string_vector_from_hdf5(ghandle["column_names"])
         if "row_names" in ghandle:
-            row_names = [v.decode("UTF8") for v in ghandle["row_names"]]
+            row_names = strings.load_string_vector_from_hdf5(ghandle["row_names"])
 
         dhandle = ghandle["data"]
         for i, col in enumerate(column_names):
@@ -50,7 +51,7 @@ def read_data_frame(path: str, metadata: dict, data_frame_represent_column_as_1d
                 contents[col] = alt_read_object(os.path.join(path, "other_columns", name), **kwargs)
             else:
                 xhandle = dhandle[name]
-                curtype = xhandle.attrs["type"]
+                curtype = strings.load_scalar_string_attribute_from_hdf5(xhandle, "type")
                 if curtype == "factor":
                     contents[col] = load_factor_from_hdf5(xhandle)
                 else:

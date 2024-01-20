@@ -10,7 +10,8 @@ import h5py
 
 from .save_object import save_object, validate_saves
 from .alt_save_object import alt_save_object
-from . import _utils_misc as ut
+from . import _utils_misc as misc
+from . import _utils_string as strings
 from . import _utils_vector as write
 
 
@@ -147,7 +148,7 @@ def _save_simple_list_recursive_StringList(x: StringList, externals: list, handl
     handle.attrs["uzuki_type"] = "string"
     write.write_string_list_to_hdf5(handle, "data", x.as_list())
     if nms is not None:
-        ut.save_fixed_length_strings(handle, "names", nms.as_list())
+        strings.save_fixed_length_strings(handle, "names", nms.as_list())
     return
 
 
@@ -157,7 +158,7 @@ def _save_simple_list_recursive_IntegerList(x: IntegerList, externals: list, han
 
     if handle is None:
         final_type = "integer"
-        if ut.sequence_exceeds_int32(x):
+        if misc.sequence_exceeds_int32(x):
             final_type = "number"
         output = { "type": final_type, "values": x.as_list() }
         if nms is not None:
@@ -171,7 +172,7 @@ def _save_simple_list_recursive_IntegerList(x: IntegerList, externals: list, han
     else:
         handle.attrs["uzuki_type"] = "integer"
     if nms is not None:
-        ut.save_fixed_length_strings(handle, "names", nms.as_list())
+        strings.save_fixed_length_strings(handle, "names", nms.as_list())
     return
 
 
@@ -190,7 +191,7 @@ def _save_simple_list_recursive_FloatList(x: FloatList, externals: list, handle)
     handle.attrs["uzuki_type"] = "number"
     write.write_float_list_to_hdf5(handle, "data", x.as_list())
     if nms is not None:
-        ut.save_fixed_length_strings(handle, "names", nms.as_list())
+        strings.save_fixed_length_strings(handle, "names", nms.as_list())
     return
 
 
@@ -208,7 +209,7 @@ def _save_simple_list_recursive_BooleanList(x: BooleanList, externals: list, han
     handle.attrs["uzuki_type"] = "boolean"
     write.write_boolean_list_to_hdf5(handle, "data", x.as_list())
     if nms is not None:
-        ut.save_fixed_length_strings(handle, "names", nms.as_list())
+        strings.save_fixed_length_strings(handle, "names", nms.as_list())
     return
 
 
@@ -251,7 +252,7 @@ def _save_simple_list_recursive_dict(x: dict, externals: list, handle):
             if not isinstance(k, str):
                 warn("converting non-string key with value " + str(k) + " to a string", UserWarning)
             names.append(str(k))
-        ut.save_fixed_length_strings(handle, "names", names)
+        strings.save_fixed_length_strings(handle, "names", names)
         return
 
 
@@ -272,7 +273,7 @@ def _save_simple_list_recursive_NamedList(x: NamedList, externals: list, handle)
         for i, v in enumerate(x.as_list()):
             ghandle = dhandle.create_group(str(i))
             _save_simple_list_recursive(v, externals, ghandle)
-        ut.save_fixed_length_strings(handle, "names", x.get_names().as_list())
+        strings.save_fixed_length_strings(handle, "names", x.get_names().as_list())
         return
 
 
@@ -287,7 +288,7 @@ def _save_simple_list_recursive_bool(x: bool, externals: list, handle):
 
 @_save_simple_list_recursive.register
 def _save_simple_list_recursive_int(x: int, externals: list, handle):
-    if not ut.scalar_exceeds_int32(x):
+    if not misc.scalar_exceeds_int32(x):
         if handle is None:
             return { "type": "integer", "values": int(x) }
         else:
@@ -340,7 +341,7 @@ def _save_simple_list_recursive_MaskedConstant(x: np.ndarray, externals: list, h
 def _save_simple_list_recursive_numpy_generic(x: np.generic, externals: list, handle):
     final_type = None
     if np.issubdtype(x.dtype, np.integer):
-        if not ut.scalar_exceeds_int32(x):
+        if not misc.scalar_exceeds_int32(x):
             final_type = int
         else:
             final_type = float
@@ -394,12 +395,12 @@ def _save_simple_list_recursive_factor(x: Factor, externals: list, handle):
         if (x.get_codes() == -1).any():
             dhandle.attrs.create("missing-value-placeholder", data=-1, dtype="i4")
 
-        ut.save_fixed_length_strings(handle, "levels", x.get_levels().as_list())
+        strings.save_fixed_length_strings(handle, "levels", x.get_levels().as_list())
         if x.get_ordered():
             handle.create_dataset("ordered", data=x.get_ordered(), dtype="i1")
 
         if not nms is None:
-            ut.save_fixed_length_strings(handle, "names", nms.as_list())
+            strings.save_fixed_length_strings(handle, "names", nms.as_list())
         return
 
 
