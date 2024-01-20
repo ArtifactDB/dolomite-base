@@ -23,12 +23,11 @@ struct PythonNumpyVector : public Base, public PythonBase {
     }
 
     void set(size_t i, T val) {
-        storage.mutable_at(i) = val;
+        storage[i] = val;
     }
 
     void set_missing(size_t i) {
-        storage.mutable_at(i) = 0;
-        missing.push_back(i);
+        storage[i] = pybind11::none();
     }
 
     void set_name(size_t i, std::string n) {
@@ -38,53 +37,32 @@ struct PythonNumpyVector : public Base, public PythonBase {
     pybind11::object extract() const {
         if (names.empty()) {
             if (is_scalar) {
-                pybind11::module np = pybind11::module::import("numpy");
-                if (!missing.empty()) {
-                    pybind11::module ma = np.attr("ma");
-                    return ma.attr("masked");
-                } else {
-                    return pybind11::cast(storage.at(0));
-                }
-
+                return storage[0];
             } else {
-                if (missing.empty()) {
-                    return storage;
+                pybind11::module bu = pybind11::module::import("biocutils");
+                if constexpr(std::is_same<T, int32_t>::value) {
+                    return bu.attr("IntegerList")(storage);
+                } else if constexpr(std::is_same<T, bool>::value) {
+                    return bu.attr("BooleanList")(storage);
                 } else {
-                    return mask_numpy_array(storage, missing);
+                    return bu.attr("FloatList")(storage);
                 }
             }
-
         } else {
-            // Numpy arrays don't have direct support for names, so we
-            // just convert it into a dict.
-            pybind11::dict output;
-            pybind11::module np = pybind11::module::import("numpy");
-
-            if (missing.empty()) {
-                for (size_t i = 0, end = storage.size(); i < end; ++i) {
-                    output[names[i].c_str()] = pybind11::cast(storage.at(i));
-                }
+            pybind11::module bu = pybind11::module::import("biocutils");
+            using namespace pybind11::literals;
+            if constexpr(std::is_same<T, int32_t>::value) {
+                return bu.attr("IntegerList")(storage, "names"_a = names);
+            } else if constexpr(std::is_same<T, bool>::value) {
+                return bu.attr("BooleanList")(storage, "names"_a = names);
             } else {
-                std::unordered_set<size_t> all_missing(missing.begin(), missing.end());
-                pybind11::module ma = np.attr("ma");
-                pybind11::object masked = ma.attr("masked");
-
-                for (size_t i = 0, end = storage.size(); i < end; ++i) {
-                    if (all_missing.find(i) == all_missing.end()) {
-                        output[names[i].c_str()] = pybind11::cast(storage.at(i));
-                    } else {
-                        output[names[i].c_str()] = masked;
-                    }
-                }
+                return bu.attr("FloatList")(storage, "names"_a = names);
             }
-
-            return output;
         }
     }
 
-    pybind11::array_t<T> storage;
-    std::vector<std::string> names;
-    std::vector<size_t> missing;
+    pybind11::list storage;
+    pybind11::list names;
     bool is_scalar;
 };
 
@@ -120,19 +98,14 @@ struct PythonStringVector : public uzuki2::StringVector, public PythonBase {
                 return bu.attr("StringList")(storage);
             }
         } else {
-            // Numpy arrays don't have direct support for names, so we
-            // just convert it into a dict.
-            pybind11::dict output;
-            for (size_t i = 0, end = storage.size(); i < end; ++i) {
-                output[names[i].c_str()] = storage[i];
-            }
-            return output;
+            pybind11::module bu = pybind11::module::import("biocutils");
+            using namespace pybind11::literals;
+            return bu.attr("StringList")(storage, "names"_a = names);
         }
     }
 
     pybind11::list storage;
-    std::vector<std::string> names;
-    std::vector<size_t> missing;
+    pybind11::list names;
     bool is_scalar;
 };
 
@@ -160,28 +133,17 @@ struct PythonFactor : public uzuki2::Factor, public PythonBase {
     }
 
     pybind11::object extract() const {
-        if (names.empty()) {
-            pybind11::module bu = pybind11::module::import("biocutils");
-            using namespace pybind11::literals;
+        pybind11::module bu = pybind11::module::import("biocutils");
+        using namespace pybind11::literals;
+        if (names.size() == 0) {
             return bu.attr("Factor")(storage, levels, "ordered"_a = ordered);
-
         } else {
-            // Factor doesn't have direct support for names, so we
-            // just convert it into a dict.
-            pybind11::dict output;
-            for (size_t i = 0, end = storage.size(); i < end; ++i) {
-                if (storage.at(i) >= 0) {
-                    output[names[i].c_str()] = levels[storage.at(i)];
-                } else {
-                    output[names[i].c_str()] = pybind11::none();
-                }
-            }
-            return output;
+            return bu.attr("Factor")(storage, levels, "ordered"_a = ordered, "names"_a = names);
         }
     }
 
     pybind11::array_t<int32_t> storage;
-    std::vector<std::string> names;
+    pybind11::list names;
     bool is_scalar;
     pybind11::list levels;
     bool ordered;
@@ -219,20 +181,18 @@ struct PythonList : public uzuki2::List, public PythonBase {
     }
 
     pybind11::object extract() const {
+        pybind11::module bu = pybind11::module::import("biocutils");
         if (!has_names) {
-            return values;
+            return bu.attr("NamedList")(values);
         } else {
-            pybind11::dict output;
-            for (size_t i = 0, end = names.size(); i < end; ++i) {
-                output[names[i].c_str()] = values[i];
-            }
-            return output;
+            using namespace pybind11::literals;
+            return bu.attr("NamedList")(values, "names"_a = names);
         }
     }
 
     pybind11::list values;
     bool has_names = false;
-    std::vector<std::string> names;
+    pybind11::list names;
 };
 
 /** Provisioner. **/
@@ -287,15 +247,7 @@ pybind11::object load_list_json(std::string path, pybind11::list children) {
     return dynamic_cast<PythonBase*>(parsed.get())->extract();
 }
 
-void validate_list_json(std::string path, size_t n) {
-    uzuki2::json::validate_file(path, n);
-}
-
 pybind11::object load_list_hdf5(std::string path, std::string name, pybind11::list children) {
     auto parsed = uzuki2::hdf5::parse<PythonProvisioner>(path, name, PythonExternals(children));
     return dynamic_cast<PythonBase*>(parsed.get())->extract();
-}
-
-void validate_list_hdf5(std::string path, std::string name, size_t n) {
-    uzuki2::hdf5::validate(path, name, n);
 }

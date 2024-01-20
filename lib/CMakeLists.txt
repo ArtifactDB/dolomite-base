@@ -11,7 +11,7 @@ include(FetchContent)
 FetchContent_Declare(
   millijson
   GIT_REPOSITORY https://github.com/ArtifactDB/millijson
-  GIT_TAG v1.0.0
+  GIT_TAG v1.0.1
 )
 
 FetchContent_Declare(
@@ -23,25 +23,25 @@ FetchContent_Declare(
 FetchContent_Declare(
   uzuki2
   GIT_REPOSITORY https://github.com/ArtifactDB/uzuki2
-  GIT_TAG v1.3.0
-)
-
-FetchContent_Declare(
-  comservatory
-  GIT_REPOSITORY https://github.com/ArtifactDB/comservatory
-  GIT_TAG v2.0.1
+  GIT_TAG v1.4.0
 )
 
 FetchContent_Declare(
   ritsuko 
   GIT_REPOSITORY https://github.com/ArtifactDB/ritsuko
-  GIT_TAG v0.3.4
+  GIT_TAG v0.5.2
+)
+
+FetchContent_Declare(
+  chihaya
+  GIT_REPOSITORY https://github.com/ArtifactDB/chihaya
+  GIT_TAG v1.1.0
 )
 
 FetchContent_Declare(
   takane
   GIT_REPOSITORY https://github.com/ArtifactDB/takane
-  GIT_TAG v0.5.0
+  GIT_TAG v0.6.1
 )
 
 FetchContent_MakeAvailable(uzuki2)
@@ -49,7 +49,7 @@ FetchContent_MakeAvailable(byteme)
 FetchContent_MakeAvailable(millijson)
 FetchContent_MakeAvailable(takane)
 FetchContent_MakeAvailable(ritsuko)
-FetchContent_MakeAvailable(comservatory)
+FetchContent_MakeAvailable(chihaya)
 
 # Defining the targets.
 set(TARGET dolomite_base)
@@ -59,16 +59,15 @@ find_package(pybind11 CONFIG)
 
 # pybind11 method:
 pybind11_add_module(${TARGET} 
-    src/load_csv.cpp
     src/load_list.cpp
     src/choose_missing_placeholder.cpp
-    src/check_df.cpp
+    src/validate.cpp
     src/init.cpp
 )
 
 set_property(TARGET ${TARGET} PROPERTY CXX_STANDARD 17)
 
-target_link_libraries(${TARGET} PRIVATE uzuki2 comservatory takane pybind11::pybind11)
+target_link_libraries(${TARGET} PRIVATE uzuki2 takane pybind11::pybind11)
 
 set_target_properties(${TARGET} PROPERTIES
     OUTPUT_NAME lib_dolomite_base
