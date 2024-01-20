@@ -22,6 +22,16 @@ def save_object(x: Any, path: str, **kwargs):
 
 
 def validate_saves(fn):
+    """
+    Decorator to validate the output of :py:func:`~save_object`.
+
+    Args:
+        fn: Function that implements a method for ``save_object``.
+
+    Returns:
+        A wrapped version of the function that validates the directory
+        containing the on-disk representation of the saved object.
+    """
     @wraps(fn)
     def wrapper(x, path, **kwargs):
         out = fn(x, path, **kwargs)

@@ -15,7 +15,7 @@ except PackageNotFoundError:  # pragma: no cover
 finally:
     del version, PackageNotFoundError
 
-from .save_object import save_object
+from .save_object import save_object, validate_saves
 from .validate_object import validate_object
 from .save_atomic_vector import save_atomic_vector_from_string_list, save_atomic_vector_from_integer_list, save_atomic_vector_from_float_list, save_atomic_vector_from_boolean_list
 from .save_string_factor import save_string_factor
