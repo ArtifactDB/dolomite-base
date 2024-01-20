@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>dolomite_base.acquire_file - dolomite-base unknown documentation</title>
+        <title>dolomite_base.read_string_factor - dolomite-base unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -196,53 +196,41 @@
           </label>
         </div>
         <article role="main">
-          <h1>Source code for dolomite_base.acquire_file</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
+          <h1>Source code for dolomite_base.read_string_factor</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">biocutils</span> <span class="kn">import</span> <span class="n">Factor</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">h5py</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-
-<div class="viewcode-block" id="acquire_file">
-<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.acquire_file.acquire_file">[docs]</a>
-<span class="nd">@singledispatch</span>
-<span class="k">def</span> <span class="nf">acquire_file</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">path</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Acquire the file path for a resource. Applications should define methods</span>
-<span class="sd">    for this generic to acquire metadata from other places.</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">        project: </span>
-<span class="sd">            Any value that specifies the project of interest.  By default, this</span>
-<span class="sd">            should be a path to a staging directory, but other applications may</span>
-<span class="sd">            provide their own classes, e.g., identify projects on remotes. </span>
-
-<span class="sd">        path:</span>
-<span class="sd">            Relative path to the resource of interest inside the project.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        File path to the resource, possibly after downloading and caching.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;&#39;acquire_file&#39; for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">project</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; has not been implemented&quot;</span><span class="p">)</span></div>
+<span class="kn">from</span> <span class="nn">._utils_factor</span> <span class="kn">import</span> <span class="n">load_factor_from_hdf5</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_utils_string</span> <span class="k">as</span> <span class="n">strings</span>
 
 
+<div class="viewcode-block" id="read_string_factor">
+<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.read_string_factor.read_string_factor">[docs]</a>
+<span class="k">def</span> <span class="nf">read_string_factor</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Factor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read a string factor from disk. In general, this function should not</span>
+<span class="sd">    be called directly but instead via</span>
+<span class="sd">    :py:meth:`~dolomite_base.load_object.load_object`.</span>
 
-<div class="viewcode-block" id="acquire_file_from_dir">
-<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.acquire_file.acquire_file_from_dir">[docs]</a>
-<span class="nd">@acquire_file</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">acquire_file_from_dir</span><span class="p">(</span><span class="n">project</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Acquire the file path for a resource in a local staging directory.</span>
-<span class="sd">    This is a method for the :py:meth:`~acquire_file` generic.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        path: Path to the directory containing the object.</span>
 
-<span class="sd">    Arguments:</span>
-<span class="sd">        project: </span>
-<span class="sd">            Path to a staging directory.</span>
+<span class="sd">        metadata: Metadata for the object. </span>
 
-<span class="sd">        path:</span>
-<span class="sd">            Relative path to the resource of interest inside the project.</span>
+<span class="sd">        kwargs: Further arguments, passed to nested objects.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        File path to the resource, possibly after downloading and caching.</span>
+<span class="sd">        A :py:class:`~biocutils.Factor.Factor` object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
+
+    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;contents.h5&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">ghandle</span> <span class="o">=</span> <span class="n">handle</span><span class="p">[</span><span class="s2">&quot;string_factor&quot;</span><span class="p">]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">load_factor_from_hdf5</span><span class="p">(</span><span class="n">ghandle</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;names&quot;</span> <span class="ow">in</span> <span class="n">ghandle</span><span class="p">:</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">set_names</span><span class="p">(</span><span class="n">strings</span><span class="o">.</span><span class="n">load_string_vector_from_hdf5</span><span class="p">(</span><span class="n">ghandle</span><span class="p">[</span><span class="s2">&quot;names&quot;</span><span class="p">]),</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span></div>
 
 </pre></div>
         </article>

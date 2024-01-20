@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>dolomite_base.load_string_factor - dolomite-base unknown documentation</title>
+        <title>dolomite_base.alt_save_object - dolomite-base unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -196,54 +196,69 @@
           </label>
         </div>
         <article role="main">
-          <h1>Source code for dolomite_base.load_string_factor</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
-<span class="kn">from</span> <span class="nn">biocutils</span> <span class="kn">import</span> <span class="n">Factor</span>
-
-<span class="kn">from</span> <span class="nn">.acquire_file</span> <span class="kn">import</span> <span class="n">acquire_file</span>
-<span class="kn">from</span> <span class="nn">.acquire_metadata</span> <span class="kn">import</span> <span class="n">acquire_metadata</span>
-<span class="kn">from</span> <span class="nn">.alt_load_object</span> <span class="kn">import</span> <span class="n">alt_load_object</span>
-<span class="kn">from</span> <span class="nn">.write_csv</span> <span class="kn">import</span> <span class="n">read_csv</span>
-<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">_is_gzip_compressed</span>
+          <h1>Source code for dolomite_base.alt_save_object</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">.save_object</span> <span class="kn">import</span> <span class="n">save_object</span>
 
 
-<div class="viewcode-block" id="load_string_factor">
-<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.load_string_factor.load_string_factor">[docs]</a>
-<span class="k">def</span> <span class="nf">load_string_factor</span><span class="p">(</span><span class="n">meta</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">project</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Factor</span><span class="p">:</span>
+<span class="n">ALT_SAVE_OBJECT_FUNCTION</span> <span class="o">=</span> <span class="n">save_object</span>
+
+
+<div class="viewcode-block" id="alt_save_object_function">
+<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.alt_save_object.alt_save_object_function">[docs]</a>
+<span class="k">def</span> <span class="nf">alt_save_object_function</span><span class="p">(</span><span class="n">fun</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Load a string factor from a CSV file. In general, this function should not</span>
-<span class="sd">    be called directly but instead via</span>
-<span class="sd">    :py:meth:`~dolomite_base.load_object.load_object`.</span>
+<span class="sd">    Get or set the alternative saving function for use by</span>
+<span class="sd">    :py:meth:`~alt_save_object`. Typically set by applications prior to</span>
+<span class="sd">    saving for customization, e.g., to save extra metadata.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        meta: Metadata for this string factor.</span>
-
-<span class="sd">        project: Value specifying the project of interest. This is most</span>
-<span class="sd">            typically a string containing a file path to a staging directory</span>
-<span class="sd">            but may also be an application-specific object that works with</span>
-<span class="sd">            :py:meth:`~dolomite_base.acquire_file.acquire_file`.</span>
-
-<span class="sd">        kwargs: Further arguments, passed to nested objects.</span>
+<span class="sd">    Arguments:</span>
+<span class="sd">        fun:</span>
+<span class="sd">            The alternative saving function. This should accept the same</span>
+<span class="sd">            arguments and return the same value as</span>
+<span class="sd">            :py:meth:`~dolomite_base.save_object.save_object`.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        A :py:class:`~biocutils.Factor.Factor` object.</span>
+<span class="sd">        If ``fun = None``, the current setting of the alternative saving</span>
+<span class="sd">        function is returned. </span>
+
+<span class="sd">        Otherwise, the alternative saving function is set to ``fun``,</span>
+<span class="sd">        and the previous function is returned.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">fpath</span> <span class="o">=</span> <span class="n">acquire_file</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">])</span>
-    <span class="n">gzip</span> <span class="o">=</span> <span class="n">_is_gzip_compressed</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="s2">&quot;factor&quot;</span><span class="p">)</span>
-    <span class="n">dump_names</span><span class="p">,</span> <span class="n">dump_fields</span> <span class="o">=</span> <span class="n">read_csv</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;factor&quot;</span><span class="p">][</span><span class="s2">&quot;length&quot;</span><span class="p">],</span> <span class="n">compression</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;gzip&quot;</span> <span class="k">if</span> <span class="n">gzip</span> <span class="k">else</span> <span class="s2">&quot;none&quot;</span><span class="p">))</span>
+    <span class="k">global</span> <span class="n">ALT_SAVE_OBJECT_FUNCTION</span>
+    <span class="k">if</span> <span class="n">fun</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ALT_SAVE_OBJECT_FUNCTION</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">old</span> <span class="o">=</span> <span class="n">ALT_SAVE_OBJECT_FUNCTION</span>
+        <span class="n">ALT_SAVE_OBJECT_FUNCTION</span> <span class="o">=</span> <span class="n">fun</span>
+        <span class="k">return</span> <span class="n">old</span></div>
 
-    <span class="c1"># Better hope it&#39;s not named, we don&#39;t have a good way to deal with that right now.</span>
-    <span class="c1"># Probably should just emit a warning about lost names.</span>
-    <span class="n">codes</span> <span class="o">=</span> <span class="n">dump_fields</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="n">lmeta</span> <span class="o">=</span> <span class="n">acquire_metadata</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;string_factor&quot;</span><span class="p">][</span><span class="s2">&quot;levels&quot;</span><span class="p">][</span><span class="s2">&quot;resource&quot;</span><span class="p">][</span><span class="s2">&quot;path&quot;</span><span class="p">])</span>
-    <span class="n">levels</span> <span class="o">=</span> <span class="n">alt_load_object</span><span class="p">(</span><span class="n">lmeta</span><span class="p">,</span> <span class="n">project</span><span class="p">)</span>
 
-    <span class="n">ordered</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="k">if</span> <span class="s2">&quot;ordered&quot;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;string_factor&quot;</span><span class="p">]:</span>
-        <span class="n">ordered</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;string_factor&quot;</span><span class="p">][</span><span class="s2">&quot;ordered&quot;</span><span class="p">]</span>
+<div class="viewcode-block" id="alt_save_object">
+<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.alt_save_object.alt_save_object">[docs]</a>
+<span class="k">def</span> <span class="nf">alt_save_object</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper around :py:meth:`~dolomite_base.save_object.save_object` that</span>
+<span class="sd">    respects application-defined overrides from</span>
+<span class="sd">    :py:meth:`~alt_save_object_function`.  This allows applications to</span>
+<span class="sd">    customize the saving process for some or all of the object classes,</span>
+<span class="sd">    assuming that developers of dolomite extensions (and the associated</span>
+<span class="sd">    ``save_object`` methods) use ``alt_save_object`` internally for saving</span>
+<span class="sd">    child objects instead of ``save_object``.</span>
 
-    <span class="k">return</span> <span class="n">Factor</span><span class="p">(</span><span class="n">codes</span><span class="p">,</span> <span class="n">levels</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="n">ordered</span><span class="p">)</span></div>
+<span class="sd">    Arguments:</span>
+<span class="sd">        x: Object to be saved.</span>
+
+<span class="sd">        path: Path to a directory to save `x`.</span>
+
+<span class="sd">        kwargs: Further arguments to be passed to individual methods.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        `x` is saved to `path`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fun</span> <span class="o">=</span> <span class="n">alt_save_object_function</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fun</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 </pre></div>
         </article>

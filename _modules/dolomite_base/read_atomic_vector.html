@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>dolomite_base.stage_string_factor - dolomite-base unknown documentation</title>
+        <title>dolomite_base.read_atomic_vector - dolomite-base unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -196,71 +196,60 @@
           </label>
         </div>
         <article role="main">
-          <h1>Source code for dolomite_base.stage_string_factor</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">biocutils</span> <span class="kn">import</span> <span class="n">Factor</span>
-<span class="kn">from</span> <span class="nn">biocframe</span> <span class="kn">import</span> <span class="n">BiocFrame</span>
+          <h1>Source code for dolomite_base.read_atomic_vector</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">biocutils</span> <span class="kn">import</span> <span class="n">StringList</span><span class="p">,</span> <span class="n">IntegerList</span><span class="p">,</span> <span class="n">FloatList</span><span class="p">,</span> <span class="n">BooleanList</span><span class="p">,</span> <span class="n">NamedList</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
-<span class="kn">from</span> <span class="nn">.stage_object</span> <span class="kn">import</span> <span class="n">stage_object</span>
-<span class="kn">from</span> <span class="nn">.alt_stage_object</span> <span class="kn">import</span> <span class="n">alt_stage_object</span>
-<span class="kn">from</span> <span class="nn">.write_metadata</span> <span class="kn">import</span> <span class="n">write_metadata</span>
-<span class="kn">from</span> <span class="nn">.write_csv</span> <span class="kn">import</span> <span class="n">write_csv</span>
+<span class="kn">from</span> <span class="nn">._utils_vector</span> <span class="kn">import</span> <span class="n">load_vector_from_hdf5</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_utils_string</span> <span class="k">as</span> <span class="n">strings</span>
 
 
-<div class="viewcode-block" id="stage_string_factor">
-<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.stage_string_factor.stage_string_factor">[docs]</a>
-<span class="nd">@stage_object</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">stage_string_factor</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Factor</span><span class="p">,</span> <span class="nb">dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">is_child</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Method for saving :py:class:`~biocutils.Factor.Factor` objects to their</span>
-<span class="sd">    corresponding file representation, see</span>
-<span class="sd">    :py:meth:`~dolomite_base.stage_object.stage_object` for details.</span>
+<div class="viewcode-block" id="read_atomic_vector">
+<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.read_atomic_vector.read_atomic_vector">[docs]</a>
+<span class="k">def</span> <span class="nf">read_atomic_vector</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">atomic_vector_use_numeric_1darray</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">StringList</span><span class="p">,</span> <span class="n">IntegerList</span><span class="p">,</span> <span class="n">FloatList</span><span class="p">,</span> <span class="n">BooleanList</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read an atomic vector from its on-disk representation. In general, this</span>
+<span class="sd">    function should not be called directly but instead via</span>
+<span class="sd">    :py:meth:`~dolomite_base.read_object.read_object`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        x: Object to be staged.</span>
+<span class="sd">        path: Path to the directory containing the object.</span>
 
-<span class="sd">        dir: Staging directory.</span>
+<span class="sd">        metadata: Metadata for the object.</span>
 
-<span class="sd">        path: Relative path inside ``dir`` to save the object.</span>
+<span class="sd">        atomic_vector_use_numeric_1darray: </span>
+<span class="sd">            Whether numeric vectors should be represented as 1-dimensional</span>
+<span class="sd">            NumPy arrays. This is more memory-efficient than regular Python</span>
+<span class="sd">            lists but discards the distinction between vectors and 1-D arrays.</span>
+<span class="sd">            We set this to ``False`` by default to ensure that we can load</span>
+<span class="sd">            names via :py:class:`~biocutils.NamedList.NamedList` subclasses.</span>
 
-<span class="sd">        is_child: Is ``x`` a child of another object?</span>
-
-<span class="sd">        kwargs: Further arguments, ignored.</span>
+<span class="sd">        kwargs: Further arguments, passed to nested objects.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Metadata that can be edited by calling methods and then saved with </span>
-<span class="sd">        :py:meth:`~dolomite_base.write_metadata.write_metadata`.</span>
+<span class="sd">        An atomic vector, represented as a</span>
+<span class="sd">        :py:class:`~biocutils.StringList.StringList`,</span>
+<span class="sd">        :py:class:`~biocutils.IntegerList.IntegerList`,</span>
+<span class="sd">        :py:class:`~biocutils.FloatList.FloatList`,</span>
+<span class="sd">        :py:class:`~biocutils.BooleanList.BooleanList`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
-    <span class="n">ofpath</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;/codes.csv.gz&quot;</span>
 
-    <span class="n">codes</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_codes</span><span class="p">()</span>
-    <span class="n">missing</span> <span class="o">=</span> <span class="n">codes</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
-    <span class="k">if</span> <span class="n">missing</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-        <span class="n">codes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">codes</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">missing</span><span class="p">)</span>
-    <span class="n">write_csv</span><span class="p">(</span><span class="n">BiocFrame</span><span class="p">({</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">codes</span> <span class="p">}),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">ofpath</span><span class="p">),</span> <span class="n">compression</span><span class="o">=</span><span class="s2">&quot;gzip&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;contents.h5&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">ghandle</span> <span class="o">=</span> <span class="n">handle</span><span class="p">[</span><span class="s2">&quot;atomic_vector&quot;</span><span class="p">]</span>
+        <span class="n">vectype</span> <span class="o">=</span> <span class="n">strings</span><span class="o">.</span><span class="n">load_scalar_string_attribute_from_hdf5</span><span class="p">(</span><span class="n">ghandle</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">)</span>
+        <span class="n">dhandle</span> <span class="o">=</span> <span class="n">ghandle</span><span class="p">[</span><span class="s2">&quot;values&quot;</span><span class="p">]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">load_vector_from_hdf5</span><span class="p">(</span><span class="n">dhandle</span><span class="p">,</span> <span class="n">vectype</span><span class="p">,</span> <span class="n">atomic_vector_use_numeric_1darray</span><span class="p">)</span>
 
-    <span class="n">levmeta</span> <span class="o">=</span> <span class="n">alt_stage_object</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">get_levels</span><span class="p">(),</span> <span class="nb">dir</span><span class="p">,</span> <span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;/levels&quot;</span><span class="p">,</span> <span class="n">is_child</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
-    <span class="n">levres</span> <span class="o">=</span> <span class="n">write_metadata</span><span class="p">(</span><span class="n">levmeta</span><span class="p">,</span> <span class="nb">dir</span><span class="p">)</span>
-
-    <span class="n">ordered</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">get_ordered</span><span class="p">():</span>
-        <span class="n">ordered</span> <span class="o">=</span> <span class="kc">True</span>
-
-    <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;string_factor/v1.json&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">ofpath</span><span class="p">,</span>
-        <span class="s2">&quot;is_child&quot;</span><span class="p">:</span> <span class="n">is_child</span><span class="p">,</span>
-        <span class="s2">&quot;factor&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
-            <span class="s2">&quot;compression&quot;</span><span class="p">:</span> <span class="s2">&quot;gzip&quot;</span><span class="p">,</span>
-        <span class="p">},</span>
-        <span class="s2">&quot;string_factor&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;levels&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;resource&quot;</span><span class="p">:</span> <span class="n">levres</span> <span class="p">},</span>
-            <span class="s2">&quot;ordered&quot;</span><span class="p">:</span> <span class="n">ordered</span><span class="p">,</span>
-        <span class="p">}</span>
-    <span class="p">}</span></div>
+        <span class="k">if</span> <span class="s2">&quot;names&quot;</span> <span class="ow">in</span> <span class="n">ghandle</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">NamedList</span><span class="p">):</span>
+                <span class="n">output</span><span class="o">.</span><span class="n">set_names</span><span class="p">(</span><span class="n">strings</span><span class="o">.</span><span class="n">load_string_vector_from_hdf5</span><span class="p">(</span><span class="n">ghandle</span><span class="p">[</span><span class="s2">&quot;names&quot;</span><span class="p">]),</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;skipping names when reading atomic vectors as 1-dimensional NumPy arrays&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span></div>
 
 </pre></div>
         </article>

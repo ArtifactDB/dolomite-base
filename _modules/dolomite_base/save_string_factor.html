@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>dolomite_base.alt_load_object - dolomite-base unknown documentation</title>
+        <title>dolomite_base.save_string_factor - dolomite-base unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -196,72 +196,46 @@
           </label>
         </div>
         <article role="main">
-          <h1>Source code for dolomite_base.alt_load_object</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">from</span> <span class="nn">.load_object</span> <span class="kn">import</span> <span class="n">load_object</span>
+          <h1>Source code for dolomite_base.save_string_factor</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">biocutils</span> <span class="kn">import</span> <span class="n">Factor</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
 
+<span class="kn">from</span> <span class="nn">.save_object</span> <span class="kn">import</span> <span class="n">save_object</span><span class="p">,</span> <span class="n">validate_saves</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_utils_string</span> <span class="k">as</span> <span class="n">strings</span>
+<span class="kn">from</span> <span class="nn">._utils_factor</span> <span class="kn">import</span> <span class="n">save_factor_to_hdf5</span>
 
-<span class="n">ALT_LOAD_OBJECT_FUNCTION</span> <span class="o">=</span> <span class="n">load_object</span>
+<div class="viewcode-block" id="save_string_factor">
+<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.save_string_factor.save_string_factor">[docs]</a>
+<span class="nd">@save_object</span><span class="o">.</span><span class="n">register</span>
+<span class="nd">@validate_saves</span>
+<span class="k">def</span> <span class="nf">save_string_factor</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Factor</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Method for saving :py:class:`~biocutils.Factor.Factor` objects to their</span>
+<span class="sd">    corresponding file representation, see</span>
+<span class="sd">    :py:meth:`~dolomite_base.save_object.save_object` for details.</span>
 
+<span class="sd">    Args:</span>
+<span class="sd">        x: Object to be saved.</span>
 
-<div class="viewcode-block" id="alt_load_object_function">
-<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.alt_load_object.alt_load_object_function">[docs]</a>
-<span class="k">def</span> <span class="nf">alt_load_object_function</span><span class="p">(</span><span class="n">fun</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get or set the alternative loading function for use by</span>
-<span class="sd">    :py:meth:`~alt_load_object`. Typically set by applications prior to loading</span>
-<span class="sd">    for customization, e.g., to attach more metadata to the loaded object.</span>
+<span class="sd">        path: Path to save the object.</span>
 
-<span class="sd">    Arguments:</span>
-<span class="sd">        fun:</span>
-<span class="sd">            The alternative loading function. This should accept the same</span>
-<span class="sd">            arguments and return the same value as</span>
-<span class="sd">            :py:meth:`~dolomite_base.load_object.load_object`.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        If ``fun = None``, the current setting of the alternative loading</span>
-<span class="sd">        function is returned. </span>
-
-<span class="sd">        Otherwise, the alternative loading function is set to ``fun``,</span>
-<span class="sd">        and the previous function is returned.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">global</span> <span class="n">ALT_LOAD_OBJECT_FUNCTION</span>
-    <span class="k">if</span> <span class="n">fun</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">ALT_LOAD_OBJECT_FUNCTION</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">old</span> <span class="o">=</span> <span class="n">ALT_LOAD_OBJECT_FUNCTION</span>
-        <span class="n">ALT_LOAD_OBJECT_FUNCTION</span> <span class="o">=</span> <span class="n">fun</span>
-        <span class="k">return</span> <span class="n">old</span></div>
-
-
-
-<div class="viewcode-block" id="alt_load_object">
-<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.alt_load_object.alt_load_object">[docs]</a>
-<span class="k">def</span> <span class="nf">alt_load_object</span><span class="p">(</span><span class="n">meta</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">project</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Wrapper around :py:meth:`~dolomite_base.load_object.load_object` that</span>
-<span class="sd">    respects application-defined overrides from</span>
-<span class="sd">    :py:meth:`~alt_load_object_function`.  This allows applications to</span>
-<span class="sd">    customize the loading process for some or all of the object classes,</span>
-<span class="sd">    assuming that developers of dolomite extensions (and the associated</span>
-<span class="sd">    functions called by ``load_object``) use ``alt_load_object`` internally for</span>
-<span class="sd">    staging child objects instead of ``load_object``.</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">        meta: Metadata for this object.</span>
-
-<span class="sd">        project: </span>
-<span class="sd">            Value specifying the project of interest, see</span>
-<span class="sd">            :py:meth:`~dolomite_base.load_object.load_object` for details.</span>
-
-<span class="sd">        kwargs: Further arguments, passed to individual methods.</span>
+<span class="sd">        kwargs: Further arguments, ignored.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Some kind of object.</span>
+<span class="sd">        `x` is saved to `path`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">fun</span> <span class="o">=</span> <span class="n">alt_load_object_function</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">fun</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;OBJECT&quot;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;{ &quot;type&quot;: &quot;string_factor&quot;, &quot;string_factor&quot;: { &quot;version&quot;: &quot;1.0&quot; } }&#39;</span><span class="p">)</span>
 
+    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;contents.h5&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">ghandle</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;string_factor&quot;</span><span class="p">)</span>
+        <span class="n">save_factor_to_hdf5</span><span class="p">(</span><span class="n">ghandle</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">nms</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_names</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">strings</span><span class="o">.</span><span class="n">save_fixed_length_strings</span><span class="p">(</span><span class="n">ghandle</span><span class="p">,</span> <span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="n">nms</span><span class="o">.</span><span class="n">as_list</span><span class="p">())</span></div>
 
 </pre></div>
         </article>

@@ -4,34 +4,26 @@ dolomite\_base package
 Submodules
 ----------
 
-dolomite\_base.acquire\_file module
------------------------------------
-
-.. automodule:: dolomite_base.acquire_file
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-dolomite\_base.acquire\_metadata module
+dolomite\_base.alt\_read\_object module
 ---------------------------------------
 
-.. automodule:: dolomite_base.acquire_metadata
+.. automodule:: dolomite_base.alt_read_object
    :members:
    :undoc-members:
    :show-inheritance:
 
-dolomite\_base.alt\_load\_object module
+dolomite\_base.alt\_save\_object module
 ---------------------------------------
 
-.. automodule:: dolomite_base.alt_load_object
+.. automodule:: dolomite_base.alt_save_object
    :members:
    :undoc-members:
    :show-inheritance:
 
-dolomite\_base.alt\_stage\_object module
-----------------------------------------
+dolomite\_base.choose\_missing\_placeholder module
+--------------------------------------------------
 
-.. automodule:: dolomite_base.alt_stage_object
+.. automodule:: dolomite_base.choose_missing_placeholder
    :members:
    :undoc-members:
    :show-inheritance:
@@ -44,98 +36,90 @@ dolomite\_base.lib\_dolomite\_base module
    :undoc-members:
    :show-inheritance:
 
-dolomite\_base.load\_atomic\_vector module
+dolomite\_base.read\_atomic\_vector module
 ------------------------------------------
 
-.. automodule:: dolomite_base.load_atomic_vector
+.. automodule:: dolomite_base.read_atomic_vector
    :members:
    :undoc-members:
    :show-inheritance:
 
-dolomite\_base.load\_data\_frame module
+dolomite\_base.read\_data\_frame module
 ---------------------------------------
 
-.. automodule:: dolomite_base.load_data_frame
+.. automodule:: dolomite_base.read_data_frame
    :members:
    :undoc-members:
    :show-inheritance:
 
-dolomite\_base.load\_object module
+dolomite\_base.read\_object module
 ----------------------------------
 
-.. automodule:: dolomite_base.load_object
+.. automodule:: dolomite_base.read_object
    :members:
    :undoc-members:
    :show-inheritance:
 
-dolomite\_base.load\_simple\_list module
+dolomite\_base.read\_simple\_list module
 ----------------------------------------
 
-.. automodule:: dolomite_base.load_simple_list
+.. automodule:: dolomite_base.read_simple_list
    :members:
    :undoc-members:
    :show-inheritance:
 
-dolomite\_base.load\_string\_factor module
+dolomite\_base.read\_string\_factor module
 ------------------------------------------
 
-.. automodule:: dolomite_base.load_string_factor
+.. automodule:: dolomite_base.read_string_factor
    :members:
    :undoc-members:
    :show-inheritance:
 
-dolomite\_base.stage\_atomic\_vector module
--------------------------------------------
+dolomite\_base.save\_atomic\_vector module
+------------------------------------------
 
-.. automodule:: dolomite_base.stage_atomic_vector
+.. automodule:: dolomite_base.save_atomic_vector
    :members:
    :undoc-members:
    :show-inheritance:
 
-dolomite\_base.stage\_data\_frame module
+dolomite\_base.save\_data\_frame module
+---------------------------------------
+
+.. automodule:: dolomite_base.save_data_frame
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.save\_object module
+----------------------------------
+
+.. automodule:: dolomite_base.save_object
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.save\_simple\_list module
 ----------------------------------------
 
-.. automodule:: dolomite_base.stage_data_frame
+.. automodule:: dolomite_base.save_simple_list
    :members:
    :undoc-members:
    :show-inheritance:
 
-dolomite\_base.stage\_object module
------------------------------------
+dolomite\_base.save\_string\_factor module
+------------------------------------------
 
-.. automodule:: dolomite_base.stage_object
+.. automodule:: dolomite_base.save_string_factor
    :members:
    :undoc-members:
    :show-inheritance:
 
-dolomite\_base.stage\_simple\_list module
------------------------------------------
+dolomite\_base.validate\_object module
+--------------------------------------
 
-.. automodule:: dolomite_base.stage_simple_list
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-dolomite\_base.stage\_string\_factor module
--------------------------------------------
-
-.. automodule:: dolomite_base.stage_string_factor
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-dolomite\_base.write\_csv module
---------------------------------
-
-.. automodule:: dolomite_base.write_csv
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-dolomite\_base.write\_metadata module
--------------------------------------
-
-.. automodule:: dolomite_base.write_metadata
+.. automodule:: dolomite_base.validate_object
    :members:
    :undoc-members:
    :show-inheritance:

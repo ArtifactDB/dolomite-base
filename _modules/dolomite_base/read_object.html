@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>dolomite_base.load_object - dolomite-base unknown documentation</title>
+        <title>dolomite_base.read_object - dolomite-base unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -196,105 +196,51 @@
           </label>
         </div>
         <article role="main">
-          <h1>Source code for dolomite_base.load_object</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+          <h1>Source code for dolomite_base.read_object</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
 
-<span class="kn">from</span> <span class="nn">._schemas</span> <span class="kn">import</span> <span class="n">_hunt_for_schemas</span>
+<span class="n">registry</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;atomic_vector&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_base.read_atomic_vector&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;string_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_base.read_string_factor&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;simple_list&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_base.read_simple_list&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;data_frame&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_base.read_data_frame&quot;</span>
+<span class="p">}</span>
 
 
-<div class="viewcode-block" id="custom_load_object_helper">
-<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.load_object.custom_load_object_helper">[docs]</a>
-<span class="k">def</span> <span class="nf">custom_load_object_helper</span><span class="p">(</span><span class="n">meta</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">project</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">locations</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">memory</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to create application-specific variants of</span>
-<span class="sd">    :py:meth:`~dolomite_base.load_object.load_object`. This allows</span>
-<span class="sd">    applications to divert to different schema locations and/or</span>
-<span class="sd">    loading functions for one or multiple object classes.</span>
+<div class="viewcode-block" id="read_object">
+<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.read_object.read_object">[docs]</a>
+<span class="k">def</span> <span class="nf">read_object</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read an object from its on-disk representation.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        meta: Metadata for this object.</span>
+<span class="sd">        path: Path to a directory containing the object.</span>
 
-<span class="sd">        project: </span>
-<span class="sd">            Value specifying the project of interest. This is most</span>
-<span class="sd">            typically a string containing a file path to a staging directory</span>
-<span class="sd">            but may also be an application-specific object that works with</span>
-<span class="sd">            :py:meth:`~dolomite_base.acquire_file.acquire_file`.</span>
-
-<span class="sd">        locations: </span>
-<span class="sd">            Application-specific list of names of packages to be searched for</span>
-<span class="sd">            object schemas. It is expected that the schema for each object</span>
-<span class="sd">            specifies the function required to create that object from its file</span>
-<span class="sd">            representations.</span>
-
-<span class="sd">        memory:</span>
-<span class="sd">            Application-specific cache of restoration functions for each object</span>
-<span class="sd">            schema. This avoids redundant look-ups if the same ``memory`` is</span>
-<span class="sd">            recycled across calls.</span>
+<span class="sd">        metadata: Metadata for the object. This is read from the `OBJECT` file if None.</span>
 
 <span class="sd">        kwargs: Further arguments, passed to individual methods.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Some kind of object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">schema</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;$schema&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;OBJECT&quot;</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">schema</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">memory</span><span class="p">:</span>
-        <span class="n">schema_details</span> <span class="o">=</span> <span class="n">_hunt_for_schemas</span><span class="p">(</span><span class="n">locations</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
-        <span class="n">command</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="s2">&quot;_attributes&quot;</span> <span class="ow">in</span> <span class="n">schema_details</span><span class="p">:</span>
-            <span class="n">attr_meta</span> <span class="o">=</span> <span class="n">schema_details</span><span class="p">[</span><span class="s2">&quot;_attributes&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s2">&quot;restore&quot;</span> <span class="ow">in</span> <span class="n">attr_meta</span><span class="p">:</span>
-                <span class="n">res_meta</span> <span class="o">=</span> <span class="n">attr_meta</span><span class="p">[</span><span class="s2">&quot;restore&quot;</span><span class="p">]</span>
-                <span class="k">if</span> <span class="s2">&quot;python&quot;</span> <span class="ow">in</span> <span class="n">res_meta</span><span class="p">:</span>
-                    <span class="n">command</span> <span class="o">=</span> <span class="n">res_meta</span><span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">]</span>
+    <span class="n">tt</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">tt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">registry</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;could not find a Python command to read &#39;&quot;</span> <span class="o">+</span> <span class="n">tt</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">command</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;could not find a Python context to restore &#39;&quot;</span> <span class="o">+</span> <span class="n">schema</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
-
+    <span class="n">command</span> <span class="o">=</span> <span class="n">registry</span><span class="p">[</span><span class="n">tt</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> 
         <span class="n">first_period</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">command</span><span class="p">[:</span><span class="n">first_period</span><span class="p">])</span>
-        <span class="n">memory</span><span class="p">[</span><span class="n">schema</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">command</span><span class="p">[</span><span class="n">first_period</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:])</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">command</span><span class="p">[</span><span class="n">first_period</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:])</span>
+        <span class="n">registry</span><span class="p">[</span><span class="n">tt</span><span class="p">]</span> <span class="o">=</span> <span class="n">command</span>
 
-    <span class="k">return</span> <span class="n">memory</span><span class="p">[</span><span class="n">schema</span><span class="p">](</span><span class="n">meta</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-
-
-<span class="c1">#: Default locations (as package names) in which to search for schemas.</span>
-<span class="c1">#: Each package should have a ``schemas/`` subdirectory containing all schemas.</span>
-<span class="c1">#: Advanced users can insert their own packages here to influence the search.</span>
-<span class="n">DEFAULT_SCHEMA_LOCATIONS</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;dolomite_schemas&quot;</span> <span class="p">]</span>
-
-
-<span class="n">_schema_restoration</span> <span class="o">=</span> <span class="p">{}</span>
-
-
-<div class="viewcode-block" id="load_object">
-<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.load_object.load_object">[docs]</a>
-<span class="k">def</span> <span class="nf">load_object</span><span class="p">(</span><span class="n">meta</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">project</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load an object from a resource inside a project. This uses the schemas</span>
-<span class="sd">    in :py:obj:`~DEFAULT_SCHEMA_LOCATIONS` to identify the restoration functions.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        meta: Metadata for this object.</span>
-
-<span class="sd">        project: Value specifying the project of interest. This is most</span>
-<span class="sd">            typically a string containing a file path to a staging directory</span>
-<span class="sd">            but may also be an application-specific object that can be handled</span>
-<span class="sd">            by :py:meth:`~dolomite_base.acquire_file.acquire_file`.</span>
-
-<span class="sd">        kwargs: Further arguments, passed to individual methods.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Some kind of object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">custom_load_object_helper</span><span class="p">(</span>
-        <span class="n">meta</span><span class="p">,</span> 
-        <span class="n">project</span><span class="p">,</span> 
-        <span class="n">locations</span> <span class="o">=</span> <span class="n">DEFAULT_SCHEMA_LOCATIONS</span><span class="p">,</span> 
-        <span class="n">memory</span> <span class="o">=</span> <span class="n">_schema_restoration</span><span class="p">,</span> 
-        <span class="o">**</span><span class="n">kwargs</span>
-    <span class="p">)</span> </div>
+    <span class="k">return</span> <span class="n">command</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 </pre></div>
         </article>

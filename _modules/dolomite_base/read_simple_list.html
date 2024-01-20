@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>dolomite_base.stage_atomic_vector - dolomite-base unknown documentation</title>
+        <title>dolomite_base.read_simple_list - dolomite-base unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -196,75 +196,50 @@
           </label>
         </div>
         <article role="main">
-          <h1>Source code for dolomite_base.stage_atomic_vector</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
-<span class="kn">from</span> <span class="nn">biocutils</span> <span class="kn">import</span> <span class="n">StringList</span>
-<span class="kn">from</span> <span class="nn">biocframe</span> <span class="kn">import</span> <span class="n">BiocFrame</span>
+          <h1>Source code for dolomite_base.read_simple_list</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">.stage_object</span> <span class="kn">import</span> <span class="n">stage_object</span>
-<span class="kn">from</span> <span class="nn">.write_csv</span> <span class="kn">import</span> <span class="n">write_csv</span>
-<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">_determine_numpy_type</span>
+<span class="kn">from</span> <span class="nn">.alt_read_object</span> <span class="kn">import</span> <span class="n">alt_read_object</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lib_dolomite_base</span> <span class="k">as</span> <span class="n">lib</span>
 
 
-<span class="k">def</span> <span class="nf">_stage_atomic_vector</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">is_child</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
-    <span class="n">ofpath</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;/simple.csv.gz&quot;</span>
-    <span class="n">write_csv</span><span class="p">(</span><span class="n">BiocFrame</span><span class="p">({</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">x</span> <span class="p">}),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">ofpath</span><span class="p">),</span> <span class="n">compression</span><span class="o">=</span><span class="s2">&quot;gzip&quot;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">StringList</span><span class="p">):</span>
-        <span class="n">vectype</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">ntype</span> <span class="o">=</span> <span class="n">_determine_numpy_type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">ntype</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
-            <span class="n">vectype</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
-        <span class="k">elif</span> <span class="n">ntype</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
-            <span class="n">vectype</span> <span class="o">=</span> <span class="s2">&quot;integer&quot;</span>
-        <span class="k">elif</span> <span class="n">ntype</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">:</span>
-            <span class="n">vectype</span> <span class="o">=</span> <span class="s2">&quot;boolean&quot;</span>
-
-    <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">ofpath</span><span class="p">,</span>
-        <span class="s2">&quot;is_child&quot;</span><span class="p">:</span> <span class="n">is_child</span><span class="p">,</span>
-        <span class="s2">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;atomic_vector/v1.json&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;atomic_vector&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">vectype</span><span class="p">,</span>
-            <span class="s2">&quot;compression&quot;</span><span class="p">:</span> <span class="s2">&quot;gzip&quot;</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-
-<div class="viewcode-block" id="stage_string_list">
-<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.stage_atomic_vector.stage_string_list">[docs]</a>
-<span class="nd">@stage_object</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">stage_string_list</span><span class="p">(</span>
-    <span class="n">x</span><span class="p">:</span> <span class="n">StringList</span><span class="p">,</span> 
-    <span class="nb">dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
-    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
-    <span class="n">is_child</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> 
-    <span class="o">**</span><span class="n">kwargs</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Method for saving :py:class:`~biocutils.StringList.StringList` objects</span>
-<span class="sd">    to their corresponding file representation, see</span>
-<span class="sd">    :py:meth:`~dolomite_base.stage_object.stage_object` for details.</span>
+<div class="viewcode-block" id="read_simple_list">
+<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.read_simple_list.read_simple_list">[docs]</a>
+<span class="k">def</span> <span class="nf">read_simple_list</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read an R-style list from its on-disk representation in the **uzuki2**</span>
+<span class="sd">    format.  In general, this function should not be called directly but</span>
+<span class="sd">    instead via :py:meth:`~dolomite_base.read_object.read_object`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        x: Object to be staged.</span>
+<span class="sd">        path: Path to the directory containing the object.</span>
 
-<span class="sd">        dir: Staging directory.</span>
-
-<span class="sd">        path: Relative path inside ``dir`` to save the object.</span>
-
-<span class="sd">        is_child: Is ``x`` a child of another object?</span>
-
-<span class="sd">        kwargs: Further arguments, ignored.</span>
+<span class="sd">        metadata: Metadata for the object.</span>
+<span class="sd">    </span>
+<span class="sd">        kwargs: Further arguments, passed to nested objects.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Metadata that can be edited by calling methods and then saved with </span>
-<span class="sd">        :py:meth:`~dolomite_base.write_metadata.write_metadata`.</span>
+<span class="sd">        A list or dictionary.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_stage_atomic_vector</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dir</span><span class="o">=</span><span class="nb">dir</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">is_child</span><span class="o">=</span><span class="n">is_child</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="n">other_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;other_contents&quot;</span><span class="p">)</span>
+    <span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">other_dir</span><span class="p">):</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">other_dir</span><span class="p">)</span>
+        <span class="n">collected</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="n">collected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">collected</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">collected</span><span class="p">:</span>
+            <span class="n">children</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span> <span class="o">=</span> <span class="n">alt_read_object</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">other_dir</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;simple_list&quot;</span><span class="p">][</span><span class="s2">&quot;format&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;hdf5&quot;</span><span class="p">:</span>
+        <span class="n">full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;list_contents.h5&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lib</span><span class="o">.</span><span class="n">load_list_hdf5</span><span class="p">(</span><span class="n">full_path</span><span class="p">,</span> <span class="s2">&quot;simple_list&quot;</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">full_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;list_contents.json.gz&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lib</span><span class="o">.</span><span class="n">load_list_json</span><span class="p">(</span><span class="n">full_path</span><span class="p">,</span> <span class="n">children</span><span class="p">)</span></div>
 
 </pre></div>
         </article>

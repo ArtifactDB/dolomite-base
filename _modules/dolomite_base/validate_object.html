@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>dolomite_base.stage_object - dolomite-base unknown documentation</title>
+        <title>dolomite_base.validate_object - dolomite-base unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -196,36 +196,24 @@
           </label>
         </div>
         <article role="main">
-          <h1>Source code for dolomite_base.stage_object</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
+          <h1>Source code for dolomite_base.validate_object</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lib_dolomite_base</span> <span class="k">as</span> <span class="n">lib</span>
 
 
-<div class="viewcode-block" id="stage_object">
-<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.stage_object.stage_object">[docs]</a>
-<span class="nd">@singledispatch</span>
-<span class="k">def</span> <span class="nf">stage_object</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="nb">dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save an object to file in a staging directory. **dolomite** extensions</span>
-<span class="sd">    should define methods for this generic to stage different object classes.</span>
+<div class="viewcode-block" id="validate_object">
+<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.validate_object.validate_object">[docs]</a>
+<span class="k">def</span> <span class="nf">validate_object</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate an on-disk representation of an object,</span>
+<span class="sd">    using validators based on the **takane** specifications.</span>
 
-<span class="sd">    Arguments:</span>
-<span class="sd">        x: Object to be staged.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        path: Path to the directory containing the object&#39;s representation.</span>
 
-<span class="sd">        dir: Path to a staging directory.</span>
-
-<span class="sd">        path: Relative path inside ``dir`` where ``x`` is to be saved.</span>
-<span class="sd">            This will be used to create a subdirectory inside ``dir``.</span>
-
-<span class="sd">        kwargs: Further arguments to be passed to individual methods.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Metadata for ``x``, which can be edited by calling methods and then</span>
-<span class="sd">        saved with :py:meth:`~dolomite_base.write_metadata.write_metadata`.</span>
-<span class="sd">        This should contain at least a ``$schema`` property, specifying the</span>
-<span class="sd">        schema to use for validation of the metadata; and a ``path`` property,</span>
-<span class="sd">        specifying the relative path to the file representation of ``x``.</span>
+<span class="sd">    Raise:</span>
+<span class="sd">        Error if the validation fails.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;&#39;stage_object&#39; is not implemented for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span></div>
+    <span class="n">lib</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">return</span></div>
 
 </pre></div>
         </article>
