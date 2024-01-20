@@ -1,6 +1,4 @@
-from numpy import ndarray
 import numpy
-from typing import Union, Sequence, Tuple
 from biocutils import Factor
 import h5py
 

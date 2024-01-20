@@ -1,17 +1,19 @@
 from typing import List
-from numpy import ndarray
-import numpy
 import h5py
 
 
 def save_fixed_length_strings(handle: h5py.Group, name: str, x: List[str]) -> h5py.Dataset:
-    """
-    Save a list of strings into a fixed-length string dataset.
+    """Save a list of strings into a fixed-length string dataset.
 
     Args:
-        handle: Handle to a HDF5 Group.
-        name: Name of the dataset to create in ``handle``.
-        x: List of strings to save.
+        handle:     
+            Handle to a HDF5 Group.
+        
+        name: 
+            Name of the dataset to create in ``handle``.
+        
+        x: 
+            List of strings to save.
 
     Returns:
         ``x`` is saved into the group as a fixed-length string dataset,
