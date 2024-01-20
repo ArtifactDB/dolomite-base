@@ -231,6 +231,16 @@
 <div class="viewcode-block" id="validate_saves">
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.save_object.validate_saves">[docs]</a>
 <span class="k">def</span> <span class="nf">validate_saves</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator to validate the output of :py:func:`~save_object`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fn: Function that implements a method for ``save_object``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A wrapped version of the function that validates the directory</span>
+<span class="sd">        containing the on-disk representation of the saved object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>

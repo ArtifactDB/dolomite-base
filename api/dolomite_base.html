@@ -754,7 +754,17 @@ this generic to stage different object classes.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.save_object.validate_saves">
 <span class="sig-prename descclassname"><span class="pre">dolomite_base.save_object.</span></span><span class="sig-name descname"><span class="pre">validate_saves</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_object.html#validate_saves"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_object.validate_saves" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Decorator to validate the output of <a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-func docutils literal notranslate"><span class="pre">save_object()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fn</strong> – Function that implements a method for <code class="docutils literal notranslate"><span class="pre">save_object</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A wrapped version of the function that validates the directory
+containing the on-disk representation of the saved object.</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="module-dolomite_base.save_simple_list">
