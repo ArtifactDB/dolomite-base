@@ -197,7 +197,7 @@
         </div>
         <article role="main">
           <h1>Source code for dolomite_base.read_simple_list</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">from</span> <span class="nn">.alt_read_object</span> <span class="kn">import</span> <span class="n">alt_read_object</span>
@@ -212,11 +212,14 @@
 <span class="sd">    instead via :py:meth:`~dolomite_base.read_object.read_object`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        path: Path to the directory containing the object.</span>
+<span class="sd">        path: </span>
+<span class="sd">            Path to the directory containing the object.</span>
 
-<span class="sd">        metadata: Metadata for the object.</span>
+<span class="sd">        metadata: </span>
+<span class="sd">            Metadata for the object.</span>
 <span class="sd">    </span>
-<span class="sd">        kwargs: Further arguments, passed to nested objects.</span>
+<span class="sd">        kwargs: </span>
+<span class="sd">            Further arguments, passed to nested objects.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A list or dictionary.</span>

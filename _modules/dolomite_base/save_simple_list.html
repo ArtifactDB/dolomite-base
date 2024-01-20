@@ -199,7 +199,7 @@
           <h1>Source code for dolomite_base.save_simple_list</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Literal</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
 <span class="kn">from</span> <span class="nn">biocutils</span> <span class="kn">import</span> <span class="n">Factor</span><span class="p">,</span> <span class="n">StringList</span><span class="p">,</span> <span class="n">NamedList</span><span class="p">,</span> <span class="n">IntegerList</span><span class="p">,</span> <span class="n">BooleanList</span><span class="p">,</span> <span class="n">FloatList</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -224,13 +224,17 @@
 <span class="sd">    :py:meth:`~dolomite_base.save_object.save_object` for details.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        x: Object to be saved.</span>
+<span class="sd">        x: </span>
+<span class="sd">            Object to be saved.</span>
 
-<span class="sd">        path: Path to a directory in which to save the object.</span>
+<span class="sd">        path: </span>
+<span class="sd">            Path to a directory in which to save the object.</span>
 
-<span class="sd">        simple_list_mode: Whether to save in HDF5 or JSON mode.</span>
+<span class="sd">        simple_list_mode: </span>
+<span class="sd">            Whether to save in HDF5 or JSON mode.</span>
 
-<span class="sd">        kwargs: Further arguments, ignored.</span>
+<span class="sd">        kwargs: </span>
+<span class="sd">            Further arguments, ignored.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        `x` is saved to `path`.</span>
@@ -250,13 +254,17 @@
 <span class="sd">    :py:meth:`~dolomite_base.save_object.save_object` for details.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        x: Object to be saved.</span>
+<span class="sd">        x: </span>
+<span class="sd">            Object to be saved.</span>
 
-<span class="sd">        path: Path to a directory in which to save the object.</span>
+<span class="sd">        path: </span>
+<span class="sd">            Path to a directory in which to save the object.</span>
 
-<span class="sd">        simple_list_mode: Whether to save in HDF5 or JSON mode.</span>
+<span class="sd">        simple_list_mode: </span>
+<span class="sd">            Whether to save in HDF5 or JSON mode.</span>
 
-<span class="sd">        kwargs: Further arguments, ignored.</span>
+<span class="sd">        kwargs: </span>
+<span class="sd">            Further arguments, ignored.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        `x` is saved to `path`.</span>
@@ -275,13 +283,17 @@
 <span class="sd">    see :py:meth:`~dolomite_base.save_object.save_object` for details.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        x: Object to be saved.</span>
+<span class="sd">        x: </span>
+<span class="sd">            Object to be saved.</span>
 
-<span class="sd">        path: Path to a directory in which to save the object.</span>
+<span class="sd">        path: </span>
+<span class="sd">            Path to a directory in which to save the object.</span>
 
-<span class="sd">        simple_list_mode: Whether to save in HDF5 or JSON mode.</span>
+<span class="sd">        simple_list_mode: </span>
+<span class="sd">            Whether to save in HDF5 or JSON mode.</span>
 
-<span class="sd">        kwargs: Further arguments, ignored.</span>
+<span class="sd">        kwargs: </span>
+<span class="sd">            Further arguments, ignored.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        `x` is saved to `path`.</span>
@@ -303,7 +315,6 @@
         <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;{ &quot;type&quot;: &quot;simple_list&quot;, &quot;simple_list&quot;: { &quot;version&quot;: &quot;1.0&quot;, &quot;format&quot;: &quot;&#39;</span> <span class="o">+</span> <span class="n">format2</span> <span class="o">+</span> <span class="s1">&#39;&quot; } }&#39;</span><span class="p">)</span>
 
     <span class="n">externals</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">components</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">if</span> <span class="n">simple_list_mode</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span><span class="p">:</span>
         <span class="n">transformed</span> <span class="o">=</span> <span class="n">_save_simple_list_recursive</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">externals</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -446,7 +457,7 @@
         <span class="n">collected</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">vals</span><span class="p">,</span> <span class="s2">&quot;names&quot;</span><span class="p">:</span> <span class="n">names</span> <span class="p">}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;converting non-string key with value &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; to a string&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+                <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;converting non-string key with value &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; to a string&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
             <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
             <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_save_simple_list_recursive</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">externals</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">collected</span>
@@ -591,7 +602,7 @@
             <span class="s2">&quot;levels&quot;</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">get_levels</span><span class="p">()</span><span class="o">.</span><span class="n">as_list</span><span class="p">(),</span>
             <span class="s2">&quot;ordered&quot;</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">get_ordered</span><span class="p">(),</span>
         <span class="p">}</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">nms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">nms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">output</span><span class="p">[</span><span class="s2">&quot;names&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nms</span><span class="o">.</span><span class="n">as_list</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">output</span>
 
@@ -607,7 +618,7 @@
         <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">get_ordered</span><span class="p">():</span>
             <span class="n">handle</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;ordered&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">get_ordered</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;i1&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">nms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">nms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">strings</span><span class="o">.</span><span class="n">save_fixed_length_strings</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="n">nms</span><span class="o">.</span><span class="n">as_list</span><span class="p">())</span>
         <span class="k">return</span>
 

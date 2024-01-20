@@ -208,8 +208,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.alt_read_object.alt_read_object">
 <span class="sig-prename descclassname"><span class="pre">dolomite_base.alt_read_object.</span></span><span class="sig-name descname"><span class="pre">alt_read_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/alt_read_object.html#alt_read_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.alt_read_object.alt_read_object" title="Link to this definition">#</a></dt>
-<dd><p>Wrapper around <a class="reference internal" href="#dolomite_base.read_object.read_object" title="dolomite_base.read_object.read_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_object()</span></code></a> that
-respects application-defined overrides from
+<dd><p>Wrapper around <a class="reference internal" href="#dolomite_base.read_object.read_object" title="dolomite_base.read_object.read_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_object()</span></code></a>
+that respects application-defined overrides from
 <a class="reference internal" href="#dolomite_base.alt_read_object.alt_read_object_function" title="dolomite_base.alt_read_object.alt_read_object_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">alt_read_object_function()</span></code></a>.  This allows applications to
 customize the reading process for some or all of the object classes,
 assuming that developers of dolomite extensions (and the associated
@@ -264,7 +264,8 @@ and the previous function is returned.</p>
 <span class="sig-prename descclassname"><span class="pre">dolomite_base.alt_save_object.</span></span><span class="sig-name descname"><span class="pre">alt_save_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/alt_save_object.html#alt_save_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.alt_save_object.alt_save_object" title="Link to this definition">#</a></dt>
 <dd><p>Wrapper around <a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a> that
 respects application-defined overrides from
-<a class="reference internal" href="#dolomite_base.alt_save_object.alt_save_object_function" title="dolomite_base.alt_save_object.alt_save_object_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">alt_save_object_function()</span></code></a>.  This allows applications to
+<a class="reference internal" href="#dolomite_base.alt_save_object.alt_save_object_function" title="dolomite_base.alt_save_object.alt_save_object_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">alt_save_object_function()</span></code></a>.</p>
+<p>This allows applications to
 customize the saving process for some or all of the object classes,
 assuming that developers of dolomite extensions (and the associated
 <code class="docutils literal notranslate"><span class="pre">save_object</span></code> methods) use <code class="docutils literal notranslate"><span class="pre">alt_save_object</span></code> internally for saving
@@ -278,7 +279,7 @@ child objects instead of <code class="docutils literal notranslate"><span class=
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>x</cite> is saved to <cite>path</cite>.</p>
@@ -322,8 +323,10 @@ and the previous function is returned.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – A boolean array (or any numeric array to be interpreted as boolean).</p></li>
-<li><p><strong>mask</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – An array of the same shape as <code class="docutils literal notranslate"><span class="pre">x</span></code>, indicating which elements are masked.</p></li>
-<li><p><strong>copy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to make a copy of <code class="docutils literal notranslate"><span class="pre">x</span></code>. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this function may mutate it in-place.</p></li>
+<li><p><strong>mask</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – An array of the same shape as <code class="docutils literal notranslate"><span class="pre">x</span></code>,
+indicating which elements are masked.</p></li>
+<li><p><strong>copy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to make a copy of <code class="docutils literal notranslate"><span class="pre">x</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this function may mutate it in-place.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -341,8 +344,10 @@ masked values are replaced by a placeholder, plus the placeholder value.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – A floating-point array.</p></li>
-<li><p><strong>mask</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – An array of the same shape as <code class="docutils literal notranslate"><span class="pre">x</span></code>, indicating which elements are masked.</p></li>
-<li><p><strong>copy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to make a copy of <code class="docutils literal notranslate"><span class="pre">x</span></code>. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this function may mutate it in-place.</p></li>
+<li><p><strong>mask</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – An array of the same shape as <code class="docutils literal notranslate"><span class="pre">x</span></code>,
+indicating which elements are masked.</p></li>
+<li><p><strong>copy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to make a copy of <code class="docutils literal notranslate"><span class="pre">x</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this function may mutate it in-place.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -363,8 +368,10 @@ masked values are replaced by a placeholder, plus the placeholder value.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – An integer array.</p></li>
-<li><p><strong>mask</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – An array of the same shape as <code class="docutils literal notranslate"><span class="pre">x</span></code>, indicating which elements are masked.</p></li>
-<li><p><strong>copy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to make a copy of <code class="docutils literal notranslate"><span class="pre">x</span></code>. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this function may mutate it in-place.</p></li>
+<li><p><strong>mask</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – An array of the same shape as <code class="docutils literal notranslate"><span class="pre">x</span></code>, indicating
+which elements are masked.</p></li>
+<li><p><strong>copy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to make a copy of <code class="docutils literal notranslate"><span class="pre">x</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this function may mutate it in-place.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -386,7 +393,8 @@ itself. Note that the output array may be of a floating-point type.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a></span>) – A sequence of strings or Nones.</p></li>
-<li><p><strong>copy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to make a copy of <code class="docutils literal notranslate"><span class="pre">x</span></code>. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this function may mutate it in-place.</p></li>
+<li><p><strong>copy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to make a copy of <code class="docutils literal notranslate"><span class="pre">x</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this function may mutate it in-place.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -523,8 +531,9 @@ instead via <a class="reference internal" href="#dolomite_base.read_object.read_
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.read_string_factor.read_string_factor">
 <span class="sig-prename descclassname"><span class="pre">dolomite_base.read_string_factor.</span></span><span class="sig-name descname"><span class="pre">read_string_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/read_string_factor.html#read_string_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.read_string_factor.read_string_factor" title="Link to this definition">#</a></dt>
-<dd><p>Read a string factor from disk. In general, this function should not
-be called directly but instead via
+<dd><p>Read a string factor from disk.</p>
+<p>In general, this function should not be called directly
+but instead via
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">load_object()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -633,6 +642,29 @@ to their corresponding file representation, see
 <dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dolomite_base.save_data_frame.</span></span><span class="sig-name descname"><span class="pre">Hdf5ColumnOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">otherable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_list_to_vector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_1darray_to_vector</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.__getnewargs__">
+<span class="sig-name descname"><span class="pre">__getnewargs__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__getnewargs__" title="Link to this definition">#</a></dt>
+<dd><p>Return self as a plain tuple.  Used by copy and pickle.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.__new__">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">__new__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">otherable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_list_to_vector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_1darray_to_vector</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__new__" title="Link to this definition">#</a></dt>
+<dd><p>Create new instance of Hdf5ColumnOutput(handle, otherable, convert_list_to_vector, convert_1darray_to_vector)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__repr__" title="Link to this definition">#</a></dt>
+<dd><p>Return a nicely formatted representation string</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.__slots__">
+<span class="sig-name descname"><span class="pre">__slots__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">()</span></em><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__slots__" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.convert_1darray_to_vector">
 <span class="sig-name descname"><span class="pre">convert_1darray_to_vector</span></span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.convert_1darray_to_vector" title="Link to this definition">#</a></dt>
@@ -688,7 +720,7 @@ external “dense array” object instead.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><cite>x</cite> is saved to <cite>path</cite>.</p>
@@ -702,8 +734,9 @@ external “dense array” object instead.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.save_object.save_object">
 <span class="sig-prename descclassname"><span class="pre">dolomite_base.save_object.</span></span><span class="sig-name descname"><span class="pre">save_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_object.html#save_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_object.save_object" title="Link to this definition">#</a></dt>
-<dd><p>Save an object to its on-disk representation. <strong>dolomite</strong> extensions
-should define methods for this generic to stage different object classes.</p>
+<dd><p>Save an object to its on-disk representation.</p>
+<p><strong>dolomite</strong> extensions should define methods for
+this generic to stage different object classes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -931,6 +964,10 @@ using validators based on the <strong>takane</strong> specifications.</p>
 </li>
 <li><a class="reference internal" href="#module-dolomite_base.save_data_frame">dolomite_base.save_data_frame module</a><ul>
 <li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput</span></code></a><ul>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__getnewargs__"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.__getnewargs__()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__new__"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.__new__()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__repr__"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.__repr__()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__slots__"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.__slots__</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.convert_1darray_to_vector"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.convert_1darray_to_vector</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.convert_list_to_vector"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.convert_list_to_vector</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.handle"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.handle</span></code></a></li>

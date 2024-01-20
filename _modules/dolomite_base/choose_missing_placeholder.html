@@ -205,13 +205,19 @@
 <div class="viewcode-block" id="choose_missing_integer_placeholder">
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.choose_missing_placeholder.choose_missing_integer_placeholder">[docs]</a>
 <span class="k">def</span> <span class="nf">choose_missing_integer_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Choose a missing placeholder for integer arrays.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose a missing placeholder for integer arrays.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        x: An integer array.</span>
-<span class="sd">        mask: An array of the same shape as ``x``, indicating which elements are masked.</span>
-<span class="sd">        copy: Whether to make a copy of ``x``. If ``False``, this function may mutate it in-place.</span>
+<span class="sd">        x: </span>
+<span class="sd">            An integer array.</span>
+<span class="sd">        </span>
+<span class="sd">        mask: </span>
+<span class="sd">            An array of the same shape as ``x``, indicating </span>
+<span class="sd">            which elements are masked.</span>
+<span class="sd">        </span>
+<span class="sd">        copy: </span>
+<span class="sd">            Whether to make a copy of ``x``. </span>
+<span class="sd">            If ``False``, this function may mutate it in-place.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A tuple containing an int32 array with the contents of ``x``, where all</span>
@@ -235,13 +241,19 @@
 <div class="viewcode-block" id="choose_missing_float_placeholder">
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.choose_missing_placeholder.choose_missing_float_placeholder">[docs]</a>
 <span class="k">def</span> <span class="nf">choose_missing_float_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Choose a missing placeholder for float arrays.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose a missing placeholder for float arrays.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        x: A floating-point array.</span>
-<span class="sd">        mask: An array of the same shape as ``x``, indicating which elements are masked.</span>
-<span class="sd">        copy: Whether to make a copy of ``x``. If ``False``, this function may mutate it in-place.</span>
+<span class="sd">        x: </span>
+<span class="sd">            A floating-point array.</span>
+<span class="sd">        </span>
+<span class="sd">        mask: </span>
+<span class="sd">            An array of the same shape as ``x``, </span>
+<span class="sd">            indicating which elements are masked.</span>
+<span class="sd">        </span>
+<span class="sd">        copy: </span>
+<span class="sd">            Whether to make a copy of ``x``. </span>
+<span class="sd">            If ``False``, this function may mutate it in-place.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A tuple containing a float64 array with the contents of ``x`` where all</span>
@@ -259,13 +271,19 @@
 <div class="viewcode-block" id="choose_missing_boolean_placeholder">
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.choose_missing_placeholder.choose_missing_boolean_placeholder">[docs]</a>
 <span class="k">def</span> <span class="nf">choose_missing_boolean_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Choose a missing placeholder for boolean arrays.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose a missing placeholder for boolean arrays.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        x: A boolean array (or any numeric array to be interpreted as boolean).</span>
-<span class="sd">        mask: An array of the same shape as ``x``, indicating which elements are masked.</span>
-<span class="sd">        copy: Whether to make a copy of ``x``. If ``False``, this function may mutate it in-place.</span>
+<span class="sd">        x: </span>
+<span class="sd">            A boolean array (or any numeric array to be interpreted as boolean).</span>
+<span class="sd">        </span>
+<span class="sd">        mask: </span>
+<span class="sd">            An array of the same shape as ``x``, </span>
+<span class="sd">            indicating which elements are masked.</span>
+<span class="sd">        </span>
+<span class="sd">        copy: </span>
+<span class="sd">            Whether to make a copy of ``x``. </span>
+<span class="sd">            If ``False``, this function may mutate it in-place.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A tuple containing an int8 array with the contents of ``x``, where all</span>
@@ -284,12 +302,15 @@
 <div class="viewcode-block" id="choose_missing_string_placeholder">
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.choose_missing_placeholder.choose_missing_string_placeholder">[docs]</a>
 <span class="k">def</span> <span class="nf">choose_missing_string_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Choose a missing placeholder for string sequences.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose a missing placeholder for string sequences.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        x: A sequence of strings or Nones.</span>
-<span class="sd">        copy: Whether to make a copy of ``x``. If ``False``, this function may mutate it in-place.</span>
+<span class="sd">        x: </span>
+<span class="sd">            A sequence of strings or Nones.</span>
+<span class="sd">        </span>
+<span class="sd">        copy: </span>
+<span class="sd">            Whether to make a copy of ``x``. </span>
+<span class="sd">            If ``False``, this function may mutate it in-place.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A tuple containing a list of strings with the contents of ``x`` where</span>

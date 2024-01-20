@@ -197,7 +197,7 @@
         </div>
         <article role="main">
           <h1>Source code for dolomite_base.alt_read_object</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Callable</span>
 <span class="kn">from</span> <span class="nn">.read_object</span> <span class="kn">import</span> <span class="n">read_object</span>
 
 
@@ -206,13 +206,13 @@
 
 <div class="viewcode-block" id="alt_read_object_function">
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.alt_read_object.alt_read_object_function">[docs]</a>
-<span class="k">def</span> <span class="nf">alt_read_object_function</span><span class="p">(</span><span class="n">fun</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">alt_read_object_function</span><span class="p">(</span><span class="n">fun</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get or set the alternative reading function for use by</span>
 <span class="sd">    :py:meth:`~alt_read_object`. Typically set by applications prior to reading</span>
 <span class="sd">    for customization, e.g., to attach more metadata to the readed object.</span>
 
-<span class="sd">    Arguments:</span>
+<span class="sd">    Args:</span>
 <span class="sd">        fun:</span>
 <span class="sd">            The alternative reading function. This should accept the same</span>
 <span class="sd">            arguments and return the same value as</span>
@@ -238,19 +238,20 @@
 <div class="viewcode-block" id="alt_read_object">
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.alt_read_object.alt_read_object">[docs]</a>
 <span class="k">def</span> <span class="nf">alt_read_object</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Wrapper around :py:meth:`~dolomite_base.read_object.read_object` that</span>
-<span class="sd">    respects application-defined overrides from</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper around :py:meth:`~dolomite_base.read_object.read_object` </span>
+<span class="sd">    that respects application-defined overrides from</span>
 <span class="sd">    :py:meth:`~alt_read_object_function`.  This allows applications to</span>
 <span class="sd">    customize the reading process for some or all of the object classes,</span>
 <span class="sd">    assuming that developers of dolomite extensions (and the associated</span>
 <span class="sd">    functions called by ``read_object``) use ``alt_read_object`` internally for</span>
 <span class="sd">    staging child objects instead of ``read_object``.</span>
 
-<span class="sd">    Arguments:</span>
-<span class="sd">        path: Directory containing the object to load.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        path: </span>
+<span class="sd">            Directory containing the object to load.</span>
 
-<span class="sd">        kwargs: Further arguments, passed to individual methods.</span>
+<span class="sd">        kwargs: </span>
+<span class="sd">            Further arguments, passed to individual methods.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Some kind of object.</span>
