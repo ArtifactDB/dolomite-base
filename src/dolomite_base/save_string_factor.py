@@ -34,5 +34,5 @@ def save_string_factor(x: Factor, path: str, **kwargs):
         ghandle = handle.create_group("string_factor")
         save_factor_to_hdf5(ghandle, x)
         nms = x.get_names()
-        if not nms is None:
+        if nms is not None:
             strings.save_fixed_length_strings(ghandle, "names", nms.as_list())
