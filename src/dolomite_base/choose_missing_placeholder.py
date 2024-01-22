@@ -1,123 +1,133 @@
-from typing import Tuple, Sequence
+from typing import Tuple, Sequence, Optional
 import numpy
-from . import lib_dolomite_base as lib
 
 
-def choose_missing_integer_placeholder(x: numpy.ndarray, mask: numpy.ndarray, copy: bool = True) -> Tuple:
-    """Choose a missing placeholder for integer arrays.
+def _scan_for_integer_placeholder(x: Sequence[int], dtype: type) -> Optional[numpy.generic]:
+    stats = numpy.iinfo(dtype)
+    if not stats.min in x:
+        return dtype(stats.min)
+    if not stats.max in x:
+        return dtype(stats.max)
+    if stats.min != 0 and not 0 in x:
+        return dtype(0)
+
+    if not isinstance(x, set):
+        alt = set()
+        for y in x:
+            if y is not None and not numpy.ma.is_masked(y):
+                alt.add(y)
+        x = alt
+
+    for i in range(stats.min + 1, stats.max):
+        if not i in x:
+            return dtype(i)
+    return None
+
+
+def choose_missing_integer_placeholder(x: Sequence[int], max_dtype: type = numpy.int32) -> Optional[numpy.generic]:
+    """Choose a missing placeholder for integer sequences.
+
+    Args:
+        x:
+            Sequence of integers, possibly containing masked or None values.
+
+        max_dtype: 
+            Integer NumPy type that is guaranteed to faithfully represent all
+            (non-None, non-masked) values of ``x``.
+
+    Returns:
+        Value of the placeholder. This is guaranteed to be of a type that can
+        fit into ``max_dtype``. It also may not be of the same type as
+        ``x.dtype`` if ``x`` is a NumPy array, so some casting may be required
+        when replacing missing values with the placeholder.
+
+        If no suitable placeholder can be found, None is returned instead.
+    """
+    if isinstance(x, numpy.ndarray) and (x.itemsize < max_dtype().itemsize):
+        candidate = _scan_for_integer_placeholder(x, x.dtype.type)
+        if not candidate is None:
+            return candidate
+    return _scan_for_integer_placeholder(x, max_dtype)
+
+
+def choose_missing_float_placeholder(x: Sequence[float], dtype: type = numpy.float64) -> Optional[numpy.generic]:
+    """Choose a missing placeholder for float sequences.
 
     Args:
         x: 
-            An integer array.
-        
-        mask: 
-            An array of the same shape as ``x``, indicating 
-            which elements are masked.
-        
-        copy: 
-            Whether to make a copy of ``x``. 
-            If ``False``, this function may mutate it in-place.
+            Sequence of floats, possibly containing masked or None values.
+
+        dtype:
+            Floating-point NumPy type to use for the placeholder. Ignored if
+            ``x`` is already a NumPy floating-point array, in which case the
+            ``dtype`` is just set to the ``x.dtype``.
 
     Returns:
-        A tuple containing an int32 array with the contents of ``x``, where all
-        masked values are replaced by a placeholder, plus the placeholder value
-        itself. Note that the output array may be of a floating-point type.
+        Value of the placeholder. If ``x`` is a NumPy floating-point array,
+        this is guaranteed to be of the same type as ``x.dtype``.
+
+        If no suitable placeholder can be found, None is returned instead.
     """
-    xcopy = x.astype(numpy.int32, copy = copy) # make a copy as we'll be mutating it in C++.
-    mask = mask.astype(numpy.uint8, copy = False) # use uint8 to avoid problems with ambiguous bool typing.
+    if isinstance(x, numpy.ndarray) and numpy.issubdtype(x.dtype, numpy.floating):
+        dtype = x.dtype.type
 
-    okay, placeholder = lib.choose_missing_integer_placeholder(xcopy, mask)
-    if okay:
-        return xcopy, placeholder
+    can_nan = True
+    for y in x:
+        if y is not None and not numpy.ma.is_masked(y) and numpy.isnan(y):
+            can_nan = False
+            break
+    if can_nan:
+        return dtype(numpy.NaN)
 
-    # In the rare case that it's not okay, we just convert it to a float, which
-    # gives us some more room to save placeholders.
-    xcopy, placeholder = choose_missing_float_placeholder(x, mask, copy = copy)
-    return xcopy, placeholder
+    if not numpy.inf in x:
+        return dtype(numpy.inf)
+    if not -numpy.inf in x:
+        return dtype(-numpy.inf)
 
+    stats = numpy.finfo(dtype)
+    if not stats.min in x:
+        return dtype(stats.min)
+    if not stats.max in x:
+        return dtype(stats.max)
+    if not 0 in x:
+        return dtype(0)
 
-def choose_missing_float_placeholder(x: numpy.ndarray, mask: numpy.ndarray, copy: bool = True) -> Tuple:
-    """Choose a missing placeholder for float arrays.
+    if not isinstance(x, set):
+        alt = set()
+        for y in x:
+            if y is not None and not numpy.ma.is_masked(y):
+                alt.add(y)
+        x = alt
 
-    Args:
-        x: 
-            A floating-point array.
-        
-        mask: 
-            An array of the same shape as ``x``, 
-            indicating which elements are masked.
-        
-        copy: 
-            Whether to make a copy of ``x``. 
-            If ``False``, this function may mutate it in-place.
+    accumulated = []
+    for y in x:
+        if y is not None and numpy.isfinite(y):
+            accumulated.append(y)
+    accumulated.sort()
+    for i in range(1, len(accumulated)):
+        previous = accumulated[i-1]
+        current = accumulated[i]
+        mid = previous + (current - previous) / dtype(2)
+        if mid != previous and mid != current:
+            return mid
 
-    Returns:
-        A tuple containing a float64 array with the contents of ``x`` where all
-        masked values are replaced by a placeholder, plus the placeholder value.
-    """
-    xcopy = x.astype(numpy.float64, copy = copy) # make a copy as we'll be mutating it in C++.
-    mask = mask.astype(numpy.uint8, copy = False) # use uint8 to avoid problems with ambiguous bool typing.
-    okay, placeholder = lib.choose_missing_float_placeholder(xcopy, mask)
-    if not okay:
-        raise ValueError("failed to find an appropriate floating-point missing value placeholder")
-    return xcopy, placeholder
-
-
-def choose_missing_boolean_placeholder(x: numpy.ndarray, mask: numpy.ndarray, copy: bool = True):
-    """Choose a missing placeholder for boolean arrays.
-
-    Args:
-        x: 
-            A boolean array (or any numeric array to be interpreted as boolean).
-        
-        mask: 
-            An array of the same shape as ``x``, 
-            indicating which elements are masked.
-        
-        copy: 
-            Whether to make a copy of ``x``. 
-            If ``False``, this function may mutate it in-place.
-
-    Returns:
-        A tuple containing an int8 array with the contents of ``x``, where all
-        masked values are replaced by a placeholder, plus the placeholder value.
-    """
-    xcopy = x.astype(numpy.int8, copy = copy) 
-    placeholder = numpy.int8(-1)
-    if mask.dtype == numpy.bool_:
-        xcopy[mask] = placeholder
-    else:
-        xcopy[mask != 0] = placeholder
-    return xcopy, placeholder
+    # Highly unlikely that we'll get to this point.
+    return None
 
 
-def choose_missing_string_placeholder(x: Sequence, copy: bool = True) -> Tuple:
+def choose_missing_string_placeholder(x: Sequence[str]) -> str:
     """Choose a missing placeholder for string sequences.
 
     Args:
         x: 
-            A sequence of strings or Nones.
-        
-        copy: 
-            Whether to make a copy of ``x``. 
-            If ``False``, this function may mutate it in-place.
+            Sequence of strings, possibly containing missing or None values.
 
     Returns:
-        A tuple containing a list of strings with the contents of ``x`` where
-        all masked values are replaced by a placeholder, plus the placeholder.
+        String to use as the placeholder. This may be longer than the maximum
+        string length in ``x`` (for fixed-length-string arrays), so some
+        casting may be required.
     """
-    present = set(x)
     placeholder = "NA"
-    while placeholder in present:
+    while placeholder in x:
         placeholder += "_"
-
-    if copy:
-        xcopy = x[:]
-    else:
-        xcopy = x
-
-    for j, y in enumerate(xcopy):
-        if y is None:
-            xcopy[j] = placeholder 
-
-    return xcopy, placeholder
+    return placeholder
