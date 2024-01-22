@@ -211,7 +211,7 @@
 <span class="kn">from</span> <span class="nn">.alt_save_object</span> <span class="kn">import</span> <span class="n">alt_save_object</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_utils_misc</span> <span class="k">as</span> <span class="n">misc</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_utils_string</span> <span class="k">as</span> <span class="n">strings</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_utils_vector</span> <span class="k">as</span> <span class="n">write</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">write_vector_to_hdf5</span> <span class="k">as</span> <span class="n">write</span>
 
 
 <div class="viewcode-block" id="save_simple_list_from_dict">
@@ -365,7 +365,7 @@
 
     <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;vector&quot;</span>
     <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span>
-    <span class="n">write</span><span class="o">.</span><span class="n">write_string_list_to_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">as_list</span><span class="p">())</span>
+    <span class="n">write</span><span class="o">.</span><span class="n">write_string_vector_to_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">as_list</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">nms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">strings</span><span class="o">.</span><span class="n">save_fixed_length_strings</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="n">nms</span><span class="o">.</span><span class="n">as_list</span><span class="p">())</span>
     <span class="k">return</span>
@@ -385,7 +385,7 @@
         <span class="k">return</span> <span class="n">output</span>
 
     <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;vector&quot;</span>
-    <span class="n">dset</span> <span class="o">=</span> <span class="n">write</span><span class="o">.</span><span class="n">write_integer_list_to_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">as_list</span><span class="p">())</span>
+    <span class="n">dset</span> <span class="o">=</span> <span class="n">write</span><span class="o">.</span><span class="n">write_integer_vector_to_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">as_list</span><span class="p">(),</span> <span class="n">allow_float_promotion</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dset</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">):</span>
         <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
     <span class="k">else</span><span class="p">:</span>
@@ -408,7 +408,7 @@
 
     <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;vector&quot;</span>
     <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;number&quot;</span>
-    <span class="n">write</span><span class="o">.</span><span class="n">write_float_list_to_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">as_list</span><span class="p">())</span>
+    <span class="n">write</span><span class="o">.</span><span class="n">write_float_vector_to_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">as_list</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">nms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">strings</span><span class="o">.</span><span class="n">save_fixed_length_strings</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="n">nms</span><span class="o">.</span><span class="n">as_list</span><span class="p">())</span>
     <span class="k">return</span>
@@ -426,7 +426,7 @@
 
     <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;vector&quot;</span>
     <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;boolean&quot;</span>
-    <span class="n">write</span><span class="o">.</span><span class="n">write_boolean_list_to_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">as_list</span><span class="p">())</span>
+    <span class="n">write</span><span class="o">.</span><span class="n">write_boolean_vector_to_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">as_list</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">nms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">strings</span><span class="o">.</span><span class="n">save_fixed_length_strings</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s2">&quot;names&quot;</span><span class="p">,</span> <span class="n">nms</span><span class="o">.</span><span class="n">as_list</span><span class="p">())</span>
     <span class="k">return</span>

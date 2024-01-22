@@ -203,13 +203,14 @@
 
 <span class="kn">from</span> <span class="nn">.alt_read_object</span> <span class="kn">import</span> <span class="n">alt_read_object</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_utils_string</span> <span class="k">as</span> <span class="n">strings</span>
-<span class="kn">from</span> <span class="nn">._utils_vector</span> <span class="kn">import</span> <span class="n">load_vector_from_hdf5</span>
+<span class="kn">from</span> <span class="nn">.load_vector_from_hdf5</span> <span class="kn">import</span> <span class="n">load_vector_from_hdf5</span>
 <span class="kn">from</span> <span class="nn">._utils_factor</span> <span class="kn">import</span> <span class="n">load_factor_from_hdf5</span> 
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_utils_misc</span> <span class="k">as</span> <span class="n">misc</span>
 
 
 <div class="viewcode-block" id="read_data_frame">
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.read_data_frame.read_data_frame">[docs]</a>
-<span class="k">def</span> <span class="nf">read_data_frame</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">data_frame_represent_column_as_1darray</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BiocFrame</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">read_data_frame</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">data_frame_represent_numeric_column_as_1darray</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BiocFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a data frame from a HDF5 file. In general, this function should not</span>
 <span class="sd">    be called directly but instead via :py:meth:`~dolomite_base.read_object.read_object`.</span>
 
@@ -220,7 +221,7 @@
 <span class="sd">        metadata: </span>
 <span class="sd">            Metadata for the object.</span>
 
-<span class="sd">        data_frame_represent_column_as_1darray: </span>
+<span class="sd">        data_frame_represent_numeric_column_as_1darray: </span>
 <span class="sd">            Whether numeric columns should be represented as 1-dimensional</span>
 <span class="sd">            NumPy arrays. This is more efficient than regular Python lists but</span>
 <span class="sd">            discards the distinction between vectors and 1-D arrays. Usually</span>
@@ -255,7 +256,8 @@
                 <span class="k">if</span> <span class="n">curtype</span> <span class="o">==</span> <span class="s2">&quot;factor&quot;</span><span class="p">:</span>
                     <span class="n">contents</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_factor_from_hdf5</span><span class="p">(</span><span class="n">xhandle</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">contents</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_vector_from_hdf5</span><span class="p">(</span><span class="n">xhandle</span><span class="p">,</span> <span class="n">curtype</span><span class="p">,</span> <span class="n">data_frame_represent_column_as_1darray</span><span class="p">)</span>
+                    <span class="n">expected_type</span> <span class="o">=</span> <span class="n">misc</span><span class="o">.</span><span class="n">translate_type</span><span class="p">(</span><span class="n">curtype</span><span class="p">)</span>
+                    <span class="n">contents</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_vector_from_hdf5</span><span class="p">(</span><span class="n">xhandle</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">,</span> <span class="n">report_1darray</span><span class="o">=</span><span class="p">(</span><span class="n">expected_type</span> <span class="o">!=</span> <span class="nb">str</span> <span class="ow">and</span> <span class="n">data_frame_represent_numeric_column_as_1darray</span><span class="p">))</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">BiocFrame</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">number_of_rows</span><span class="o">=</span><span class="n">expected_rows</span><span class="p">,</span> <span class="n">row_names</span><span class="o">=</span><span class="n">row_names</span><span class="p">,</span> <span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
 

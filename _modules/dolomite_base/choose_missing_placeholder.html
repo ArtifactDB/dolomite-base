@@ -197,140 +197,147 @@
         </div>
         <article role="main">
           <h1>Source code for dolomite_base.choose_missing_placeholder</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Sequence</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Optional</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lib_dolomite_base</span> <span class="k">as</span> <span class="n">lib</span>
+
+
+<span class="k">def</span> <span class="nf">_scan_for_integer_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">generic</span><span class="p">]:</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">stats</span><span class="o">.</span><span class="n">min</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dtype</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">min</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">stats</span><span class="o">.</span><span class="n">max</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dtype</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">stats</span><span class="o">.</span><span class="n">min</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dtype</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
+        <span class="n">alt</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+                <span class="n">alt</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">alt</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">min</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">stats</span><span class="o">.</span><span class="n">max</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dtype</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span>
 
 
 <div class="viewcode-block" id="choose_missing_integer_placeholder">
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.choose_missing_placeholder.choose_missing_integer_placeholder">[docs]</a>
-<span class="k">def</span> <span class="nf">choose_missing_integer_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose a missing placeholder for integer arrays.</span>
+<span class="k">def</span> <span class="nf">choose_missing_integer_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">max_dtype</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">generic</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose a missing placeholder for integer sequences.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        x: </span>
-<span class="sd">            An integer array.</span>
-<span class="sd">        </span>
-<span class="sd">        mask: </span>
-<span class="sd">            An array of the same shape as ``x``, indicating </span>
-<span class="sd">            which elements are masked.</span>
-<span class="sd">        </span>
-<span class="sd">        copy: </span>
-<span class="sd">            Whether to make a copy of ``x``. </span>
-<span class="sd">            If ``False``, this function may mutate it in-place.</span>
+<span class="sd">        x:</span>
+<span class="sd">            Sequence of integers, possibly containing masked or None values.</span>
+
+<span class="sd">        max_dtype: </span>
+<span class="sd">            Integer NumPy type that is guaranteed to faithfully represent all</span>
+<span class="sd">            (non-None, non-masked) values of ``x``.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        A tuple containing an int32 array with the contents of ``x``, where all</span>
-<span class="sd">        masked values are replaced by a placeholder, plus the placeholder value</span>
-<span class="sd">        itself. Note that the output array may be of a floating-point type.</span>
+<span class="sd">        Value of the placeholder. This is guaranteed to be of a type that can</span>
+<span class="sd">        fit into ``max_dtype``. It also may not be of the same type as</span>
+<span class="sd">        ``x.dtype`` if ``x`` is a NumPy array, so some casting may be required</span>
+<span class="sd">        when replacing missing values with the placeholder.</span>
+
+<span class="sd">        If no suitable placeholder can be found, None is returned instead.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">xcopy</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">copy</span> <span class="o">=</span> <span class="n">copy</span><span class="p">)</span> <span class="c1"># make a copy as we&#39;ll be mutating it in C++.</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span> <span class="n">copy</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="c1"># use uint8 to avoid problems with ambiguous bool typing.</span>
-
-    <span class="n">okay</span><span class="p">,</span> <span class="n">placeholder</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">choose_missing_integer_placeholder</span><span class="p">(</span><span class="n">xcopy</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">okay</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">xcopy</span><span class="p">,</span> <span class="n">placeholder</span>
-
-    <span class="c1"># In the rare case that it&#39;s not okay, we just convert it to a float, which</span>
-    <span class="c1"># gives us some more room to save placeholders.</span>
-    <span class="n">xcopy</span><span class="p">,</span> <span class="n">placeholder</span> <span class="o">=</span> <span class="n">choose_missing_float_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">copy</span> <span class="o">=</span> <span class="n">copy</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">xcopy</span><span class="p">,</span> <span class="n">placeholder</span></div>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">itemsize</span> <span class="o">&lt;</span> <span class="n">max_dtype</span><span class="p">()</span><span class="o">.</span><span class="n">itemsize</span><span class="p">):</span>
+        <span class="n">candidate</span> <span class="o">=</span> <span class="n">_scan_for_integer_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">candidate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">candidate</span>
+    <span class="k">return</span> <span class="n">_scan_for_integer_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">max_dtype</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="choose_missing_float_placeholder">
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.choose_missing_placeholder.choose_missing_float_placeholder">[docs]</a>
-<span class="k">def</span> <span class="nf">choose_missing_float_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose a missing placeholder for float arrays.</span>
+<span class="k">def</span> <span class="nf">choose_missing_float_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">generic</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose a missing placeholder for float sequences.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x: </span>
-<span class="sd">            A floating-point array.</span>
-<span class="sd">        </span>
-<span class="sd">        mask: </span>
-<span class="sd">            An array of the same shape as ``x``, </span>
-<span class="sd">            indicating which elements are masked.</span>
-<span class="sd">        </span>
-<span class="sd">        copy: </span>
-<span class="sd">            Whether to make a copy of ``x``. </span>
-<span class="sd">            If ``False``, this function may mutate it in-place.</span>
+<span class="sd">            Sequence of floats, possibly containing masked or None values.</span>
+
+<span class="sd">        dtype:</span>
+<span class="sd">            Floating-point NumPy type to use for the placeholder. Ignored if</span>
+<span class="sd">            ``x`` is already a NumPy floating-point array, in which case the</span>
+<span class="sd">            ``dtype`` is just set to the ``x.dtype``.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        A tuple containing a float64 array with the contents of ``x`` where all</span>
-<span class="sd">        masked values are replaced by a placeholder, plus the placeholder value.</span>
+<span class="sd">        Value of the placeholder. If ``x`` is a NumPy floating-point array,</span>
+<span class="sd">        this is guaranteed to be of the same type as ``x.dtype``.</span>
+
+<span class="sd">        If no suitable placeholder can be found, None is returned instead.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">xcopy</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span> <span class="o">=</span> <span class="n">copy</span><span class="p">)</span> <span class="c1"># make a copy as we&#39;ll be mutating it in C++.</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span> <span class="n">copy</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="c1"># use uint8 to avoid problems with ambiguous bool typing.</span>
-    <span class="n">okay</span><span class="p">,</span> <span class="n">placeholder</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">choose_missing_float_placeholder</span><span class="p">(</span><span class="n">xcopy</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">okay</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;failed to find an appropriate floating-point missing value placeholder&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">xcopy</span><span class="p">,</span> <span class="n">placeholder</span></div>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">numpy</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floating</span><span class="p">):</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">type</span>
 
+    <span class="n">can_nan</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="ow">and</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+            <span class="n">can_nan</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">break</span>
+    <span class="k">if</span> <span class="n">can_nan</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dtype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">NaN</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">inf</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dtype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="o">-</span><span class="n">numpy</span><span class="o">.</span><span class="n">inf</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dtype</span><span class="p">(</span><span class="o">-</span><span class="n">numpy</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
 
-<div class="viewcode-block" id="choose_missing_boolean_placeholder">
-<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.choose_missing_placeholder.choose_missing_boolean_placeholder">[docs]</a>
-<span class="k">def</span> <span class="nf">choose_missing_boolean_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose a missing placeholder for boolean arrays.</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">stats</span><span class="o">.</span><span class="n">min</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dtype</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">min</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">stats</span><span class="o">.</span><span class="n">max</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dtype</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dtype</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        x: </span>
-<span class="sd">            A boolean array (or any numeric array to be interpreted as boolean).</span>
-<span class="sd">        </span>
-<span class="sd">        mask: </span>
-<span class="sd">            An array of the same shape as ``x``, </span>
-<span class="sd">            indicating which elements are masked.</span>
-<span class="sd">        </span>
-<span class="sd">        copy: </span>
-<span class="sd">            Whether to make a copy of ``x``. </span>
-<span class="sd">            If ``False``, this function may mutate it in-place.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
+        <span class="n">alt</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+                <span class="n">alt</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">alt</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        A tuple containing an int8 array with the contents of ``x``, where all</span>
-<span class="sd">        masked values are replaced by a placeholder, plus the placeholder value.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">xcopy</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span> <span class="n">copy</span> <span class="o">=</span> <span class="n">copy</span><span class="p">)</span> 
-    <span class="n">placeholder</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int8</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">numpy</span><span class="o">.</span><span class="n">bool_</span><span class="p">:</span>
-        <span class="n">xcopy</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">placeholder</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">xcopy</span><span class="p">[</span><span class="n">mask</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">placeholder</span>
-    <span class="k">return</span> <span class="n">xcopy</span><span class="p">,</span> <span class="n">placeholder</span></div>
+    <span class="n">accumulated</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+            <span class="n">accumulated</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">accumulated</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">accumulated</span><span class="p">)):</span>
+        <span class="n">previous</span> <span class="o">=</span> <span class="n">accumulated</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">accumulated</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">mid</span> <span class="o">=</span> <span class="n">previous</span> <span class="o">+</span> <span class="p">(</span><span class="n">current</span> <span class="o">-</span> <span class="n">previous</span><span class="p">)</span> <span class="o">/</span> <span class="n">dtype</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mid</span> <span class="o">!=</span> <span class="n">previous</span> <span class="ow">and</span> <span class="n">mid</span> <span class="o">!=</span> <span class="n">current</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">mid</span>
+
+    <span class="c1"># Highly unlikely that we&#39;ll get to this point.</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
 
 
 
 <div class="viewcode-block" id="choose_missing_string_placeholder">
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.choose_missing_placeholder.choose_missing_string_placeholder">[docs]</a>
-<span class="k">def</span> <span class="nf">choose_missing_string_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">choose_missing_string_placeholder</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose a missing placeholder for string sequences.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x: </span>
-<span class="sd">            A sequence of strings or Nones.</span>
-<span class="sd">        </span>
-<span class="sd">        copy: </span>
-<span class="sd">            Whether to make a copy of ``x``. </span>
-<span class="sd">            If ``False``, this function may mutate it in-place.</span>
+<span class="sd">            Sequence of strings, possibly containing missing or None values.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        A tuple containing a list of strings with the contents of ``x`` where</span>
-<span class="sd">        all masked values are replaced by a placeholder, plus the placeholder.</span>
+<span class="sd">        String to use as the placeholder. This may be longer than the maximum</span>
+<span class="sd">        string length in ``x`` (for fixed-length-string arrays), so some</span>
+<span class="sd">        casting may be required.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">present</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">placeholder</span> <span class="o">=</span> <span class="s2">&quot;NA&quot;</span>
-    <span class="k">while</span> <span class="n">placeholder</span> <span class="ow">in</span> <span class="n">present</span><span class="p">:</span>
+    <span class="k">while</span> <span class="n">placeholder</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
         <span class="n">placeholder</span> <span class="o">+=</span> <span class="s2">&quot;_&quot;</span>
-
-    <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
-        <span class="n">xcopy</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">xcopy</span> <span class="o">=</span> <span class="n">x</span>
-
-    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">xcopy</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">xcopy</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">placeholder</span> 
-
-    <span class="k">return</span> <span class="n">xcopy</span><span class="p">,</span> <span class="n">placeholder</span></div>
+    <span class="k">return</span> <span class="n">placeholder</span></div>
 
 </pre></div>
         </article>

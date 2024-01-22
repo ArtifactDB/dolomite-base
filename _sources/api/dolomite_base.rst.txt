@@ -36,6 +36,14 @@ dolomite\_base.lib\_dolomite\_base module
    :undoc-members:
    :show-inheritance:
 
+dolomite\_base.load\_vector\_from\_hdf5 module
+----------------------------------------------
+
+.. automodule:: dolomite_base.load_vector_from_hdf5
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dolomite\_base.read\_atomic\_vector module
 ------------------------------------------
 
@@ -120,6 +128,14 @@ dolomite\_base.validate\_object module
 --------------------------------------
 
 .. automodule:: dolomite_base.validate_object
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.write\_vector\_to\_hdf5 module
+---------------------------------------------
+
+.. automodule:: dolomite_base.write_vector_to_hdf5
    :members:
    :undoc-members:
    :show-inheritance:

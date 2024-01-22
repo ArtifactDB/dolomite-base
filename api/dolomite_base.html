@@ -316,93 +316,71 @@ and the previous function is returned.</p>
 <section id="module-dolomite_base.choose_missing_placeholder">
 <span id="dolomite-base-choose-missing-placeholder-module"></span><h2>dolomite_base.choose_missing_placeholder module<a class="headerlink" href="#module-dolomite_base.choose_missing_placeholder" title="Link to this heading">#</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="dolomite_base.choose_missing_placeholder.choose_missing_boolean_placeholder">
-<span class="sig-prename descclassname"><span class="pre">dolomite_base.choose_missing_placeholder.</span></span><span class="sig-name descname"><span class="pre">choose_missing_boolean_placeholder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/choose_missing_placeholder.html#choose_missing_boolean_placeholder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.choose_missing_placeholder.choose_missing_boolean_placeholder" title="Link to this definition">#</a></dt>
-<dd><p>Choose a missing placeholder for boolean arrays.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – A boolean array (or any numeric array to be interpreted as boolean).</p></li>
-<li><p><strong>mask</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – An array of the same shape as <code class="docutils literal notranslate"><span class="pre">x</span></code>,
-indicating which elements are masked.</p></li>
-<li><p><strong>copy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to make a copy of <code class="docutils literal notranslate"><span class="pre">x</span></code>.
-If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this function may mutate it in-place.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A tuple containing an int8 array with the contents of <code class="docutils literal notranslate"><span class="pre">x</span></code>, where all
-masked values are replaced by a placeholder, plus the placeholder value.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.choose_missing_placeholder.choose_missing_float_placeholder">
-<span class="sig-prename descclassname"><span class="pre">dolomite_base.choose_missing_placeholder.</span></span><span class="sig-name descname"><span class="pre">choose_missing_float_placeholder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/choose_missing_placeholder.html#choose_missing_float_placeholder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.choose_missing_placeholder.choose_missing_float_placeholder" title="Link to this definition">#</a></dt>
-<dd><p>Choose a missing placeholder for float arrays.</p>
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.choose_missing_placeholder.</span></span><span class="sig-name descname"><span class="pre">choose_missing_float_placeholder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float64'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/choose_missing_placeholder.html#choose_missing_float_placeholder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.choose_missing_placeholder.choose_missing_float_placeholder" title="Link to this definition">#</a></dt>
+<dd><p>Choose a missing placeholder for float sequences.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – A floating-point array.</p></li>
-<li><p><strong>mask</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – An array of the same shape as <code class="docutils literal notranslate"><span class="pre">x</span></code>,
-indicating which elements are masked.</p></li>
-<li><p><strong>copy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to make a copy of <code class="docutils literal notranslate"><span class="pre">x</span></code>.
-If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this function may mutate it in-place.</p></li>
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>) – Sequence of floats, possibly containing masked or None values.</p></li>
+<li><p><strong>dtype</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a></span>) – Floating-point NumPy type to use for the placeholder. Ignored if
+<code class="docutils literal notranslate"><span class="pre">x</span></code> is already a NumPy floating-point array, in which case the
+<code class="docutils literal notranslate"><span class="pre">dtype</span></code> is just set to the <code class="docutils literal notranslate"><span class="pre">x.dtype</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.generic" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code></a>]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A tuple containing a float64 array with the contents of <code class="docutils literal notranslate"><span class="pre">x</span></code> where all
-masked values are replaced by a placeholder, plus the placeholder value.</p>
+<dd class="field-odd"><p><p>Value of the placeholder. If <code class="docutils literal notranslate"><span class="pre">x</span></code> is a NumPy floating-point array,
+this is guaranteed to be of the same type as <code class="docutils literal notranslate"><span class="pre">x.dtype</span></code>.</p>
+<p>If no suitable placeholder can be found, None is returned instead.</p>
+</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.choose_missing_placeholder.choose_missing_integer_placeholder">
-<span class="sig-prename descclassname"><span class="pre">dolomite_base.choose_missing_placeholder.</span></span><span class="sig-name descname"><span class="pre">choose_missing_integer_placeholder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/choose_missing_placeholder.html#choose_missing_integer_placeholder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.choose_missing_placeholder.choose_missing_integer_placeholder" title="Link to this definition">#</a></dt>
-<dd><p>Choose a missing placeholder for integer arrays.</p>
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.choose_missing_placeholder.</span></span><span class="sig-name descname"><span class="pre">choose_missing_integer_placeholder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dtype=&lt;class</span> <span class="pre">'numpy.int32'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/choose_missing_placeholder.html#choose_missing_integer_placeholder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.choose_missing_placeholder.choose_missing_integer_placeholder" title="Link to this definition">#</a></dt>
+<dd><p>Choose a missing placeholder for integer sequences.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – An integer array.</p></li>
-<li><p><strong>mask</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – An array of the same shape as <code class="docutils literal notranslate"><span class="pre">x</span></code>, indicating
-which elements are masked.</p></li>
-<li><p><strong>copy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to make a copy of <code class="docutils literal notranslate"><span class="pre">x</span></code>.
-If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this function may mutate it in-place.</p></li>
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span>) – Sequence of integers, possibly containing masked or None values.</p></li>
+<li><p><strong>max_dtype</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a></span>) – Integer NumPy type that is guaranteed to faithfully represent all
+(non-None, non-masked) values of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.generic" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code></a>]</span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A tuple containing an int32 array with the contents of <code class="docutils literal notranslate"><span class="pre">x</span></code>, where all
-masked values are replaced by a placeholder, plus the placeholder value
-itself. Note that the output array may be of a floating-point type.</p>
+<dd class="field-odd"><p><p>Value of the placeholder. This is guaranteed to be of a type that can
+fit into <code class="docutils literal notranslate"><span class="pre">max_dtype</span></code>. It also may not be of the same type as
+<code class="docutils literal notranslate"><span class="pre">x.dtype</span></code> if <code class="docutils literal notranslate"><span class="pre">x</span></code> is a NumPy array, so some casting may be required
+when replacing missing values with the placeholder.</p>
+<p>If no suitable placeholder can be found, None is returned instead.</p>
+</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.choose_missing_placeholder.choose_missing_string_placeholder">
-<span class="sig-prename descclassname"><span class="pre">dolomite_base.choose_missing_placeholder.</span></span><span class="sig-name descname"><span class="pre">choose_missing_string_placeholder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/choose_missing_placeholder.html#choose_missing_string_placeholder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.choose_missing_placeholder.choose_missing_string_placeholder" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.choose_missing_placeholder.</span></span><span class="sig-name descname"><span class="pre">choose_missing_string_placeholder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/choose_missing_placeholder.html#choose_missing_string_placeholder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.choose_missing_placeholder.choose_missing_string_placeholder" title="Link to this definition">#</a></dt>
 <dd><p>Choose a missing placeholder for string sequences.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a></span>) – A sequence of strings or Nones.</p></li>
-<li><p><strong>copy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to make a copy of <code class="docutils literal notranslate"><span class="pre">x</span></code>.
-If <code class="docutils literal notranslate"><span class="pre">False</span></code>, this function may mutate it in-place.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Sequence of strings, possibly containing missing or None values.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A tuple containing a list of strings with the contents of <code class="docutils literal notranslate"><span class="pre">x</span></code> where
-all masked values are replaced by a placeholder, plus the placeholder.</p>
+<dd class="field-odd"><p>String to use as the placeholder. This may be longer than the maximum
+string length in <code class="docutils literal notranslate"><span class="pre">x</span></code> (for fixed-length-string arrays), so some
+casting may be required.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -410,6 +388,35 @@ all masked values are replaced by a placeholder, plus the placeholder.</p>
 </section>
 <section id="module-dolomite_base.lib_dolomite_base">
 <span id="dolomite-base-lib-dolomite-base-module"></span><h2>dolomite_base.lib_dolomite_base module<a class="headerlink" href="#module-dolomite_base.lib_dolomite_base" title="Link to this heading">#</a></h2>
+</section>
+<section id="module-dolomite_base.load_vector_from_hdf5">
+<span id="dolomite-base-load-vector-from-hdf5-module"></span><h2>dolomite_base.load_vector_from_hdf5 module<a class="headerlink" href="#module-dolomite_base.load_vector_from_hdf5" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.load_vector_from_hdf5.load_vector_from_hdf5">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.load_vector_from_hdf5.</span></span><span class="sig-name descname"><span class="pre">load_vector_from_hdf5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_1darray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/load_vector_from_hdf5.html#load_vector_from_hdf5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.load_vector_from_hdf5.load_vector_from_hdf5" title="Link to this definition">#</a></dt>
+<dd><p>Load a vector from a 1-dimensional HDF5 dataset, with coercion to the expected type.
+Any missing value placeholders are used to set Nones or to create masks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span>) – Handle to a HDF5 dataset.</p></li>
+<li><p><strong>expected_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a></span>) – Expected type of the output vector. This should be one of
+<code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code> or <code class="docutils literal notranslate"><span class="pre">bool</span></code>.</p></li>
+<li><p><strong>report_1darray</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to report the output as a 1-dimensional NumPy array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">StringList</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">IntegerList</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">FloatList</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanList</span></code>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The contents of the dataset as a vector-like object. By default, this
+is a typed <code class="xref py py-class docutils literal notranslate"><span class="pre">NamedList</span></code> subclass with
+missing values represented by None. If <code class="docutils literal notranslate"><span class="pre">keep_as_1darray</span> <span class="pre">=</span> <span class="pre">True</span></code>, a
+1-dimensional NumPy array is returned instead, possibly with masking.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-dolomite_base.read_atomic_vector">
 <span id="dolomite-base-read-atomic-vector-module"></span><h2>dolomite_base.read_atomic_vector module<a class="headerlink" href="#module-dolomite_base.read_atomic_vector" title="Link to this heading">#</a></h2>
@@ -450,7 +457,7 @@ names via <code class="xref py py-class docutils literal notranslate"><span clas
 <span id="dolomite-base-read-data-frame-module"></span><h2>dolomite_base.read_data_frame module<a class="headerlink" href="#module-dolomite_base.read_data_frame" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.read_data_frame.read_data_frame">
-<span class="sig-prename descclassname"><span class="pre">dolomite_base.read_data_frame.</span></span><span class="sig-name descname"><span class="pre">read_data_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_frame_represent_column_as_1darray</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/read_data_frame.html#read_data_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.read_data_frame.read_data_frame" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.read_data_frame.</span></span><span class="sig-name descname"><span class="pre">read_data_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_frame_represent_numeric_column_as_1darray</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/read_data_frame.html#read_data_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.read_data_frame.read_data_frame" title="Link to this definition">#</a></dt>
 <dd><p>Load a data frame from a HDF5 file. In general, this function should not
 be called directly but instead via <a class="reference internal" href="#dolomite_base.read_object.read_object" title="dolomite_base.read_object.read_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_object()</span></code></a>.</p>
 <dl class="field-list simple">
@@ -458,7 +465,7 @@ be called directly but instead via <a class="reference internal" href="#dolomite
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to the directory containing the object.</p></li>
 <li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>) – Metadata for the object.</p></li>
-<li><p><strong>data_frame_represent_column_as_1darray</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether numeric columns should be represented as 1-dimensional
+<li><p><strong>data_frame_represent_numeric_column_as_1darray</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether numeric columns should be represented as 1-dimensional
 NumPy arrays. This is more efficient than regular Python lists but
 discards the distinction between vectors and 1-D arrays. Usually
 this is not an important difference, but nonetheless, users can set
@@ -873,6 +880,123 @@ using validators based on the <strong>takane</strong> specifications.</p>
 </dd></dl>
 
 </section>
+<section id="module-dolomite_base.write_vector_to_hdf5">
+<span id="dolomite-base-write-vector-to-hdf5-module"></span><h2>dolomite_base.write_vector_to_hdf5 module<a class="headerlink" href="#module-dolomite_base.write_vector_to_hdf5" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.write_vector_to_hdf5.write_boolean_vector_to_hdf5">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.write_vector_to_hdf5.</span></span><span class="sig-name descname"><span class="pre">write_boolean_vector_to_hdf5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placeholder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'missing-value-placeholder'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/write_vector_to_hdf5.html#write_boolean_vector_to_hdf5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.write_vector_to_hdf5.write_boolean_vector_to_hdf5" title="Link to this definition">#</a></dt>
+<dd><p>Write a boolean vector to a HDF5 file as a 1-dimensional dataset with
+a 8-bit signed integer datatype. If <code class="docutils literal notranslate"><span class="pre">x</span></code> contains missing values, they
+are replaced with a placeholder value of -1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></span>) – A handle to a HDF5 group.</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the dataset in which to save the integer vector.</p></li>
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>]</span>) – Sequence containing booleans, Nones, and/or masked NumPy values.</p></li>
+<li><p><strong>placeholder_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the attribute in which to store the missing value
+placeholder, if <code class="docutils literal notranslate"><span class="pre">x</span></code> contains None or masked values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Handle for the newly created dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.write_vector_to_hdf5.write_float_vector_to_hdf5">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.write_vector_to_hdf5.</span></span><span class="sig-name descname"><span class="pre">write_float_vector_to_hdf5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h5type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'f8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placeholder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'missing-value-placeholder'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/write_vector_to_hdf5.html#write_float_vector_to_hdf5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.write_vector_to_hdf5.write_float_vector_to_hdf5" title="Link to this definition">#</a></dt>
+<dd><p>Write a floating-point vector to a HDF5 file as a 1-dimensional dataset.
+If <code class="docutils literal notranslate"><span class="pre">x</span></code> contains missing values, a placeholder value is selected by
+<a class="reference internal" href="#dolomite_base.choose_missing_placeholder.choose_missing_float_placeholder" title="dolomite_base.choose_missing_placeholder.choose_missing_float_placeholder"><code class="xref py py-func docutils literal notranslate"><span class="pre">choose_missing_float_placeholder()</span></code></a>.
+and used to replace all of the missing values in the dataset. The
+placeholder value itself is stored as an attribute of the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></span>) – A handle to a HDF5 group.</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the dataset in which to save the integer vector.</p></li>
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>) – Sequence containing floats, Nones, and/or masked NumPy values.</p></li>
+<li><p><strong>h5type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Floating-point type of the HDF5 dataset to create.</p></li>
+<li><p><strong>placeholder_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the attribute in which to store the missing value
+placeholder, if <code class="docutils literal notranslate"><span class="pre">x</span></code> contains None or masked values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Handle for the newly created dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.write_vector_to_hdf5.write_integer_vector_to_hdf5">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.write_vector_to_hdf5.</span></span><span class="sig-name descname"><span class="pre">write_integer_vector_to_hdf5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h5type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'i4'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placeholder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'missing-value-placeholder'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_float_promotion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/write_vector_to_hdf5.html#write_integer_vector_to_hdf5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.write_vector_to_hdf5.write_integer_vector_to_hdf5" title="Link to this definition">#</a></dt>
+<dd><p>Write an integer vector to a HDF5 file as a 1-dimensional dataset. If
+<code class="docutils literal notranslate"><span class="pre">x</span></code> contains missing values, a placeholder value is selected by
+<a class="reference internal" href="#dolomite_base.choose_missing_placeholder.choose_missing_integer_placeholder" title="dolomite_base.choose_missing_placeholder.choose_missing_integer_placeholder"><code class="xref py py-func docutils literal notranslate"><span class="pre">choose_missing_integer_placeholder()</span></code></a>
+and used to replace all of the missing values in the dataset. The
+placeholder value itself is stored as an attribute of the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></span>) – A handle to a HDF5 group.</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the dataset in which to save the integer vector.</p></li>
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span>) – Sequence containing integers, Nones, and/or masked NumPy values.</p></li>
+<li><p><strong>h5type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Integer type of the HDF5 dataset to create.</p></li>
+<li><p><strong>placeholder_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the attribute in which to store the missing value
+placeholder, if <code class="docutils literal notranslate"><span class="pre">x</span></code> contains None or masked values.</p></li>
+<li><p><strong>allow_float_promotion</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to save <code class="docutils literal notranslate"><span class="pre">x</span></code> into a 64-bit floating-point dataset if any
+values in <code class="docutils literal notranslate"><span class="pre">x</span></code> exceeds the range of values that can be represented
+by <code class="docutils literal notranslate"><span class="pre">h5type</span></code>, or if no missing value placeholder can be found
+within the acceptable range of integer values. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, an
+error is raised if <code class="docutils literal notranslate"><span class="pre">x</span></code> cannot be saved without promotion.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Handle for the newly created dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.write_vector_to_hdf5.write_string_vector_to_hdf5">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.write_vector_to_hdf5.</span></span><span class="sig-name descname"><span class="pre">write_string_vector_to_hdf5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placeholder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'missing-value-placeholder'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/write_vector_to_hdf5.html#write_string_vector_to_hdf5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.write_vector_to_hdf5.write_string_vector_to_hdf5" title="Link to this definition">#</a></dt>
+<dd><p>Write a string vector to a HDF5 file as a 1-dimensional dataset with a
+fixed-length string datatype. If <code class="docutils literal notranslate"><span class="pre">x</span></code> contains missing values, a suitable
+placeholder value is selected using
+<a class="reference internal" href="#dolomite_base.choose_missing_placeholder.choose_missing_string_placeholder" title="dolomite_base.choose_missing_placeholder.choose_missing_string_placeholder"><code class="xref py py-func docutils literal notranslate"><span class="pre">choose_missing_string_placeholder()</span></code></a>.
+and used to replace all missing values in the dataset. The placeholder
+itself is stored as an attribute of the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></span>) – A handle to a HDF5 group.</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the dataset in which to save the string vector.</p></li>
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Sequence" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Sequence containing strings, Nones, and/or masked NumPy values.</p></li>
+<li><p><strong>placeholder_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the attribute in which to store the missing value
+placeholder, if <code class="docutils literal notranslate"><span class="pre">x</span></code> contains None or masked values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Handle for the newly created dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="module-dolomite_base">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dolomite_base" title="Link to this heading">#</a></h2>
 </section>
@@ -938,13 +1062,16 @@ using validators based on the <strong>takane</strong> specifications.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-dolomite_base.choose_missing_placeholder">dolomite_base.choose_missing_placeholder module</a><ul>
-<li><a class="reference internal" href="#dolomite_base.choose_missing_placeholder.choose_missing_boolean_placeholder"><code class="docutils literal notranslate"><span class="pre">choose_missing_boolean_placeholder()</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.choose_missing_placeholder.choose_missing_float_placeholder"><code class="docutils literal notranslate"><span class="pre">choose_missing_float_placeholder()</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.choose_missing_placeholder.choose_missing_integer_placeholder"><code class="docutils literal notranslate"><span class="pre">choose_missing_integer_placeholder()</span></code></a></li>
 <li><a class="reference internal" href="#dolomite_base.choose_missing_placeholder.choose_missing_string_placeholder"><code class="docutils literal notranslate"><span class="pre">choose_missing_string_placeholder()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-dolomite_base.lib_dolomite_base">dolomite_base.lib_dolomite_base module</a></li>
+<li><a class="reference internal" href="#module-dolomite_base.load_vector_from_hdf5">dolomite_base.load_vector_from_hdf5 module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.load_vector_from_hdf5.load_vector_from_hdf5"><code class="docutils literal notranslate"><span class="pre">load_vector_from_hdf5()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-dolomite_base.read_atomic_vector">dolomite_base.read_atomic_vector module</a><ul>
 <li><a class="reference internal" href="#dolomite_base.read_atomic_vector.read_atomic_vector"><code class="docutils literal notranslate"><span class="pre">read_atomic_vector()</span></code></a></li>
 </ul>
@@ -1004,6 +1131,13 @@ using validators based on the <strong>takane</strong> specifications.</p>
 </li>
 <li><a class="reference internal" href="#module-dolomite_base.validate_object">dolomite_base.validate_object module</a><ul>
 <li><a class="reference internal" href="#dolomite_base.validate_object.validate_object"><code class="docutils literal notranslate"><span class="pre">validate_object()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.write_vector_to_hdf5">dolomite_base.write_vector_to_hdf5 module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.write_vector_to_hdf5.write_boolean_vector_to_hdf5"><code class="docutils literal notranslate"><span class="pre">write_boolean_vector_to_hdf5()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.write_vector_to_hdf5.write_float_vector_to_hdf5"><code class="docutils literal notranslate"><span class="pre">write_float_vector_to_hdf5()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.write_vector_to_hdf5.write_integer_vector_to_hdf5"><code class="docutils literal notranslate"><span class="pre">write_integer_vector_to_hdf5()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.write_vector_to_hdf5.write_string_vector_to_hdf5"><code class="docutils literal notranslate"><span class="pre">write_string_vector_to_hdf5()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-dolomite_base">Module contents</a></li>
