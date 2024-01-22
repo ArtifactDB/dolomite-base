@@ -27,6 +27,8 @@ def save_factor_to_hdf5(handle: h5py.Group, f: Factor):
 def load_factor_from_hdf5(handle: h5py.Group):
     chandle = handle["codes"]
     codes = chandle[:]
+    codes = codes.astype(numpy.int32, copy=False)
+
     if "missing-value-placeholder" in chandle.attrs:
         placeholder = chandle.attrs["missing-value-placeholder"]
         codes[codes == placeholder] = -1
@@ -35,6 +37,5 @@ def load_factor_from_hdf5(handle: h5py.Group):
     if "ordered" in handle.attrs:
         ordered = handle.attrs["ordered"][()] != 0
     
-    codes = codes.astype(numpy.int32, copy=False)
     levels = strings.load_string_vector_from_hdf5(handle["levels"])
     return Factor(codes, levels, ordered = ordered)
