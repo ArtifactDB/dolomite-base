@@ -86,7 +86,7 @@ def write_integer_vector_to_hdf5(
     x: Sequence[int], 
     h5type: str = "i4",
     placeholder_name: str = "missing-value-placeholder", 
-    allow_float_promotion: bool = True
+    allow_float_promotion: bool = False 
 ) -> h5py.Dataset:
     """
     Write an integer vector to a HDF5 file as a 1-dimensional dataset. If

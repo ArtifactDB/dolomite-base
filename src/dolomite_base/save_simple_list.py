@@ -177,7 +177,7 @@ def _save_simple_list_recursive_IntegerList(x: IntegerList, externals: list, han
         return output
 
     handle.attrs["uzuki_object"] = "vector"
-    dset = write.write_integer_vector_to_hdf5(handle, "data", x.as_list())
+    dset = write.write_integer_vector_to_hdf5(handle, "data", x.as_list(), allow_float_promotion=True)
     if np.issubdtype(dset, np.floating):
         handle.attrs["uzuki_type"] = "number"
     else:

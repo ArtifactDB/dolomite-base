@@ -146,7 +146,7 @@ def _process_list_column_for_hdf5(x: list, index: int, output: Hdf5ColumnOutput)
             return
 
         elif final_type == int:
-            dhandle = write.write_integer_vector_to_hdf5(output.handle, str(index), x)
+            dhandle = write.write_integer_vector_to_hdf5(output.handle, str(index), x, allow_float_promotion=True)
             if numpy.issubdtype(dhandle.dtype, numpy.floating):
                 dhandle.attrs["type"] = "number"
             else:
@@ -176,7 +176,7 @@ def _process_StringList_column_for_hdf5(x: StringList, index: int, output: Hdf5C
 
 @_process_column_for_hdf5.register
 def _process_IntegerList_column_for_hdf5(x: IntegerList, index: int, output: Hdf5ColumnOutput):
-    dhandle = write.write_integer_vector_to_hdf5(output.handle, str(index), x.as_list())
+    dhandle = write.write_integer_vector_to_hdf5(output.handle, str(index), x.as_list(), allow_float_promotion=True)
     if numpy.issubdtype(dhandle.dtype, numpy.floating):
         dhandle.attrs["type"] = "number"
     else:
@@ -212,7 +212,7 @@ def _process_ndarray_column_for_hdf5(x: numpy.ndarray, index: int, output: Hdf5C
             return
 
         elif numpy.issubdtype(x.dtype, numpy.integer):
-            dhandle = write.write_integer_vector_to_hdf5(output.handle, str(index), x)
+            dhandle = write.write_integer_vector_to_hdf5(output.handle, str(index), x, allow_float_promotion=True)
             if numpy.issubdtype(dhandle.dtype, numpy.floating):
                 dhandle.attrs["type"] = "number"
             else:

@@ -69,7 +69,7 @@ def save_atomic_vector_from_integer_list(x: IntegerList, path: str, **kwargs):
 
     with h5py.File(os.path.join(path, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("atomic_vector")
-        dset = write.write_integer_vector_to_hdf5(ghandle, "values", x.as_list())
+        dset = write.write_integer_vector_to_hdf5(ghandle, "values", x.as_list(), allow_float_promotion=True)
 
         if numpy.issubdtype(dset, numpy.floating):
             ghandle.attrs["type"] = "number"
