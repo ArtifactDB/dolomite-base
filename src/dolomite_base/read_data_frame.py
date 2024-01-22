@@ -4,11 +4,12 @@ import os
 
 from .alt_read_object import alt_read_object
 from . import _utils_string as strings
-from ._utils_vector import load_vector_from_hdf5
+from .load_vector_from_hdf5 import load_vector_from_hdf5
 from ._utils_factor import load_factor_from_hdf5 
+from . import _utils_misc as misc
 
 
-def read_data_frame(path: str, metadata: dict, data_frame_represent_column_as_1darray : bool = True, **kwargs) -> BiocFrame:
+def read_data_frame(path: str, metadata: dict, data_frame_represent_numeric_column_as_1darray : bool = True, **kwargs) -> BiocFrame:
     """Load a data frame from a HDF5 file. In general, this function should not
     be called directly but instead via :py:meth:`~dolomite_base.read_object.read_object`.
 
@@ -19,7 +20,7 @@ def read_data_frame(path: str, metadata: dict, data_frame_represent_column_as_1d
         metadata: 
             Metadata for the object.
 
-        data_frame_represent_column_as_1darray: 
+        data_frame_represent_numeric_column_as_1darray: 
             Whether numeric columns should be represented as 1-dimensional
             NumPy arrays. This is more efficient than regular Python lists but
             discards the distinction between vectors and 1-D arrays. Usually
@@ -54,7 +55,8 @@ def read_data_frame(path: str, metadata: dict, data_frame_represent_column_as_1d
                 if curtype == "factor":
                     contents[col] = load_factor_from_hdf5(xhandle)
                 else:
-                    contents[col] = load_vector_from_hdf5(xhandle, curtype, data_frame_represent_column_as_1darray)
+                    expected_type = misc.translate_type(curtype)
+                    contents[col] = load_vector_from_hdf5(xhandle, expected_type, report_1darray=(expected_type != str and data_frame_represent_numeric_column_as_1darray))
 
     df = BiocFrame(contents, number_of_rows=expected_rows, row_names=row_names, column_names=column_names)
 

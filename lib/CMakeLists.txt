@@ -60,7 +60,6 @@ find_package(pybind11 CONFIG)
 # pybind11 method:
 pybind11_add_module(${TARGET} 
     src/load_list.cpp
-    src/choose_missing_placeholder.cpp
     src/validate.cpp
     src/init.cpp
 )

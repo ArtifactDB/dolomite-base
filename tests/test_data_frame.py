@@ -187,7 +187,7 @@ def test_data_frame_no_numpy():
 
     dir = os.path.join(mkdtemp(), "foo")
     dl.save_object(df, dir)
-    roundtrip = dl.read_object(dir, data_frame_represent_column_as_1darray=False)
+    roundtrip = dl.read_object(dir, data_frame_represent_numeric_column_as_1darray=False)
 
     assert isinstance(roundtrip.get_column("alicia"), IntegerList)
     assert roundtrip.get_column("alicia").as_list() == list(df.get_column("alicia"))
@@ -206,7 +206,7 @@ def test_data_frame_NamedList():
 
     dir = os.path.join(mkdtemp(), "foo")
     dl.save_object(df, dir)
-    roundtrip = dl.read_object(dir, data_frame_represent_column_as_1darray=False)
+    roundtrip = dl.read_object(dir, data_frame_represent_numeric_column_as_1darray=False)
 
     assert roundtrip.get_column("alicia") == df.get_column("alicia")
     assert roundtrip.get_column("akira") == df.get_column("akira")

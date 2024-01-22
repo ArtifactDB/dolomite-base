@@ -12,7 +12,7 @@ from .save_object import save_object, validate_saves
 from .alt_save_object import alt_save_object
 from . import _utils_misc as misc
 from . import _utils_string as strings
-from . import _utils_vector as write
+from . import write_vector_to_hdf5 as write
 
 
 @save_object.register
@@ -157,7 +157,7 @@ def _save_simple_list_recursive_StringList(x: StringList, externals: list, handl
 
     handle.attrs["uzuki_object"] = "vector"
     handle.attrs["uzuki_type"] = "string"
-    write.write_string_list_to_hdf5(handle, "data", x.as_list())
+    write.write_string_vector_to_hdf5(handle, "data", x.as_list())
     if nms is not None:
         strings.save_fixed_length_strings(handle, "names", nms.as_list())
     return
@@ -177,7 +177,7 @@ def _save_simple_list_recursive_IntegerList(x: IntegerList, externals: list, han
         return output
 
     handle.attrs["uzuki_object"] = "vector"
-    dset = write.write_integer_list_to_hdf5(handle, "data", x.as_list())
+    dset = write.write_integer_vector_to_hdf5(handle, "data", x.as_list(), allow_float_promotion=True)
     if np.issubdtype(dset, np.floating):
         handle.attrs["uzuki_type"] = "number"
     else:
@@ -200,7 +200,7 @@ def _save_simple_list_recursive_FloatList(x: FloatList, externals: list, handle)
 
     handle.attrs["uzuki_object"] = "vector"
     handle.attrs["uzuki_type"] = "number"
-    write.write_float_list_to_hdf5(handle, "data", x.as_list())
+    write.write_float_vector_to_hdf5(handle, "data", x.as_list())
     if nms is not None:
         strings.save_fixed_length_strings(handle, "names", nms.as_list())
     return
@@ -218,7 +218,7 @@ def _save_simple_list_recursive_BooleanList(x: BooleanList, externals: list, han
 
     handle.attrs["uzuki_object"] = "vector"
     handle.attrs["uzuki_type"] = "boolean"
-    write.write_boolean_list_to_hdf5(handle, "data", x.as_list())
+    write.write_boolean_vector_to_hdf5(handle, "data", x.as_list())
     if nms is not None:
         strings.save_fixed_length_strings(handle, "names", nms.as_list())
     return
