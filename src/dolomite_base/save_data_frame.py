@@ -10,7 +10,7 @@ import h5py
 from .save_object import save_object
 from .alt_save_object import alt_save_object
 from . import _utils_string as strings
-from . import _utils_vector as write
+from . import write_vector_to_hdf5 as write
 from ._utils_factor import save_factor_to_hdf5
 
 
@@ -141,12 +141,12 @@ def _process_list_column_for_hdf5(x: list, index: int, output: Hdf5ColumnOutput)
             final_type = None
 
         if final_type == str:
-            dhandle = write.write_string_list_to_hdf5(output.handle, str(index), x)
+            dhandle = write.write_string_vector_to_hdf5(output.handle, str(index), x)
             dhandle.attrs["type"] = "string"
             return
 
         elif final_type == int:
-            dhandle = write.write_integer_list_to_hdf5(output.handle, str(index), x)
+            dhandle = write.write_integer_vector_to_hdf5(output.handle, str(index), x)
             if numpy.issubdtype(dhandle.dtype, numpy.floating):
                 dhandle.attrs["type"] = "number"
             else:
@@ -154,12 +154,12 @@ def _process_list_column_for_hdf5(x: list, index: int, output: Hdf5ColumnOutput)
             return
 
         elif final_type == float:
-            dhandle = write.write_float_list_to_hdf5(output.handle, str(index), x)
+            dhandle = write.write_float_vector_to_hdf5(output.handle, str(index), x)
             dhandle.attrs["type"] = "number"
             return
 
         elif final_type == bool:
-            dhandle = write.write_boolean_list_to_hdf5(output.handle, str(index), x)
+            dhandle = write.write_boolean_vector_to_hdf5(output.handle, str(index), x)
             dhandle.attrs["type"] = "boolean"
             return
 
@@ -169,14 +169,14 @@ def _process_list_column_for_hdf5(x: list, index: int, output: Hdf5ColumnOutput)
 
 @_process_column_for_hdf5.register
 def _process_StringList_column_for_hdf5(x: StringList, index: int, output: Hdf5ColumnOutput):
-    dhandle = write.write_string_list_to_hdf5(output.handle, str(index), x.as_list())
+    dhandle = write.write_string_vector_to_hdf5(output.handle, str(index), x.as_list())
     dhandle.attrs["type"] = "string"
     return
 
 
 @_process_column_for_hdf5.register
 def _process_IntegerList_column_for_hdf5(x: IntegerList, index: int, output: Hdf5ColumnOutput):
-    dhandle = write.write_integer_list_to_hdf5(output.handle, str(index), x.as_list())
+    dhandle = write.write_integer_vector_to_hdf5(output.handle, str(index), x.as_list())
     if numpy.issubdtype(dhandle.dtype, numpy.floating):
         dhandle.attrs["type"] = "number"
     else:
@@ -186,14 +186,14 @@ def _process_IntegerList_column_for_hdf5(x: IntegerList, index: int, output: Hdf
 
 @_process_column_for_hdf5.register
 def _process_FloatList_column_for_hdf5(x: FloatList, index: int, output: Hdf5ColumnOutput):
-    dhandle = write.write_float_list_to_hdf5(output.handle, str(index), x.as_list())
+    dhandle = write.write_float_vector_to_hdf5(output.handle, str(index), x.as_list())
     dhandle.attrs["type"] = "number"
     return
 
 
 @_process_column_for_hdf5.register
 def _process_BooleanList_column_for_hdf5(x: BooleanList, index: int, output: Hdf5ColumnOutput):
-    dhandle = write.write_float_list_to_hdf5(output.handle, str(index), x.as_list())
+    dhandle = write.write_float_vector_to_hdf5(output.handle, str(index), x.as_list())
     dhandle.attrs["type"] = "boolean"
     return
 
@@ -201,30 +201,30 @@ def _process_BooleanList_column_for_hdf5(x: BooleanList, index: int, output: Hdf
 @_process_column_for_hdf5.register
 def _process_ndarray_column_for_hdf5(x: numpy.ndarray, index: int, output: Hdf5ColumnOutput):
     if output.convert_1darray_to_vector and len(x.shape) == 1:
-        dhandle = write.write_ndarray_to_hdf5(output.handle, str(index), x)
         if numpy.issubdtype(x.dtype, numpy.floating):
+            dhandle = write.write_float_vector_to_hdf5(output.handle, str(index), x)
             dhandle.attrs["type"] = "number"
+            return
+
         elif x.dtype == numpy.bool_:
+            dhandle = write.write_boolean_vector_to_hdf5(output.handle, str(index), x)
             dhandle.attrs["type"] = "boolean"
+            return
+
+        elif numpy.issubdtype(x.dtype, numpy.integer):
+            dhandle = write.write_integer_vector_to_hdf5(output.handle, str(index), x)
+            if numpy.issubdtype(dhandle.dtype, numpy.floating):
+                dhandle.attrs["type"] = "number"
+            else:
+                dhandle.attrs["type"] = "integer"
+            return
+
+        elif numpy.issubdtype(x.dtype, numpy.str_):
+            dhandle = write.write_string_vector_to_hdf5(output.handle, str(index), x)
+            dhandle.attrs["type"] = "string"
+
         else:
-            dhandle.attrs["type"] = "integer"
-        return
-
-    _process_column_for_hdf5.registry[object](x, index, output)
-    return
-
-
-@_process_column_for_hdf5.register
-def _process_MaskedArray_column_for_hdf5(x: numpy.ma.MaskedArray, index: int, output: Hdf5ColumnOutput):
-    if output.convert_1darray_to_vector and len(x.shape) == 1:
-        dhandle = write.write_MaskedArray_to_hdf5(output.handle, str(index), x)
-        if numpy.issubdtype(x.dtype, numpy.floating):
-            dhandle.attrs["type"] = "number"
-        elif x.dtype == numpy.bool_:
-            dhandle.attrs["type"] = "boolean"
-        else:
-            dhandle.attrs["type"] = "integer"
-        return
+            raise NotImplementedError("cannot save column of type '" + x.dtype.name + "'")
 
     _process_column_for_hdf5.registry[object](x, index, output)
     return

@@ -4,7 +4,7 @@ import os
 
 from .alt_read_object import alt_read_object
 from . import _utils_string as strings
-from ._utils_vector import load_vector_from_hdf5
+from .load_vector_from_hdf5 import load_vector_from_hdf5
 from ._utils_factor import load_factor_from_hdf5 
 
 

@@ -5,7 +5,7 @@ import h5py
 import os
 import warnings
 
-from ._utils_vector import load_vector_from_hdf5
+from .load_vector_from_hdf5 import load_vector_from_hdf5
 from . import _utils_string as strings
 
 

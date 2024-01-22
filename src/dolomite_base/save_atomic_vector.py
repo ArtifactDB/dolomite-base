@@ -5,7 +5,7 @@ import numpy
 
 from .save_object import save_object, validate_saves
 from . import _utils_string as strings
-from . import _utils_vector as write
+from . import write_vector_to_hdf5 as write
 
 
 @save_object.register
@@ -35,7 +35,7 @@ def save_atomic_vector_from_string_list(x: StringList, path: str, **kwargs):
     with h5py.File(os.path.join(path, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("atomic_vector")
         ghandle.attrs["type"] = "string"
-        write.write_string_list_to_hdf5(ghandle, "values", x.as_list())
+        write.write_string_vector_to_hdf5(ghandle, "values", x.as_list())
         nms = x.get_names()
         if nms is not None:
             strings.save_fixed_length_strings(ghandle, "names", nms.as_list())
@@ -69,7 +69,7 @@ def save_atomic_vector_from_integer_list(x: IntegerList, path: str, **kwargs):
 
     with h5py.File(os.path.join(path, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("atomic_vector")
-        dset = write.write_integer_list_to_hdf5(ghandle, "values", x.as_list())
+        dset = write.write_integer_vector_to_hdf5(ghandle, "values", x.as_list())
 
         if numpy.issubdtype(dset, numpy.floating):
             ghandle.attrs["type"] = "number"
@@ -111,7 +111,7 @@ def save_atomic_vector_from_float_list(x: FloatList, path: str, **kwargs):
     with h5py.File(os.path.join(path, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("atomic_vector")
         ghandle.attrs["type"] = "number"
-        write.write_float_list_to_hdf5(ghandle, "values", x.as_list())
+        write.write_float_vector_to_hdf5(ghandle, "values", x.as_list())
         nms = x.get_names()
         if nms is not None:
             strings.save_fixed_length_strings(ghandle, "names", nms.as_list())
@@ -146,7 +146,7 @@ def save_atomic_vector_from_boolean_list(x: BooleanList, path: str, **kwargs):
     with h5py.File(os.path.join(path, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("atomic_vector")
         ghandle.attrs["type"] = "boolean"
-        write.write_boolean_list_to_hdf5(ghandle, "values", x.as_list())
+        write.write_boolean_vector_to_hdf5(ghandle, "values", x.as_list())
         nms = x.get_names()
         if nms is not None:
             strings.save_fixed_length_strings(ghandle, "names", nms.as_list())
