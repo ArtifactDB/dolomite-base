@@ -7,6 +7,7 @@ import warnings
 
 from .load_vector_from_hdf5 import load_vector_from_hdf5
 from . import _utils_string as strings
+from . import _utils_misc as misc
 
 
 def read_atomic_vector(path: str, metadata: dict, atomic_vector_use_numeric_1darray: bool = False, **kwargs) -> Union[StringList, IntegerList, FloatList, BooleanList, numpy.ndarray]:
@@ -44,7 +45,9 @@ def read_atomic_vector(path: str, metadata: dict, atomic_vector_use_numeric_1dar
         ghandle = handle["atomic_vector"]
         vectype = strings.load_scalar_string_attribute_from_hdf5(ghandle, "type")
         dhandle = ghandle["values"]
-        output = load_vector_from_hdf5(dhandle, vectype, atomic_vector_use_numeric_1darray)
+
+        expected_type = misc.translate_type(vectype)
+        output = load_vector_from_hdf5(dhandle, expected_type, atomic_vector_use_numeric_1darray)
 
         if "names" in ghandle:
             if isinstance(output, NamedList):
