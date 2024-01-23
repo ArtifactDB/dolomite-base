@@ -54,7 +54,6 @@ FetchContent_MakeAvailable(chihaya)
 # Defining the targets.
 set(TARGET dolomite_base)
 
-find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 find_package(pybind11 CONFIG)
 
 # pybind11 method:
