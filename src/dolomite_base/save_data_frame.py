@@ -204,12 +204,10 @@ def _process_ndarray_column_for_hdf5(x: numpy.ndarray, index: int, output: Hdf5C
         if numpy.issubdtype(x.dtype, numpy.floating):
             dhandle = write.write_float_vector_to_hdf5(output.handle, str(index), x)
             dhandle.attrs["type"] = "number"
-            return
 
         elif x.dtype == numpy.bool_:
             dhandle = write.write_boolean_vector_to_hdf5(output.handle, str(index), x)
             dhandle.attrs["type"] = "boolean"
-            return
 
         elif numpy.issubdtype(x.dtype, numpy.integer):
             dhandle = write.write_integer_vector_to_hdf5(output.handle, str(index), x, allow_float_promotion=True)
@@ -217,7 +215,6 @@ def _process_ndarray_column_for_hdf5(x: numpy.ndarray, index: int, output: Hdf5C
                 dhandle.attrs["type"] = "number"
             else:
                 dhandle.attrs["type"] = "integer"
-            return
 
         elif numpy.issubdtype(x.dtype, numpy.str_):
             dhandle = write.write_string_vector_to_hdf5(output.handle, str(index), x)
@@ -225,6 +222,8 @@ def _process_ndarray_column_for_hdf5(x: numpy.ndarray, index: int, output: Hdf5C
 
         else:
             raise NotImplementedError("cannot save column of type '" + x.dtype.name + "'")
+
+        return
 
     _process_column_for_hdf5.registry[object](x, index, output)
     return

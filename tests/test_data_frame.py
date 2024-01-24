@@ -152,6 +152,7 @@ def test_data_frame_numpy():
         "alicia": np.array([ 1, 2, 3, 4, 5 ]),
         "akira": np.array([ True, True, False, False, True ]),
         "athena": np.array([ 2.3, 2.3, 5.2, 32, -1.2 ]),
+        "aika": np.array([ "Chihaya", "Haruka", "Iori", "Azusa", "Ritsuko" ]),
     })
 
     dir = os.path.join(mkdtemp(), "foo")
@@ -164,6 +165,7 @@ def test_data_frame_numpy():
     assert roundtrip.get_column("akira").dtype == np.bool_
     assert (roundtrip.get_column("athena") == df.get_column("athena")).all()
     assert roundtrip.get_column("athena").dtype == np.float64
+    assert roundtrip.get_column("aika").as_list() == list(df.get_column("aika"))
 
     # Coerces integers to floats.
     with h5py.File(os.path.join(dir, "basic_columns.h5"), "a") as handle:
