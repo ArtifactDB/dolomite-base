@@ -3,7 +3,8 @@ from importlib import import_module
 import os
 import json
 
-registry = {
+
+read_object_registry = {
     "atomic_vector": "dolomite_base.read_atomic_vector",
     "string_factor": "dolomite_base.read_string_factor",
     "simple_list": "dolomite_base.read_simple_list",
@@ -17,7 +18,16 @@ registry = {
 
 
 def read_object(path: str, metadata: Optional[dict] = None, **kwargs) -> Any:
-    """Read an object from its on-disk representation.
+    """
+    Read an object from its on-disk representation. This will dispatch to
+    individual reading functions - possibly from different packages in the
+    **dolomite** framework based on the ``metadata`` from the ``OBJECT`` file. 
+
+    Application developers can control the dispatch process by setting the
+    ``read_object_registry`` for the relevant object type(s). The value can
+    either be a string specifying the fully qualified name of a function
+    (including all modules) or a function that accepts the same arguments as
+    ``read_object`` (no need to consider ``metadata = None``).
 
     Args:
         path: 
@@ -37,14 +47,20 @@ def read_object(path: str, metadata: Optional[dict] = None, **kwargs) -> Any:
             metadata = json.load(handle)
 
     tt = metadata["type"]
-    if tt not in registry:
-        raise NotImplementedError("could not find a Python command to read '" + tt + "'")
+    if tt not in read_object_registry:
+        raise NotImplementedError("could not find a Python function to read '" + tt + "'")
 
-    command = registry[tt]
+    command = read_object_registry[tt]
     if isinstance(command, str): 
         first_period = command.find(".")
-        mod = import_module(command[:first_period])
+        mod_name = command[:first_period]
+
+        try:
+            mod = import_module(mod_name)
+        except:
+            raise ModuleNotFoundError("no module named '" + mod_name + "' for reading an instance of '" + tt + "'")
+
         command = getattr(mod, command[first_period + 1:])
-        registry[tt] = command
+        read_object_registry[tt] = command
 
     return command(path, metadata, **kwargs)
