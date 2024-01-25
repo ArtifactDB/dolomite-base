@@ -200,6 +200,20 @@
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span><span class="p">,</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">.validate_object</span> <span class="kn">import</span> <span class="n">validate_object</span>
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
+
+
+<span class="n">_save_object_implementations</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;GenomicRanges&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_ranges&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;GenomicRangesList&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_ranges&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SeqInfo&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_ranges&quot;</span><span class="p">,</span>
+
+    <span class="s2">&quot;ndarray&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_matrix&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;csc_matrix&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_matrix&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;csr_matrix&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_matrix&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;coo_matrix&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_matrix&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DelayedArray&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_matrix&quot;</span><span class="p">,</span>
+<span class="p">}</span>
 
 
 <div class="viewcode-block" id="save_object">
@@ -224,7 +238,23 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        `x` is saved to `path`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;&#39;save_object&#39; is not implemented for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span></div>
+
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="s2">&quot;mro&quot;</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">sys</span>
+        <span class="n">hierarchy</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">mro</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">hierarchy</span><span class="p">:</span>
+            <span class="n">nm</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="k">if</span> <span class="n">nm</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_save_object_implementations</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">pkg</span> <span class="o">=</span> <span class="n">_save_object_implementations</span><span class="p">[</span><span class="n">nm</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">import_module</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span> <span class="c1"># this should hopefully register the methods to the dispatcher.</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="s2">&quot;cannot find &#39;&quot;</span> <span class="o">+</span> <span class="n">pkg</span> <span class="o">+</span> <span class="s2">&quot;&#39;, which contains a &#39;save_object&#39; method for type &#39;&quot;</span> <span class="o">+</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">save_object</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;&#39;save_object&#39; is not implemented for type &#39;&quot;</span> <span class="o">+</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span></div>
 
 
 
