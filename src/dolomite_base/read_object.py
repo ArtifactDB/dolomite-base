@@ -10,6 +10,9 @@ registry = {
     "data_frame": "dolomite_base.read_data_frame",
     "dense_array": "dolomite_matrix.read_dense_array",
     "compressed_sparse_matrix": "dolomite_matrix.read_compressed_sparse_matrix",
+    "genomic_ranges": "dolomite_ranges.read_genomic_ranges",
+    "genomic_ranges_list": "dolomite_ranges.read_genomic_ranges_list",
+    "sequence_information": "dolomite_ranges.read_sequence_information",
 }
 
 
