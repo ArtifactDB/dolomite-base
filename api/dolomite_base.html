@@ -488,7 +488,14 @@ this flag to <code class="docutils literal notranslate"><span class="pre">False<
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.read_object.read_object">
 <span class="sig-prename descclassname"><span class="pre">dolomite_base.read_object.</span></span><span class="sig-name descname"><span class="pre">read_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/read_object.html#read_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.read_object.read_object" title="Link to this definition">#</a></dt>
-<dd><p>Read an object from its on-disk representation.</p>
+<dd><p>Read an object from its on-disk representation. This will dispatch to
+individual reading functions - possibly from different packages in the
+<strong>dolomite</strong> framework based on the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> from the <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> file.</p>
+<p>Application developers can control the dispatch process by setting the
+<code class="docutils literal notranslate"><span class="pre">read_object_registry</span></code> for the relevant object type(s). The value can
+either be a string specifying the fully qualified name of a function
+(including all modules) or a function that accepts the same arguments as
+<code class="docutils literal notranslate"><span class="pre">read_object</span></code> (no need to consider <code class="docutils literal notranslate"><span class="pre">metadata</span> <span class="pre">=</span> <span class="pre">None</span></code>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

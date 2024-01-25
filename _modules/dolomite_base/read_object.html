@@ -202,7 +202,8 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">json</span>
 
-<span class="n">registry</span> <span class="o">=</span> <span class="p">{</span>
+
+<span class="n">read_object_registry</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;atomic_vector&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_base.read_atomic_vector&quot;</span><span class="p">,</span>
     <span class="s2">&quot;string_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_base.read_string_factor&quot;</span><span class="p">,</span>
     <span class="s2">&quot;simple_list&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_base.read_simple_list&quot;</span><span class="p">,</span>
@@ -218,7 +219,16 @@
 <div class="viewcode-block" id="read_object">
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.read_object.read_object">[docs]</a>
 <span class="k">def</span> <span class="nf">read_object</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read an object from its on-disk representation.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read an object from its on-disk representation. This will dispatch to</span>
+<span class="sd">    individual reading functions - possibly from different packages in the</span>
+<span class="sd">    **dolomite** framework based on the ``metadata`` from the ``OBJECT`` file. </span>
+
+<span class="sd">    Application developers can control the dispatch process by setting the</span>
+<span class="sd">    ``read_object_registry`` for the relevant object type(s). The value can</span>
+<span class="sd">    either be a string specifying the fully qualified name of a function</span>
+<span class="sd">    (including all modules) or a function that accepts the same arguments as</span>
+<span class="sd">    ``read_object`` (no need to consider ``metadata = None``).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        path: </span>
@@ -238,15 +248,21 @@
             <span class="n">metadata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
 
     <span class="n">tt</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">tt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">registry</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;could not find a Python command to read &#39;&quot;</span> <span class="o">+</span> <span class="n">tt</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">tt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">read_object_registry</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;could not find a Python function to read &#39;&quot;</span> <span class="o">+</span> <span class="n">tt</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
 
-    <span class="n">command</span> <span class="o">=</span> <span class="n">registry</span><span class="p">[</span><span class="n">tt</span><span class="p">]</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">read_object_registry</span><span class="p">[</span><span class="n">tt</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> 
         <span class="n">first_period</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
-        <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">command</span><span class="p">[:</span><span class="n">first_period</span><span class="p">])</span>
+        <span class="n">mod_name</span> <span class="o">=</span> <span class="n">command</span><span class="p">[:</span><span class="n">first_period</span><span class="p">]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">mod_name</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="s2">&quot;no module named &#39;&quot;</span> <span class="o">+</span> <span class="n">mod_name</span> <span class="o">+</span> <span class="s2">&quot;&#39; for reading an instance of &#39;&quot;</span> <span class="o">+</span> <span class="n">tt</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+
         <span class="n">command</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">command</span><span class="p">[</span><span class="n">first_period</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:])</span>
-        <span class="n">registry</span><span class="p">[</span><span class="n">tt</span><span class="p">]</span> <span class="o">=</span> <span class="n">command</span>
+        <span class="n">read_object_registry</span><span class="p">[</span><span class="n">tt</span><span class="p">]</span> <span class="o">=</span> <span class="n">command</span>
 
     <span class="k">return</span> <span class="n">command</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
