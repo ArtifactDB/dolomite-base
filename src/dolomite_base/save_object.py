@@ -1,6 +1,20 @@
 from typing import Any
 from functools import singledispatch, wraps
 from .validate_object import validate_object
+from importlib import import_module
+
+
+_save_object_implementations = {
+    "GenomicRanges": "dolomite_ranges",
+    "GenomicRangesList": "dolomite_ranges",
+    "SeqInfo": "dolomite_ranges",
+
+    "ndarray": "dolomite_matrix",
+    "csc_matrix": "dolomite_matrix",
+    "csr_matrix": "dolomite_matrix",
+    "coo_matrix": "dolomite_matrix",
+    "DelayedArray": "dolomite_matrix",
+}
 
 
 @singledispatch
@@ -23,7 +37,23 @@ def save_object(x: Any, path: str, **kwargs):
     Returns:
         `x` is saved to `path`.
     """
-    raise NotImplementedError("'save_object' is not implemented for " + str(type(x)))
+
+    if hasattr(type(x), "mro"):
+        import sys
+        hierarchy = type(x).mro()
+        for y in hierarchy:
+            nm = y.__name__
+            if nm not in _save_object_implementations:
+                continue
+
+            pkg = _save_object_implementations[nm]
+            try:
+                import_module(pkg) # this should hopefully register the methods to the dispatcher.
+            except:
+                raise ModuleNotFoundError("cannot find '" + pkg + "', which contains a 'save_object' method for type '" + type(x).__name__ + "'")
+            return save_object(x, path, **kwargs)
+
+    raise NotImplementedError("'save_object' is not implemented for type '" + type(x).__name__ + "'")
 
 
 def validate_saves(fn):
