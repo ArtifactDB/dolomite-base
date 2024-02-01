@@ -35,14 +35,14 @@ Implementations of these methods for various Bioconductor classes can be found i
 First, we'll install the **dolomite-base** package.
 This package is available from [PyPI](https://pypi.org/project/dolomite-base) so we can use the standard installation process:
 
-```r
+```sh
 pip install dolomite-base
 ```
 
 The simplest example involves saving a [`BiocFrame`](https://github.com/BiocPy/BiocFrame) inside a staging directory.
 Let's mock one up:
 
-```r
+```python
 import biocframe
 df = biocframe.BiocFrame({ 
     "X": list(range(0, 10)),
@@ -66,7 +66,7 @@ print(df)
 
 Then we can save it to a directory with the `save_object()` function.
 
-```r
+```python
 import tempfile
 import os
 tmp = tempfile.mkdtemp()
@@ -79,7 +79,7 @@ dolomite_base.save_object(df, path)
 We can copy the directory to another location, over a network, etc., and then easily load it back into a Python session via the `read_object()` function.
 Note that the exact Python types for the `BiocFrame` columns may not be preserved by the round trip.
 
-```r
+```python
 out = dolomite_base.read_object(path)
 print(out)
 BiocFrame with 10 rows and 2 columns
@@ -104,7 +104,7 @@ Check out the [API reference](https://artifactdb.github.io/dolomite-base/api/mod
 The saving/reading process can be applied to a range of data structures, provided the appropriate **alabaster** package is installed.
 
 | Package | Object types | PyPI |
-|-----|-----|----|----|
+|-----|-----|----|
 | [**dolomite-base**](https://github.com/ArtifactDB/dolomite-base) | [`BiocFrame`](https://github.com/BiocPy/BiocFrame), `list`, `dict`, [`NamedList`](https://github.com/BiocPy/BiocUtils) | [![](https://img.shields.io/pypi/v/dolomite-base.svg)](https://pypi.org/project/dolomite-base/) |
 | [**dolomite-matrix**](https://github.com/ArtifactDB/dolomite-matrix) | `numpy.ndarray`, `scipy.sparse.spmatrix`, [`DelayedArray`](https://github.com/BiocPy/DelayedArray) | [![](https://img.shields.io/pypi/v/dolomite-matrix.svg)](https://pypi.org/project/dolomite-matrix/) |
 | [**dolomite-ranges**](https://github.com/ArtifactDB/dolomite-ranges) | [`GenomicRanges`](https://github.com/BiocPy/GenomicRanges), `GenomicRangesList` | [![](https://img.shields.io/pypi/v/dolomite-ranges.svg)](https://pypi.org/project/dolomite-ranges/) |
@@ -123,12 +123,3 @@ Check out the [extension guide](https://bioconductor.org/packages/release/bioc/v
 Developers can also _customize_ this framework for specific applications, most typically to save bespoke metadata in the JSON file.
 The JSON file can then be indexed by systems like MongoDB and Elasticsearch to provide search capabilities.
 Check out the [applications guide](https://bioconductor.org/packages/release/bioc/vignettes/alabaster.base/inst/doc/applications.html) for more details.
-
-## Links
-
-The [**BiocObjectSchemas**](https://github.com/ArtifactDB/BiocObjectSchemas) repository contains schema definitions for many Bioconductor objects.
-
-For use in an R installation, all schemas are packaged in the [**alabaster.schemas**](https://github.com/ArtifactDB/alabaster.schemas) R package.
-
-A [Docker image](https://github.com/ArtifactDB/alabaster-docker/pkgs/container/alabaster-docker%2Fbuilder) is available, containing several pre-installed **alabaster** packages.
-
