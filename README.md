@@ -356,7 +356,7 @@ def app_read_object(path: str, metadata: Optional[Dict] = None, **kwargs):
 def read_for_application(path: str, metadata: Optional[Dict] = None, **kwargs):
     old = dolomite_base.alt_read_object_function(app_read_object)
     try:
-        return dolomite_base.alt_read_object(path, metadata, **kwargs)
+        return dolomite_base.alt_read_object(path, metadata=metadata, **kwargs)
     finally:
         dolomite_base.alt_read_object_function(old)
 
