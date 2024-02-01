@@ -19,10 +19,16 @@ _save_object_implementations = {
 
 @singledispatch
 def save_object(x: Any, path: str, **kwargs):
-    """Save an object to its on-disk representation. 
-    
-    **dolomite** extensions should define methods for 
-    this generic to stage different object classes.
+    """
+    Save an object to its on-disk representation. **dolomite** extensions
+    should define methods for this generic to stage different object classes.
+
+    Saver methods may accept additional arguments in the ``kwargs``; these
+    should be prefixed by the object type to avoid conflicts (see
+    :py:func:`~dolomite_base.save_data_frame.save_data_frame` for examples).
+
+    Saver methods should also use the :py:func:`~validate_saves` decorator
+    to ensure that the generated output in ``path`` is valid.
 
     Args:
         x: 
