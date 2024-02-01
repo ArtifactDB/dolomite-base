@@ -188,7 +188,8 @@ class Coffee:
         self.milk = milk
 ```
 
-First we implement the saving method:
+First we implement the saving method.
+Note that we add a `@validate_saves` decorator to instruct `save_object()` to automatically run `validate_object()` on the generated directory, to confirm that the output is valid.
 
 ```python
 import dolomite_base
@@ -196,6 +197,7 @@ import os
 import json
 
 @dolomite_base.save_object.register
+@validate_saves
 def save_object_for_Coffee(x: Coffee, path: str, **kwargs):
     os.mkdir(path)
     with open(os.path.join(path, "bean_type"), "w") as handle:
@@ -268,7 +270,7 @@ This is achieved by creating an application-specific saving generic with the sam
 
 ```python
 from functools import singledispatch
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 import dolomite_base
 import json
 import os
@@ -286,13 +288,13 @@ def dump_extra_metadata(path: str, extra: Dict):
 @singledispatch
 def app_save_object(x: Any, path: str, **kwargs):
     dolomite_base.save_object(x, path, **kwargs) # does the real work
-    dump_extract_metadata(path, {}) # adding some application-specific metadata
+    dump_extra_metadata(path, {}) # adding some application-specific metadata
 
 @app_save_object.register
-def app_save_object_for_BiocFrames(x: biocframe.BiocFrame, path: str, **kwargs):
+def app_save_object_for_BiocFrame(x: biocframe.BiocFrame, path: str, **kwargs):
     dolomite_base.save_object(x, path, **kwargs) # does the real work
     # We can also override specific methods to add object+application-specific metadata:
-    dump_extract_metadata(path, { "columns": x.get_column_names() })
+    dump_extra_metadata(path, { "columns": x.get_column_names().as_list() })
 ```
 
 Applications should call `alt_save_object_function()` to instruct `alt_save_object()` to use this new generic.
@@ -310,12 +312,12 @@ def save_for_application(x, path: str, **kwargs):
 
 # Saving our nested BiocFrames with our overrides active.
 import biocframe
-df = biocframe.BiocFrame(
-    A = [1, 2, 3, 4],
-    B = biocframe.BiocFrame(
-        C = ["a", "b", "c", "d"]
-    )
-)
+df = biocframe.BiocFrame({
+    "A": [1, 2, 3, 4],
+    "B": biocframe.BiocFrame({
+        "C": ["a", "b", "c", "d"]
+    })
+})
 
 import tempfile
 tmp = tempfile.mkdtemp()
@@ -325,29 +327,30 @@ save_for_application(df, path)
 # Both the parent and child BiocFrames have new metadata.
 with open(os.path.join(path, "_metadata.json"), "r") as handle:
     print(handle.read())
+## {"columns": ["A", "B"], "author": "aaron"}
+
 with open(os.path.join(path, "other_columns", "1", "_metadata.json"), "r") as handle:
     print(handle.read())
+## {"columns": ["C"], "author": "aaron"}
 ```
 
 The reading function can be similarly overridden by setting `alt_read_object_function()` to instruct all `alt_read_object()` calls to use the override.
 This allows applications to, e.g., do something with the metadata that we just added.
 
 ```python
-import json
-
 def app_read_object(path: str, metadata: Optional[Dict] = None, **kwargs):
     if metadata is None:
         with open(os.path.join(path, "OBJECT"), "r") as handle:
-            metadata = json.read(handle)
+            metadata = json.load(handle)
 
     # Print custom message based on the type and application-specific metadata.
-    with open(os.path.join(path, "_metadata.json") as handle:
-        appmeta = json.read(handle)
+    with open(os.path.join(path, "_metadata.json"), "r") as handle:
+        appmeta = json.load(handle)
         print("I am a " + metadata["type"] + " created by " + appmeta["author"])
         if metadata["type"] == "data_frame":
             print("I have the following columns: " + ", ".join(appmeta["columns"]))
 
-    read_object(path, metadata=metadata, **kwargs)
+    return dolomite_base.read_object(path, metadata=metadata, **kwargs)
 
 # Creating a user-friendly function to set the override before the read.
 def read_for_application(path: str, metadata: Optional[Dict] = None, **kwargs):
@@ -359,6 +362,10 @@ def read_for_application(path: str, metadata: Optional[Dict] = None, **kwargs):
 
 # This diverts to the override with printing of custom messages.
 read_for_application(path)
+## I am a data_frame created by aaron
+## I have the following columns: A, B
+## I am a data_frame created by aaron
+## I have the following columns: C
 ```
 
 By overriding the saving and reading process for one or more classes, each application can customize the behavior of _dolomite_ to their own needs.
