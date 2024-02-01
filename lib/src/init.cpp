@@ -5,15 +5,11 @@
 // Declarations:
 pybind11::object load_list_json(std::string, pybind11::list);
 pybind11::object load_list_hdf5(std::string, std::string, pybind11::list);
-void validate(std::string, pybind11::handle);
-void register_validate_function(std::string, pybind11::function, std::string);
-bool deregister_validate_function(std::string);
+void validate(std::string, pybind11::handle, pybind11::dict);
 
 // Binding:
 PYBIND11_MODULE(lib_dolomite_base, m) {
     m.def("load_list_json", &load_list_json);
     m.def("load_list_hdf5", &load_list_hdf5);
     m.def("validate", &validate);
-    m.def("register_validate_function", &register_validate_function);
-    m.def("deregister_validate_function", &deregister_validate_function);
 }

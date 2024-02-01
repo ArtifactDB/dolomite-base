@@ -27,22 +27,22 @@ def test_validate_object_registration():
 
     def fun(path, metadata):
         pass
-    dl.register_validate_object_function("aaron", fun)
+    dl.validate_object_registry["aaron"] = fun
     dl.validate_object(dir)
 
-    # Doesn't override by default...
     def fun2(path, metadata):
         raise ValueError("WHEEE") 
-    dl.register_validate_object_function("aaron", fun2)
-    dl.validate_object(dir)
-
-    # Until explicitly requested...
-    with pytest.raises(Exception, match="already been registered") as ex:
-        dl.register_validate_object_function("aaron", fun2, existing="error")
-    dl.register_validate_object_function("aaron", fun2, existing="new")
+    dl.validate_object_registry["aaron"] = fun2
     with pytest.raises(Exception, match="WHEEE") as ex:
         dl.validate_object(dir)
 
-    dl.register_validate_object_function("aaron", None)
-    with pytest.raises(Exception, match="no registered") as ex:
+    dl.validate_object_registry["aaron"] = "WHEE"
+    with pytest.raises(Exception, match="to contain a function") as ex:
         dl.validate_object(dir)
+
+    del dl.validate_object_registry["aaron"] 
+    dl.validate_object_registry[1] = fun
+    with pytest.raises(Exception, match="should be strings") as ex:
+        dl.validate_object(dir)
+
+    del dl.validate_object_registry[1]

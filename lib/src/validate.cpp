@@ -1,8 +1,6 @@
 #include "takane/takane.hpp"
 #include "pybind11/pybind11.h"
 
-static takane::Options global_options;
-
 std::shared_ptr<millijson::Base> convert_to_millijson(const pybind11::handle& x) {
     std::shared_ptr<millijson::Base> output;
 
@@ -76,48 +74,32 @@ pybind11::dict convert_to_python(const takane::ObjectMetadata& x) {
     return output;
 }
 
-void validate(std::string path, pybind11::handle metadata) {
+void validate(std::string path, pybind11::handle metadata, pybind11::dict custom) {
+    // We re-create the Options on every call to avoid problems with storing
+    // the pybind11::function object in a static global (via the lambda
+    // capture) - this results in GIL-related issues upon destruction.
+    takane::Options options;
+    for (auto it = custom.begin(); it != custom.end(); ++it) {
+        if (!pybind11::isinstance<pybind11::str>(it->first)) {
+            throw std::runtime_error("keys of 'validate_object_registry' should be strings");
+        }
+        auto objname = pybind11::cast<std::string>(it->first);
+
+        if (!pybind11::isinstance<pybind11::function>(it->second)) {
+            throw std::runtime_error("expected 'validate_object_registry' to contain a function for '" + objname + "'");
+        }
+        auto fun = pybind11::reinterpret_borrow<pybind11::function>(it->second);
+        options.custom_validate[std::move(objname)] = [fun](const std::filesystem::path& path, const takane::ObjectMetadata& metadata, takane::Options&) {
+             fun(pybind11::str(path.c_str()), convert_to_python(metadata));
+             return;
+        };
+    }
+
     if (pybind11::isinstance<pybind11::none>(metadata)) {
-        takane::validate(path, global_options);
+        takane::validate(path, options);
     } else {
         auto converted = convert_to_millijson(metadata);
         auto objmeta = takane::reformat_object_metadata(converted.get());
-        takane::validate(path, objmeta, global_options);
+        takane::validate(path, objmeta, options);
     }
-}
-
-template<class Registry>
-bool has_existing(const std::string& type, const Registry& registry, const std::string& existing) {
-    auto it = registry.find(type);
-    if (it == registry.end()) {
-        return false;
-    }
-    if (existing == "error") {
-        throw std::runtime_error("function has already been registered for object type '" + type + "'");
-    }
-    return (existing == "old");
-}
-
-template<class Registry>
-bool deregister(std::string type, Registry& registry) {
-    auto it = registry.find(type);
-    if (it != registry.end()) {
-        registry.erase(it);
-        return true;
-    } else {
-        return false;
-    }
-}
-
-void register_validate_function(std::string type, pybind11::function fun, std::string existing) {
-    if (!has_existing(type, global_options.custom_validate, existing)) {
-        global_options.custom_validate[type] = [fun](const std::filesystem::path& path, const takane::ObjectMetadata& metadata, takane::Options&) {
-            fun(pybind11::str(path.c_str()), convert_to_python(metadata));
-            return;
-        };
-    }
-}
-
-bool deregister_validate_function(std::string type) {
-    return deregister(type, global_options.custom_validate);
 }
