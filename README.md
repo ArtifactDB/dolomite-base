@@ -27,7 +27,7 @@ This is a more robust and portable alternative to the typical approach of pickli
   We can easily read or update part of an object without having to consider the other parts.
 
 The **dolomite-base** package defines the base generics to read and write the file structures along with the associated metadata.
-Implementations of these methods for various Bioconductor classes can be found in the other **dolomite** packages like 
+Implementations of these methods for various Bioconductor classes can be found in the other **dolomite** packages like
 [**dolomite-ranges**](https://github.com/ArtifactDB/dolomite-ranges) and [**dolomite-se**](https://github.com/ArtifactDB/dolomite-se).
 
 ## Quick start
@@ -44,7 +44,7 @@ Let's mock one up:
 
 ```python
 import biocframe
-df = biocframe.BiocFrame({ 
+df = biocframe.BiocFrame({
     "X": list(range(0, 10)),
     "Y": [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j" ]
 })
@@ -65,6 +65,7 @@ print(df)
 ```
 
 Then we can save it to a directory with the `save_object()` function.
+This function creates a directory at the user-specified path and saves the provided objects into one or more files.
 
 ```python
 import tempfile
@@ -76,7 +77,7 @@ path = os.path.join(tmp, "my_df")
 dolomite_base.save_object(df, path)
 ```
 
-We can copy the directory to another location, over a network, etc., and then easily load it back into a Python session via the `read_object()` function.
+We can easily load the contents of the directory back into a Python session via the `read_object()` function.
 Note that the exact Python types for the `BiocFrame` columns may not be preserved by the round trip.
 
 ```python
@@ -101,7 +102,10 @@ Check out the [API reference](https://artifactdb.github.io/dolomite-base/api/mod
 
 ## Supported classes
 
-The saving/reading process can be applied to a range of data structures, provided the appropriate **alabaster** package is installed.
+The saving/reading process can be applied to a range of data structures, provided the appropriate **dolomite** package is installed.
+Each of these packages implements a saving and reading function for its associated classes -
+the saving function will save the object to one or more files inside a directory,
+while the reading function load the object back into memory from the directory contents.
 
 | Package | Object types | PyPI |
 |-----|-----|----|
@@ -115,11 +119,249 @@ The saving/reading process can be applied to a range of data structures, provide
 All packages are available from PyPI and can be installed with the usual `pip install` process.
 Alternatively, to install all packages in one go, users can install the [**dolomite**](https://pypi.org/project/dolomite) umbrella package.
 
-## Extensions and applications
+## Operating on directories
 
-Developers can _extend_ this framework to support more R/Bioconductor classes by creating their own **alabaster** package.
-Check out the [extension guide](https://bioconductor.org/packages/release/bioc/vignettes/alabaster.base/inst/doc/extensions.html) for more details.
+Users can move freely rename or relocate directories and `read_object()` function will still work.
+For example, we can easily copy the entire directory to a new file system and everything will still be correctly referenced within the directory.
+The simplest way to share objects is to just `zip` or `tar` the staging directory for _ad hoc_ distribution.
+For more serious applications, `r self` can be used in conjunction with storage systems like AWS S3 for easier distribution.
 
-Developers can also _customize_ this framework for specific applications, most typically to save bespoke metadata in the JSON file.
-The JSON file can then be indexed by systems like MongoDB and Elasticsearch to provide search capabilities.
-Check out the [applications guide](https://bioconductor.org/packages/release/bioc/vignettes/alabaster.base/inst/doc/applications.html) for more details.
+```python
+# Mocking up an object:
+import biocframe
+df = biocframe.BiocFrame({
+    "X": list(range(0, 10)),
+    "Y": [ "a", "b", "c", "d", "e", "f", "g", "h", "i", "j" ]
+})
+
+# Saving to one location:
+import tempfile
+import os
+import dolomite_base
+tmp = tempfile.mkdtemp()
+path = os.path.join(tmp, "my_df")
+dolomite_base.save_object(df, path)
+
+# Reading from another location:
+alt_path = os.path.join(tmp, "foobar")
+os.rename(path, alt_path)
+alt_out = dolomite_base.read_object(alt_path)
+```
+
+That said, it is unwise to manipulate the files inside the directory created by `save_object()`.
+Reading functions will usually depend on specific file names or subdirectory structures within the directory, and fiddling with them may cause unexpected results.
+Advanced users can exploit this by loading components from subdirectories if the full object is not required:
+
+```python
+# Creating a nested DF:
+nested = biocframe.BiocFrame({ "A": df })
+nest_path = os.path.join(tmp, "nesting")
+dolomite_base.save_object(nested, nest_path)
+
+# Now reading in the nested DF:
+redf = dolomite_base.read_object(os.path.join(nest_path, "other_columns", "0"))
+```
+
+## Extending to new classes
+
+The _dolomite_ framework is easily extended to new classes by:
+
+1. Writing a method for `save_object()`.
+   This should accept an instance of the object and a path to a directory, and save the contents of the object inside the directory.
+   It should also produce an `OBJECT` file that specifies the type of the object, e.g., `data_frame`, `hdf5_sparse_matrix`.
+2. Writing a function for `read_object()` and registering it in the `read_object_registry`.
+   This should accept a path to a directory and read its contents to reconstruct the object.
+   The registered type should be the same as that used in the `OBJECT` file.
+3. Writing a function for `validate_object()` and registering it in the `validate_object_registry`.
+   This should accept a path to a directory and read its contents to determine if it is a valid on-disk representation.
+   The registered type should be the same as that used in the `OBJECT` file.
+   - (optional) Devleopers can alternatively formalize the on-disk representation by adding a specification to the [**takane**](https://github.com/ArtifactDB/takane) repository.
+     This aims to provide C++-based validators for each representation, allowing us to enforce consistency across multiple languages (e.g., R).
+     Any **takane** validator is automatically used by `validate_object()` so no registration is required.
+
+To illustrate, let's extend _dolomite_ to a custom class.
+
+```python
+class Coffee:
+    def __init__(self, beans: str, milk: bool):
+        self.beans = beans
+        self.milk = milk
+```
+
+First we implement the saving method:
+
+```python
+import dolomite_base
+import os
+import json
+
+@dolomite_base.save_object.register
+def save_object_for_Coffee(x: Coffee, path: str, **kwargs):
+    os.mkdir(path)
+    with open(os.path.join(path, "bean_type"), "w") as handle:
+        handle.write(x.beans)
+    with open(os.path.join(path, "has_milk"), "w") as handle:
+        handle.write("true" if x.milk else "false")
+    with open(os.path.join(path, "OBJECT"), "w") as handle:
+        json.dump({ "type": "coffee", "coffee": { "version": "0.1" } }, handle)
+```
+
+Then the reading method:
+
+```python
+from typing import Dict
+
+def read_Coffee(path: str, metadata: Dict, **kwargs) -> Coffee:
+    metadata["coffee"]["version"] # possibly do something different based on version
+    with open(os.path.join(path, "bean_type"), "r") as handle:
+        beans = handle.read()
+    with open(os.path.join(path, "has_milk"), "r") as handle:
+        milk = (handle.read() == "true")
+    return Coffee(beans, milk)
+
+dolomite_base.read_object_registry["coffee"] = read_Coffee
+```
+
+And finally, the validation method:
+
+```python
+def validate_Coffeee(path: str, metadata: Dict):
+    metadata["coffee"]["version"] # possibly do something different based on version
+    with open(os.path.join(path, "bean_type"), "r") as handle:
+        beans = handle.read()
+        if not beans in [ "arabica", "robusta", "excelsa", "liberica" ]:
+            raise ValueError("wrong bean type '" + beans + "'")
+    with open(os.path.join(path, "has_milk"), "r") as handle:
+        milk = handle.read()
+        if not milk in [ "true", "false" ]:
+            raise ValueError("invalid milk '" + milk + "'")
+
+dolomite_base.validate_object_registry["coffee"] = validate_Coffee
+```
+
+Let's run them and see how it works:
+
+```{r}
+cup = Coffee("arabica", milk=False)
+
+# Saving to one location:
+import tempfile
+import os
+import dolomite_base
+
+tmp = tempfile.mkdtemp()
+path = os.path.join(tmp, "stuff")
+dolomite_base.save_object(cup, path)
+cup2 = dolomite_base.read_object(path)
+```
+
+For more complex objects that are composed of multiple smaller "child" objects, developers should consider saving each of their children in subdirectories of `path`.
+This can be achieved by calling `alt_save_object()` and `alt_read_object()` in the saving and loading functions, respectively.
+(We use the `alt_*` versions of these functions to respect application overrides, see below.)
+
+# Creating applications
+
+Developers can also create applications that customize the machinery of the _dolomite_ framework for specific needs.
+In most cases, this involves storing more metadata to describe the object in more detail.
+For example, we might want to remember the identity of the author for each object.
+This is achieved by creating an application-specific saving generic with the same signature as `save_object()`:
+
+```python
+from functools import singledispatch
+from typing import Any, Dict
+import dolomite_base
+import json
+import os
+import getpass
+import biocframe
+
+def dump_extra_metadata(path: str, extra: Dict):
+    user_id = getpass.getuser()
+    # File names with leading underscores are reserved for application-specific
+    # use, so they won't clash with anything produced by save_object().
+    metapath = os.path.join(path, "_metadata.json")
+    with open(metapath, "w") as handle:
+        json.dump({ **extra, "author": user_id }, handle)
+
+@singledispatch
+def app_save_object(x: Any, path: str, **kwargs):
+    dolomite_base.save_object(x, path, **kwargs) # does the real work
+    dump_extract_metadata(path, {}) # adding some application-specific metadata
+
+@app_save_object.register
+def app_save_object_for_BiocFrames(x: biocframe.BiocFrame, path: str, **kwargs):
+    dolomite_base.save_object(x, path, **kwargs) # does the real work
+    # We can also override specific methods to add object+application-specific metadata:
+    dump_extract_metadata(path, { "columns": x.get_column_names() })
+```
+
+Applications should call `alt_save_object_function()` to instruct `alt_save_object()` to use this new generic.
+This ensures that the customizations are applied to all child objects, such as the nested `BiocFrame` below.
+
+```python
+# Create a friendly user-visible function to handle the generic override; this
+# is reversed on function exit to avoid interfering with other applications.
+def save_for_application(x, path: str, **kwargs):
+    old = dolomite_base.alt_save_object_function(app_save_object)
+    try:
+        dolomite_base.alt_save_object(x, path, **kwargs)
+    finally:
+        dolomite_base.alt_save_object_function(old)
+
+# Saving our nested BiocFrames with our overrides active.
+import biocframe
+df = biocframe.BiocFrame(
+    A = [1, 2, 3, 4],
+    B = biocframe.BiocFrame(
+        C = ["a", "b", "c", "d"]
+    )
+)
+
+import tempfile
+tmp = tempfile.mkdtemp()
+path = os.path.join(tmp, "foobar")
+save_for_application(df, path)
+
+# Both the parent and child BiocFrames have new metadata.
+with open(os.path.join(path, "_metadata.json"), "r") as handle:
+    print(handle.read())
+with open(os.path.join(path, "other_columns", "1", "_metadata.json"), "r") as handle:
+    print(handle.read())
+```
+
+The reading function can be similarly overridden by setting `alt_read_object_function()` to instruct all `alt_read_object()` calls to use the override.
+This allows applications to, e.g., do something with the metadata that we just added.
+
+```python
+import json
+
+def app_read_object(path: str, metadata: Optional[Dict] = None, **kwargs):
+    if metadata is None:
+        with open(os.path.join(path, "OBJECT"), "r") as handle:
+            metadata = json.read(handle)
+
+    # Print custom message based on the type and application-specific metadata.
+    with open(os.path.join(path, "_metadata.json") as handle:
+        appmeta = json.read(handle)
+        print("I am a " + metadata["type"] + " created by " + appmeta["author"])
+        if metadata["type"] == "data_frame":
+            print("I have the following columns: " + ", ".join(appmeta["columns"]))
+
+    read_object(path, metadata=metadata, **kwargs)
+
+# Creating a user-friendly function to set the override before the read.
+def read_for_application(path: str, metadata: Optional[Dict] = None, **kwargs):
+    old = dolomite_base.alt_read_object_function(app_read_object)
+    try:
+        return dolomite_base.alt_read_object(path, metadata, **kwargs)
+    finally:
+        dolomite_base.alt_read_object_function(old)
+
+# This diverts to the override with printing of custom messages.
+read_for_application(path)
+```
+
+By overriding the saving and reading process for one or more classes, each application can customize the behavior of _dolomite_ to their own needs.
+In general, applications should avoid modifying the files created by `save_object()`, to avoid violating any **takane** format specifications
+(unless the application maintainer really knows what they're doing).
+Applications are free to write to any path starting with an underscore as this will not be used by any specification.
