@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
         <title>dolomite_base.save_object - dolomite-base unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
@@ -220,10 +220,16 @@
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.save_object.save_object">[docs]</a>
 <span class="nd">@singledispatch</span>
 <span class="k">def</span> <span class="nf">save_object</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save an object to its on-disk representation. </span>
-<span class="sd">    </span>
-<span class="sd">    **dolomite** extensions should define methods for </span>
-<span class="sd">    this generic to stage different object classes.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save an object to its on-disk representation. **dolomite** extensions</span>
+<span class="sd">    should define methods for this generic to stage different object classes.</span>
+
+<span class="sd">    Saver methods may accept additional arguments in the ``kwargs``; these</span>
+<span class="sd">    should be prefixed by the object type to avoid conflicts (see</span>
+<span class="sd">    :py:func:`~dolomite_base.save_data_frame.save_data_frame` for examples).</span>
+
+<span class="sd">    Saver methods should also use the :py:func:`~validate_saves` decorator</span>
+<span class="sd">    to ensure that the generated output in ``path`` is valid.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x: </span>

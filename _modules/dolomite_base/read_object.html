@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
         <title>dolomite_base.read_object - dolomite-base unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
@@ -228,18 +228,24 @@
 <span class="sd">    individual reading functions - possibly from different packages in the</span>
 <span class="sd">    **dolomite** framework based on the ``metadata`` from the ``OBJECT`` file. </span>
 
-<span class="sd">    Application developers can control the dispatch process by setting the</span>
-<span class="sd">    ``read_object_registry`` for the relevant object type(s). The value can</span>
-<span class="sd">    either be a string specifying the fully qualified name of a function</span>
-<span class="sd">    (including all modules) or a function that accepts the same arguments as</span>
-<span class="sd">    ``read_object`` (no need to consider ``metadata = None``).</span>
+<span class="sd">    Application developers can control the dispatch process by modifying</span>
+<span class="sd">    ``read_object_registry``. Each key is a string containing the object type,</span>
+<span class="sd">    e.g., ``data_frame``, while the value can either be a string specifying the</span>
+<span class="sd">    fully qualified name of a reader function (including all modules, which</span>
+<span class="sd">    will be loaded upon dispatch) or the reader function itself.</span>
+
+<span class="sd">    Any reader functions should accept the same arguments as</span>
+<span class="sd">    :py:func`~dolomite_base.read-object.read_object` and return the loaded</span>
+<span class="sd">    object. Readers may assume that the ``metadata`` argument is available,</span>
+<span class="sd">    i.e., no need to account for the None case.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        path: </span>
 <span class="sd">            Path to a directory containing the object.</span>
 
 <span class="sd">        metadata: </span>
-<span class="sd">            Metadata for the object. This is read from the `OBJECT` file if None.</span>
+<span class="sd">            Metadata for the object. If None, the metadata is read from the</span>
+<span class="sd">            ``OBJECT`` file inside ``path``. </span>
 
 <span class="sd">        kwargs: </span>
 <span class="sd">            Further arguments, passed to individual methods.</span>

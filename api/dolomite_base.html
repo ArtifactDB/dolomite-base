@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="dolomite_base" href="modules.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
         <title>dolomite_base package - dolomite-base unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
@@ -207,7 +207,7 @@
 <span id="dolomite-base-alt-read-object-module"></span><h2>dolomite_base.alt_read_object module<a class="headerlink" href="#module-dolomite_base.alt_read_object" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.alt_read_object.alt_read_object">
-<span class="sig-prename descclassname"><span class="pre">dolomite_base.alt_read_object.</span></span><span class="sig-name descname"><span class="pre">alt_read_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/alt_read_object.html#alt_read_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.alt_read_object.alt_read_object" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.alt_read_object.</span></span><span class="sig-name descname"><span class="pre">alt_read_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/alt_read_object.html#alt_read_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.alt_read_object.alt_read_object" title="Link to this definition">#</a></dt>
 <dd><p>Wrapper around <a class="reference internal" href="#dolomite_base.read_object.read_object" title="dolomite_base.read_object.read_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_object()</span></code></a>
 that respects application-defined overrides from
 <a class="reference internal" href="#dolomite_base.alt_read_object.alt_read_object_function" title="dolomite_base.alt_read_object.alt_read_object_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">alt_read_object_function()</span></code></a>.  This allows applications to
@@ -219,6 +219,8 @@ staging child objects instead of <code class="docutils literal notranslate"><spa
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Directory containing the object to load.</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>]</span>) – Metadata for the object. If None, this should be read from the
+<code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> file inside <code class="docutils literal notranslate"><span class="pre">path</span></code>.</p></li>
 <li><p><strong>kwargs</strong> – Further arguments, passed to individual methods.</p></li>
 </ul>
 </dd>
@@ -236,7 +238,7 @@ staging child objects instead of <code class="docutils literal notranslate"><spa
 <span class="sig-prename descclassname"><span class="pre">dolomite_base.alt_read_object.</span></span><span class="sig-name descname"><span class="pre">alt_read_object_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fun</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/alt_read_object.html#alt_read_object_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.alt_read_object.alt_read_object_function" title="Link to this definition">#</a></dt>
 <dd><p>Get or set the alternative reading function for use by
 <a class="reference internal" href="#dolomite_base.alt_read_object.alt_read_object" title="dolomite_base.alt_read_object.alt_read_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">alt_read_object()</span></code></a>. Typically set by applications prior to reading
-for customization, e.g., to attach more metadata to the readed object.</p>
+for customization, e.g., to attach more metadata to the loaded object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fun</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Callable" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>]</span>) – The alternative reading function. This should accept the same
@@ -244,7 +246,7 @@ arguments and return the same value as
 <a class="reference internal" href="#dolomite_base.read_object.read_object" title="dolomite_base.read_object.read_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_object()</span></code></a>.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Callable" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Callable" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><p>If <code class="docutils literal notranslate"><span class="pre">fun</span> <span class="pre">=</span> <span class="pre">None</span></code>, the current setting of the alternative reading
@@ -300,7 +302,7 @@ arguments and return the same value as
 <a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a>.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Callable" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Callable" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><p>If <code class="docutils literal notranslate"><span class="pre">fun</span> <span class="pre">=</span> <span class="pre">None</span></code>, the current setting of the alternative saving
@@ -474,7 +476,7 @@ this flag to <code class="docutils literal notranslate"><span class="pre">False<
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.5.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.5.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A data frame.</p>
@@ -491,16 +493,21 @@ this flag to <code class="docutils literal notranslate"><span class="pre">False<
 <dd><p>Read an object from its on-disk representation. This will dispatch to
 individual reading functions - possibly from different packages in the
 <strong>dolomite</strong> framework based on the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> from the <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> file.</p>
-<p>Application developers can control the dispatch process by setting the
-<code class="docutils literal notranslate"><span class="pre">read_object_registry</span></code> for the relevant object type(s). The value can
-either be a string specifying the fully qualified name of a function
-(including all modules) or a function that accepts the same arguments as
-<code class="docutils literal notranslate"><span class="pre">read_object</span></code> (no need to consider <code class="docutils literal notranslate"><span class="pre">metadata</span> <span class="pre">=</span> <span class="pre">None</span></code>).</p>
+<p>Application developers can control the dispatch process by modifying
+<code class="docutils literal notranslate"><span class="pre">read_object_registry</span></code>. Each key is a string containing the object type,
+e.g., <code class="docutils literal notranslate"><span class="pre">data_frame</span></code>, while the value can either be a string specifying the
+fully qualified name of a reader function (including all modules, which
+will be loaded upon dispatch) or the reader function itself.</p>
+<p>Any reader functions should accept the same arguments as
+:py:func`~dolomite_base.read-object.read_object` and return the loaded
+object. Readers may assume that the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> argument is available,
+i.e., no need to account for the None case.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a directory containing the object.</p></li>
-<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>]</span>) – Metadata for the object. This is read from the <cite>OBJECT</cite> file if None.</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>]</span>) – Metadata for the object. If None, the metadata is read from the
+<code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> file inside <code class="docutils literal notranslate"><span class="pre">path</span></code>.</p></li>
 <li><p><strong>kwargs</strong> – Further arguments, passed to individual methods.</p></li>
 </ul>
 </dd>
@@ -708,13 +715,13 @@ to their corresponding file representation, see
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.save_data_frame.save_data_frame">
 <span class="sig-prename descclassname"><span class="pre">dolomite_base.save_data_frame.</span></span><span class="sig-name descname"><span class="pre">save_data_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_frame_convert_list_to_vector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_frame_convert_1darray_to_vector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_data_frame.html#save_data_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_data_frame.save_data_frame" title="Link to this definition">#</a></dt>
-<dd><p>Method for saving <a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.5.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>
+<dd><p>Method for saving <a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.5.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>
 objects to the corresponding file representations, see
 <a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a> for details.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.5.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></span>) – Object to be saved.</p></li>
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.5.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></span>) – Object to be saved.</p></li>
 <li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a directory in which to save <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p></li>
 <li><p><strong>data_frame_convert_list_to_vector</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – If a column is a regular Python list where all entries are of the
 same basic type (integer, string, float, boolean) or None, should
@@ -748,9 +755,13 @@ external “dense array” object instead.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.save_object.save_object">
 <span class="sig-prename descclassname"><span class="pre">dolomite_base.save_object.</span></span><span class="sig-name descname"><span class="pre">save_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_object.html#save_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_object.save_object" title="Link to this definition">#</a></dt>
-<dd><p>Save an object to its on-disk representation.</p>
-<p><strong>dolomite</strong> extensions should define methods for
-this generic to stage different object classes.</p>
+<dd><p>Save an object to its on-disk representation. <strong>dolomite</strong> extensions
+should define methods for this generic to stage different object classes.</p>
+<p>Saver methods may accept additional arguments in the <code class="docutils literal notranslate"><span class="pre">kwargs</span></code>; these
+should be prefixed by the object type to avoid conflicts (see
+<a class="reference internal" href="#dolomite_base.save_data_frame.save_data_frame" title="dolomite_base.save_data_frame.save_data_frame"><code class="xref py py-func docutils literal notranslate"><span class="pre">save_data_frame()</span></code></a> for examples).</p>
+<p>Saver methods should also use the <a class="reference internal" href="#dolomite_base.save_object.validate_saves" title="dolomite_base.save_object.validate_saves"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_saves()</span></code></a> decorator
+to ensure that the generated output in <code class="docutils literal notranslate"><span class="pre">path</span></code> is valid.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
