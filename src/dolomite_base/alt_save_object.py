@@ -5,7 +5,7 @@ from .save_object import save_object
 ALT_SAVE_OBJECT_FUNCTION = save_object
 
 
-def alt_save_object_function(fun: Optional[Callable] = None) -> Optional[Callable]:
+def alt_save_object_function(fun: Optional[Callable] = None) -> Callable:
     """Get or set the alternative saving function for use by
     :py:meth:`~alt_save_object`. Typically set by applications prior to
     saving for customization, e.g., to save extra metadata.
