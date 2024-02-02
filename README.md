@@ -64,8 +64,8 @@ print(df)
 ## [9]       9      j
 ```
 
-Then we can save it to a directory with the `save_object()` function.
-This function creates a directory at the user-specified path and saves the provided objects into one or more files.
+We save our `BiocFrame` to a user-specified directory with the `save_object()` function.
+This function saves its input object to file according to the relevant [specification](https://github.com/ArtifactDB/takane).
 
 ```python
 import tempfile
@@ -75,10 +75,14 @@ tmp = tempfile.mkdtemp()
 import dolomite_base
 path = os.path.join(tmp, "my_df")
 dolomite_base.save_object(df, path)
+
+os.listdir(path)
+## ['basic_columns.h5', 'OBJECT']
 ```
 
-We can easily load the contents of the directory back into a Python session via the `read_object()` function.
-Note that the exact Python types for the `BiocFrame` columns may not be preserved by the round trip.
+We load the contents of the directory back into a Python session by using the `read_object()` function.
+Note that the exact Python types for the `BiocFrame` columns may not be preserved by the round trip,
+though the contents of the columns will be unchanged.
 
 ```python
 out = dolomite_base.read_object(path)
@@ -102,10 +106,11 @@ Check out the [API reference](https://artifactdb.github.io/dolomite-base/api/mod
 
 ## Supported classes
 
-The saving/reading process can be applied to a range of data structures, provided the appropriate **dolomite** package is installed.
-Each of these packages implements a saving and reading function for its associated classes -
-the saving function will save the object to one or more files inside a directory,
-while the reading function load the object back into memory from the directory contents.
+The saving/reading process can be applied to a range of [**BiocPy**](https://github.com/BiocPy) data structures,
+provided the appropriate **dolomite** package is installed.
+Each package implements a saving and reading function for its associated classes,
+which are automatically used from **dolomite-base**'s `save_object()` and `read_object()` functions, respectively.
+(That is, there is no need to explicitly `import` the package when calling `save_object()` or `read_object()` for its classes.)
 
 | Package | Object types | PyPI |
 |-----|-----|----|
@@ -116,7 +121,13 @@ while the reading function load the object back into memory from the directory c
 | [**dolomite-sce**](https://github.com/ArtifactDB/dolomite-sce) | [`SingleCellExperiment`](https://github.com/BiocPy/SingleCellExperiment) | [![](https://img.shields.io/pypi/v/dolomite-sce.svg)](https://pypi.org/project/dolomite-sce/) |
 | [**dolomite-mae**](https://github.com/ArtifactDB/dolomite-mae) | [`MultiAssayExperiment`](https://bioconductor.org/packages/MultiAssayExperiment) | [![](https://img.shields.io/pypi/v/dolomite-mae.svg)](https://pypi.org/project/dolomite-mae/) |
 
-All packages are available from PyPI and can be installed with the usual `pip install` process.
+Each class's on-disk representation is determined by the associated [**takane** specification](https://github.com/ArtifactDB/takane).
+For more complex objects, the on-disk representation may consist of multiple files, or even subdirectories containing "child" objects from internal `save_object()` calls.
+Each call to `save_object()` will automatically enforce the relevant specification by validating the directory contents with **dolomite-base**'s `validate_object()` function.
+This provides some guarantees on the file structure within the directory, allowing developers to reliably implement readers in a variety of frameworks -
+for example, the [**alabaster**](https://github.com/ArtifactDB/alabaster.base) will run the same validators on its directory contents to guarantee interoperability.
+
+All of the listed packages are available from PyPI and can be installed with the usual `pip install` procedure.
 Alternatively, to install all packages in one go, users can install the [**dolomite**](https://pypi.org/project/dolomite) umbrella package.
 
 ## Operating on directories
