@@ -27,18 +27,24 @@ def read_object(path: str, metadata: Optional[dict] = None, **kwargs) -> Any:
     individual reading functions - possibly from different packages in the
     **dolomite** framework based on the ``metadata`` from the ``OBJECT`` file. 
 
-    Application developers can control the dispatch process by setting the
-    ``read_object_registry`` for the relevant object type(s). The value can
-    either be a string specifying the fully qualified name of a function
-    (including all modules) or a function that accepts the same arguments as
-    ``read_object`` (no need to consider ``metadata = None``).
+    Application developers can control the dispatch process by modifying
+    ``read_object_registry``. Each key is a string containing the object type,
+    e.g., ``data_frame``, while the value can either be a string specifying the
+    fully qualified name of a reader function (including all modules, which
+    will be loaded upon dispatch) or the reader function itself.
+
+    Any reader functions should accept the same arguments as
+    :py:func`~dolomite_base.read-object.read_object` and return the loaded
+    object. Readers may assume that the ``metadata`` argument is available,
+    i.e., no need to account for the None case.
 
     Args:
         path: 
             Path to a directory containing the object.
 
         metadata: 
-            Metadata for the object. This is read from the `OBJECT` file if None.
+            Metadata for the object. If None, the metadata is read from the
+            ``OBJECT`` file inside ``path``. 
 
         kwargs: 
             Further arguments, passed to individual methods.
