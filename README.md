@@ -179,7 +179,7 @@ The _dolomite_ framework is easily extended to new classes by:
      This aims to provide C++-based validators for each representation, allowing us to enforce consistency across multiple languages (e.g., R).
      Any **takane** validator is automatically used by `validate_object()` so no registration is required.
 
-To illustrate, let's extend _dolomite_ to a custom class.
+To illustrate, let's extend _dolomite_ to a new custom class:
 
 ```python
 class Coffee:
@@ -197,7 +197,7 @@ import os
 import json
 
 @dolomite_base.save_object.register
-@validate_saves
+@dolomite_base.validate_saves
 def save_object_for_Coffee(x: Coffee, path: str, **kwargs):
     os.mkdir(path)
     with open(os.path.join(path, "bean_type"), "w") as handle:
@@ -227,7 +227,7 @@ dolomite_base.read_object_registry["coffee"] = read_Coffee
 And finally, the validation method:
 
 ```python
-def validate_Coffeee(path: str, metadata: Dict):
+def validate_Coffee(path: str, metadata: Dict):
     metadata["coffee"]["version"] # possibly do something different based on version
     with open(os.path.join(path, "bean_type"), "r") as handle:
         beans = handle.read()
@@ -246,15 +246,14 @@ Let's run them and see how it works:
 ```{r}
 cup = Coffee("arabica", milk=False)
 
-# Saving to one location:
 import tempfile
-import os
-import dolomite_base
-
 tmp = tempfile.mkdtemp()
 path = os.path.join(tmp, "stuff")
 dolomite_base.save_object(cup, path)
+
 cup2 = dolomite_base.read_object(path)
+print(cup2.beans)
+## arabica
 ```
 
 For more complex objects that are composed of multiple smaller "child" objects, developers should consider saving each of their children in subdirectories of `path`.
