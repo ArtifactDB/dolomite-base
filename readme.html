@@ -300,7 +300,7 @@ though the contents of the columns will be unchanged.</p>
 provided the appropriate <strong>dolomite</strong> package is installed.
 Each package implements a saving and reading function for its associated classes,
 which are automatically used from <strong>dolomite-base</strong>’s <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> and <code class="docutils literal notranslate"><span class="pre">read_object()</span></code> functions, respectively.
-(That is, there is no need to explicitly <code class="docutils literal notranslate"><span class="pre">import</span></code> the package when calling <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> or <code class="docutils literal notranslate"><span class="pre">read_object()</span></code> for its classes.)</p>
+(That is, there is no need to explicitly <code class="docutils literal notranslate"><span class="pre">import</span></code> a package when calling <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> or <code class="docutils literal notranslate"><span class="pre">read_object()</span></code> for its classes.)</p>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
@@ -337,20 +337,15 @@ which are automatically used from <strong>dolomite-base</strong>’s <code class
 </tbody>
 </table>
 </div>
-<p>Each class’s on-disk representation is determined by the associated <a class="reference external" href="https://github.com/ArtifactDB/takane"><strong>takane</strong> specification</a>.
-For more complex objects, the on-disk representation may consist of multiple files, or even subdirectories containing “child” objects from internal <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> calls.
-Each call to <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> will automatically enforce the relevant specification by validating the directory contents with <strong>dolomite-base</strong>’s <code class="docutils literal notranslate"><span class="pre">validate_object()</span></code> function.
-This provides some guarantees on the file structure within the directory, allowing developers to reliably implement readers in a variety of frameworks -
-for example, the <a class="reference external" href="https://github.com/ArtifactDB/alabaster.base"><strong>alabaster</strong></a> will run the same validators on its directory contents to guarantee interoperability.</p>
 <p>All of the listed packages are available from PyPI and can be installed with the usual <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> procedure.
 Alternatively, to install all packages in one go, users can install the <a class="reference external" href="https://pypi.org/project/dolomite"><strong>dolomite</strong></a> umbrella package.</p>
 </section>
 <section id="operating-on-directories">
 <h2>Operating on directories<a class="headerlink" href="#operating-on-directories" title="Link to this heading">#</a></h2>
-<p>Users can move freely rename or relocate directories and <code class="docutils literal notranslate"><span class="pre">read_object()</span></code> function will still work.
+<p>Users can move freely rename or relocate directories and the <code class="docutils literal notranslate"><span class="pre">read_object()</span></code> function will still work.
 For example, we can easily copy the entire directory to a new file system and everything will still be correctly referenced within the directory.
-The simplest way to share objects is to just <code class="docutils literal notranslate"><span class="pre">zip</span></code> or <code class="docutils literal notranslate"><span class="pre">tar</span></code> the staging directory for <em>ad hoc</em> distribution.
-For more serious applications, <code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">self</span></code> can be used in conjunction with storage systems like AWS S3 for easier distribution.</p>
+The simplest way to share objects is to just <code class="docutils literal notranslate"><span class="pre">zip</span></code> or <code class="docutils literal notranslate"><span class="pre">tar</span></code> the staging directory for <em>ad hoc</em> distribution,
+though more serious applications will use storage systems like AWS S3 for easier distribution.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Mocking up an object:</span>
 <span class="kn">import</span> <span class="nn">biocframe</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">({</span>
@@ -385,9 +380,45 @@ Advanced users can exploit this by loading components from subdirectories if the
 </pre></div>
 </div>
 </section>
+<section id="validating-files">
+<h2>Validating files<a class="headerlink" href="#validating-files" title="Link to this heading">#</a></h2>
+<p>Each Bioconductor class’s on-disk representation is determined by the associated <a class="reference external" href="https://github.com/ArtifactDB/takane"><strong>takane</strong> specification</a>.
+For example, <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> will save a <code class="docutils literal notranslate"><span class="pre">BiocFrame</span></code> according to the <a class="reference external" href="https://github.com/ArtifactDB/takane/blob/gh-pages/docs/specifications/data_frame/1.0.md"><code class="docutils literal notranslate"><span class="pre">data_frame</span></code> specification</a>.
+More complex objects may be represented by multiple files, possibly including subdirectories with “child” objects.</p>
+<p>Each call to <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> will automatically enforce the relevant specification by validating the directory contents with <strong>dolomite-base</strong>’s <code class="docutils literal notranslate"><span class="pre">validate_object()</span></code> function.
+Successful validation provides some guarantees on the file structure within the directory, allowing developers to reliably implement readers in other frameworks.
+Conversely, the <a class="reference external" href="https://github.com/ArtifactDB/alabaster.base"><strong>alabaster</strong></a> suite applies the same validators on directories generated within an R session,
+which ensures that <strong>dolomite-base</strong> is able to read those objects into a Python environment.</p>
+<p>Users can also call <code class="docutils literal notranslate"><span class="pre">validate_object()</span></code> themselves, if they have modified the directory after calling <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> and they want to check that the contents are still valid:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Mocking up an object:</span>
+<span class="kn">import</span> <span class="nn">biocframe</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">({</span>
+    <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)),</span>
+    <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="p">]</span>
+<span class="p">})</span>
+
+<span class="c1"># Saving to one location:</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">dolomite_base</span>
+<span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;my_df&quot;</span><span class="p">)</span>
+<span class="n">dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+<span class="c1"># So far so good...</span>
+<span class="n">dolomite_base</span><span class="o">.</span><span class="n">validate_object</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+<span class="c1"># Deleting the file to make it invalid:</span>
+<span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;basic_columns.h5&quot;</span><span class="p">))</span>
+<span class="n">dolomite_base</span><span class="o">.</span><span class="n">validate_object</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="c1">## Traceback (most recent call last):</span>
+<span class="c1">## etc...</span>
+</pre></div>
+</div>
+</section>
 <section id="extending-to-new-classes">
 <h2>Extending to new classes<a class="headerlink" href="#extending-to-new-classes" title="Link to this heading">#</a></h2>
-<p>The <em>dolomite</em> framework is easily extended to new classes by:</p>
+<p>The <strong>dolomite</strong> framework is easily extended to new classes by:</p>
 <ol class="arabic simple">
 <li><p>Writing a method for <code class="docutils literal notranslate"><span class="pre">save_object()</span></code>.
 This should accept an instance of the object and a path to a directory, and save the contents of the object inside the directory.
@@ -405,7 +436,7 @@ Any <strong>takane</strong> validator is automatically used by <code class="docu
 </ul>
 </li>
 </ol>
-<p>To illustrate, let’s extend <em>dolomite</em> to a new custom class:</p>
+<p>To illustrate, let’s extend <strong>dolomite</strong> to a new custom class:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Coffee</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beans</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">milk</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">beans</span> <span class="o">=</span> <span class="n">beans</span>
@@ -413,7 +444,8 @@ Any <strong>takane</strong> validator is automatically used by <code class="docu
 </pre></div>
 </div>
 <p>First we implement the saving method.
-Note that we add a <code class="docutils literal notranslate"><span class="pre">&#64;validate_saves</span></code> decorator to instruct <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> to automatically run <code class="docutils literal notranslate"><span class="pre">validate_object()</span></code> on the generated directory, to confirm that the output is valid.</p>
+Note that we add a <code class="docutils literal notranslate"><span class="pre">&#64;validate_saves</span></code> decorator to instruct <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> to automatically run <code class="docutils literal notranslate"><span class="pre">validate_object()</span></code> on the directory by the <code class="docutils literal notranslate"><span class="pre">Coffee</span></code> method.
+This confirms that the output is valid according to our (yet to be added) validator method.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dolomite_base</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">json</span>
@@ -430,7 +462,7 @@ Note that we add a <code class="docutils literal notranslate"><span class="pre">
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;coffee&quot;</span><span class="p">,</span> <span class="s2">&quot;coffee&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1&quot;</span> <span class="p">}</span> <span class="p">},</span> <span class="n">handle</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Then the reading method:</p>
+<p>Then we implement and register the reading method:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
 
 <span class="k">def</span> <span class="nf">read_Coffee</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Coffee</span><span class="p">:</span>
@@ -460,6 +492,18 @@ Note that we add a <code class="docutils literal notranslate"><span class="pre">
 </pre></div>
 </div>
 <p>Let’s run them and see how it works:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cup</span> <span class="o">=</span> <span class="n">Coffee</span><span class="p">(</span><span class="s2">&quot;arabica&quot;</span><span class="p">,</span> <span class="n">milk</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;stuff&quot;</span><span class="p">)</span>
+<span class="n">dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="p">(</span><span class="n">cup</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+<span class="n">cup2</span> <span class="o">=</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">read_object</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">cup2</span><span class="o">.</span><span class="n">beans</span><span class="p">)</span>
+<span class="c1">## arabica</span>
+</pre></div>
+</div>
 <p>For more complex objects that are composed of multiple smaller “child” objects, developers should consider saving each of their children in subdirectories of <code class="docutils literal notranslate"><span class="pre">path</span></code>.
 This can be achieved by calling <code class="docutils literal notranslate"><span class="pre">alt_save_object()</span></code> and <code class="docutils literal notranslate"><span class="pre">alt_read_object()</span></code> in the saving and loading functions, respectively.
 (We use the <code class="docutils literal notranslate"><span class="pre">alt_*</span></code> versions of these functions to respect application overrides, see below.)</p>
@@ -499,9 +543,12 @@ This is achieved by creating an application-specific saving generic with the sam
     <span class="n">dump_extra_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">{</span> <span class="s2">&quot;columns&quot;</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">()</span><span class="o">.</span><span class="n">as_list</span><span class="p">()</span> <span class="p">})</span>
 </pre></div>
 </div>
-<p>Applications should call <code class="docutils literal notranslate"><span class="pre">alt_save_object_function()</span></code> to instruct <code class="docutils literal notranslate"><span class="pre">alt_save_object()</span></code> to use this new generic.
+<p>In general, applications should avoid modifying the files created by the <code class="docutils literal notranslate"><span class="pre">dolomite_base.save_object()</span></code> call, to avoid violating any <strong>takane</strong> format specifications
+(unless the application maintainer really knows what they’re doing).
+Applications are free to write to any path starting with an underscore as this will not be used by any specification.</p>
+<p>Once a generic is defined, applications should call <code class="docutils literal notranslate"><span class="pre">alt_save_object_function()</span></code> to instruct <code class="docutils literal notranslate"><span class="pre">alt_save_object()</span></code> to use it instead of <code class="docutils literal notranslate"><span class="pre">dolomite_base.save_object()</span></code>.
 This ensures that the customizations are applied to all child objects, such as the nested <code class="docutils literal notranslate"><span class="pre">BiocFrame</span></code> below.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a friendly user-visible function to handle the generic override; this</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a friendly user-visible function to perform the generic override; this</span>
 <span class="c1"># is reversed on function exit to avoid interfering with other applications.</span>
 <span class="k">def</span> <span class="nf">save_for_application</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">old</span> <span class="o">=</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">alt_save_object_function</span><span class="p">(</span><span class="n">app_save_object</span><span class="p">)</span>
@@ -550,7 +597,7 @@ This allows applications to, e.g., do something with the metadata that we just a
 
     <span class="k">return</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">read_object</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<span class="c1"># Creating a user-friendly function to set the override before the read.</span>
+<span class="c1"># Creating a user-friendly function to set the override before the read operation.</span>
 <span class="k">def</span> <span class="nf">read_for_application</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">old</span> <span class="o">=</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">alt_read_object_function</span><span class="p">(</span><span class="n">app_read_object</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
@@ -566,10 +613,7 @@ This allows applications to, e.g., do something with the metadata that we just a
 <span class="c1">## I have the following columns: C</span>
 </pre></div>
 </div>
-<p>By overriding the saving and reading process for one or more classes, each application can customize the behavior of <em>dolomite</em> to their own needs.
-In general, applications should avoid modifying the files created by <code class="docutils literal notranslate"><span class="pre">save_object()</span></code>, to avoid violating any <strong>takane</strong> format specifications
-(unless the application maintainer really knows what they’re doing).
-Applications are free to write to any path starting with an underscore as this will not be used by any specification.</p>
+<p>By overriding the saving and reading process for one or more classes, each application can customize the behavior of the <strong>dolomite</strong> framework to their own needs.</p>
 </section>
 
         </article>
@@ -631,6 +675,7 @@ Applications are free to write to any path starting with an underscore as this w
 <li><a class="reference internal" href="#quick-start">Quick start</a></li>
 <li><a class="reference internal" href="#supported-classes">Supported classes</a></li>
 <li><a class="reference internal" href="#operating-on-directories">Operating on directories</a></li>
+<li><a class="reference internal" href="#validating-files">Validating files</a></li>
 <li><a class="reference internal" href="#extending-to-new-classes">Extending to new classes</a></li>
 </ul>
 </li>
