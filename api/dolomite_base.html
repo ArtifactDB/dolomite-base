@@ -884,12 +884,21 @@ corresponding file representation, see
 <span id="dolomite-base-validate-object-module"></span><h2>dolomite_base.validate_object module<a class="headerlink" href="#module-dolomite_base.validate_object" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.validate_object.validate_object">
-<span class="sig-prename descclassname"><span class="pre">dolomite_base.validate_object.</span></span><span class="sig-name descname"><span class="pre">validate_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/validate_object.html#validate_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.validate_object.validate_object" title="Link to this definition">#</a></dt>
-<dd><p>Validate an on-disk representation of an object,
-using validators based on the <strong>takane</strong> specifications.</p>
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.validate_object.</span></span><span class="sig-name descname"><span class="pre">validate_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/validate_object.html#validate_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.validate_object.validate_object" title="Link to this definition">#</a></dt>
+<dd><p>Validate an on-disk representation of an object, typically using validators
+based on the <strong>takane</strong> specifications.</p>
+<p>Applications may also register their own validators by adding entries to
+<code class="docutils literal notranslate"><span class="pre">validate_object_registry</span></code>. Each key should be the object type and each
+value should be a function that accepts a path to a directory (string) and
+JSON-derived metadata (dictionary). The function should raise an error if
+the object in the directory is not valid for the specified object type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to the directory containing the object’s representation.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to the directory containing the object’s representation.</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.9/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>]</span>) – Metadata for the object. If None, this is read from the <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code>
+file in the <code class="docutils literal notranslate"><span class="pre">path</span></code>.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>Error if the validation fails.</strong> – </p>

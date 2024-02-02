@@ -197,24 +197,41 @@
         </div>
         <article role="main">
           <h1>Source code for dolomite_base.validate_object</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lib_dolomite_base</span> <span class="k">as</span> <span class="n">lib</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Literal</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lib_dolomite_base</span> <span class="k">as</span> <span class="n">lib</span>
+
+
+<span class="n">validate_object_registry</span> <span class="o">=</span> <span class="p">{}</span>
 
 
 <div class="viewcode-block" id="validate_object">
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.validate_object.validate_object">[docs]</a>
-<span class="k">def</span> <span class="nf">validate_object</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate an on-disk representation of an object,</span>
-<span class="sd">    using validators based on the **takane** specifications.</span>
+<span class="k">def</span> <span class="nf">validate_object</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate an on-disk representation of an object, typically using validators</span>
+<span class="sd">    based on the **takane** specifications. </span>
+
+<span class="sd">    Applications may also register their own validators by adding entries to</span>
+<span class="sd">    ``validate_object_registry``. Each key should be the object type and each</span>
+<span class="sd">    value should be a function that accepts a path to a directory (string) and</span>
+<span class="sd">    JSON-derived metadata (dictionary). The function should raise an error if</span>
+<span class="sd">    the object in the directory is not valid for the specified object type.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        path: </span>
 <span class="sd">            Path to the directory containing the object&#39;s representation.</span>
 
+<span class="sd">        metadata:</span>
+<span class="sd">            Metadata for the object. If None, this is read from the ``OBJECT``</span>
+<span class="sd">            file in the ``path``.</span>
+
 <span class="sd">    Raise:</span>
 <span class="sd">        Error if the validation fails.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">lib</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">lib</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">validate_object_registry</span><span class="p">)</span>
     <span class="k">return</span></div>
+
 
 </pre></div>
         </article>
