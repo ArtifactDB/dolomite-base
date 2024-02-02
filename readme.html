@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -155,7 +155,8 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Overview</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Save and load Bioconductor objects in Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#creating-applications">Creating applications</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributions &amp; Help</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
@@ -192,7 +193,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -213,10 +214,362 @@
 <img alt="Unit tests" src="https://github.com/ArtifactDB/dolomite-base/actions/workflows/run-tests.yml/badge.svg" /></p>
 <section class="tex2jax_ignore mathjax_ignore" id="save-and-load-bioconductor-objects-in-python">
 <h1>Save and load Bioconductor objects in Python<a class="headerlink" href="#save-and-load-bioconductor-objects-in-python" title="Link to this heading">#</a></h1>
-<p>The <strong>dolomite-base</strong> package is the Python counterpart to the <a class="reference external" href="https://github.com/ArtifactDB/alabaster.base"><strong>alabaster.base</strong></a> R package,
-defining the basic generics for language-agnostic reading and writing of Bioconductor objects with their associated metadata.
-Implementations of methods for these generics can be found in the other <strong>dolomite-</strong> packages.</p>
-<p>Check out the <a class="reference external" href="https://artifactdb.github.io/dolomite-base/">API documentation</a> for more details.</p>
+<p>The <strong>dolomite-base</strong> package is the Python counterpart to the <a class="reference external" href="https://github.com/ArtifactDB/alabaster.base"><strong>alabaster.base</strong></a> R package
+for language-agnostic reading and writing of Bioconductor objects (see the <a class="reference external" href="https://github.com/BiocPy"><strong>BiocPy</strong></a> project).
+This is a more robust and portable alternative to the typical approach of pickling Python objects to save them to disk.</p>
+<ul class="simple">
+<li><p>By separating the on-disk representation from the in-memory object structure, we can more easily adapt to changes in class definitions.
+This improves robustness to Python environment updates.</p></li>
+<li><p>By using standard file formats like HDF5 and CSV, we ensure that the objects can be easily read from other languages like R and Javascript.
+This improves interoperability between application ecosystems.</p></li>
+<li><p>By breaking up complex Bioconductor objects into their components, we enable modular reads and writes to the backing store.
+We can easily read or update part of an object without having to consider the other parts.</p></li>
+</ul>
+<p>The <strong>dolomite-base</strong> package defines the base generics to read and write the file structures along with the associated metadata.
+Implementations of these methods for various Bioconductor classes can be found in the other <strong>dolomite</strong> packages like
+<a class="reference external" href="https://github.com/ArtifactDB/dolomite-ranges"><strong>dolomite-ranges</strong></a> and <a class="reference external" href="https://github.com/ArtifactDB/dolomite-se"><strong>dolomite-se</strong></a>.</p>
+<section id="quick-start">
+<h2>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading">#</a></h2>
+<p>First, we’ll install the <strong>dolomite-base</strong> package.
+This package is available from <a class="reference external" href="https://pypi.org/project/dolomite-base">PyPI</a> so we can use the standard installation process:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>dolomite-base
+</pre></div>
+</div>
+<p>The simplest example involves saving a <a class="reference external" href="https://github.com/BiocPy/BiocFrame"><code class="docutils literal notranslate"><span class="pre">BiocFrame</span></code></a> inside a staging directory.
+Let’s mock one up:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">biocframe</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">({</span>
+    <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)),</span>
+    <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="p">]</span>
+<span class="p">})</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="c1">## BiocFrame with 10 rows and 2 columns</span>
+<span class="c1">##           X      Y</span>
+<span class="c1">##     &lt;range&gt; &lt;list&gt;</span>
+<span class="c1">## [0]       0      a</span>
+<span class="c1">## [1]       1      b</span>
+<span class="c1">## [2]       2      c</span>
+<span class="c1">## [3]       3      d</span>
+<span class="c1">## [4]       4      e</span>
+<span class="c1">## [5]       5      f</span>
+<span class="c1">## [6]       6      g</span>
+<span class="c1">## [7]       7      h</span>
+<span class="c1">## [8]       8      i</span>
+<span class="c1">## [9]       9      j</span>
+</pre></div>
+</div>
+<p>We save our <code class="docutils literal notranslate"><span class="pre">BiocFrame</span></code> to a user-specified directory with the <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> function.
+This function saves its input object to file according to the relevant <a class="reference external" href="https://github.com/ArtifactDB/takane">specification</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+
+<span class="kn">import</span> <span class="nn">dolomite_base</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;my_df&quot;</span><span class="p">)</span>
+<span class="n">dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="c1">## [&#39;basic_columns.h5&#39;, &#39;OBJECT&#39;]</span>
+</pre></div>
+</div>
+<p>We load the contents of the directory back into a Python session by using the <code class="docutils literal notranslate"><span class="pre">read_object()</span></code> function.
+Note that the exact Python types for the <code class="docutils literal notranslate"><span class="pre">BiocFrame</span></code> columns may not be preserved by the round trip,
+though the contents of the columns will be unchanged.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">out</span> <span class="o">=</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">read_object</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+<span class="n">BiocFrame</span> <span class="k">with</span> <span class="mi">10</span> <span class="n">rows</span> <span class="ow">and</span> <span class="mi">2</span> <span class="n">columns</span>
+<span class="c1">##                    X            Y</span>
+<span class="c1">##     &lt;ndarray[int32]&gt; &lt;StringList&gt;</span>
+<span class="c1">## [0]                0            a</span>
+<span class="c1">## [1]                1            b</span>
+<span class="c1">## [2]                2            c</span>
+<span class="c1">## [3]                3            d</span>
+<span class="c1">## [4]                4            e</span>
+<span class="c1">## [5]                5            f</span>
+<span class="c1">## [6]                6            g</span>
+<span class="c1">## [7]                7            h</span>
+<span class="c1">## [8]                8            i</span>
+<span class="c1">## [9]                9            j</span>
+</pre></div>
+</div>
+<p>Check out the <a class="reference external" href="https://artifactdb.github.io/dolomite-base/api/modules.html">API reference</a> for more details.</p>
+</section>
+<section id="supported-classes">
+<h2>Supported classes<a class="headerlink" href="#supported-classes" title="Link to this heading">#</a></h2>
+<p>The saving/reading process can be applied to a range of <a class="reference external" href="https://github.com/BiocPy"><strong>BiocPy</strong></a> data structures,
+provided the appropriate <strong>dolomite</strong> package is installed.
+Each package implements a saving and reading function for its associated classes,
+which are automatically used from <strong>dolomite-base</strong>’s <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> and <code class="docutils literal notranslate"><span class="pre">read_object()</span></code> functions, respectively.
+(That is, there is no need to explicitly <code class="docutils literal notranslate"><span class="pre">import</span></code> the package when calling <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> or <code class="docutils literal notranslate"><span class="pre">read_object()</span></code> for its classes.)</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Package</p></th>
+<th class="head"><p>Object types</p></th>
+<th class="head"><p>PyPI</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/ArtifactDB/dolomite-base"><strong>dolomite-base</strong></a></p></td>
+<td><p><a class="reference external" href="https://github.com/BiocPy/BiocFrame"><code class="docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>, <code class="docutils literal notranslate"><span class="pre">list</span></code>, <code class="docutils literal notranslate"><span class="pre">dict</span></code>, <a class="reference external" href="https://github.com/BiocPy/BiocUtils"><code class="docutils literal notranslate"><span class="pre">NamedList</span></code></a></p></td>
+<td><p><a class="reference external" href="https://pypi.org/project/dolomite-base/"><img alt="" src="https://img.shields.io/pypi/v/dolomite-base.svg" /></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/ArtifactDB/dolomite-matrix"><strong>dolomite-matrix</strong></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy.sparse.spmatrix</span></code>, <a class="reference external" href="https://github.com/BiocPy/DelayedArray"><code class="docutils literal notranslate"><span class="pre">DelayedArray</span></code></a></p></td>
+<td><p><a class="reference external" href="https://pypi.org/project/dolomite-matrix/"><img alt="" src="https://img.shields.io/pypi/v/dolomite-matrix.svg" /></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/ArtifactDB/dolomite-ranges"><strong>dolomite-ranges</strong></a></p></td>
+<td><p><a class="reference external" href="https://github.com/BiocPy/GenomicRanges"><code class="docutils literal notranslate"><span class="pre">GenomicRanges</span></code></a>, <code class="docutils literal notranslate"><span class="pre">GenomicRangesList</span></code></p></td>
+<td><p><a class="reference external" href="https://pypi.org/project/dolomite-ranges/"><img alt="" src="https://img.shields.io/pypi/v/dolomite-ranges.svg" /></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/ArtifactDB/dolomite-se"><strong>dolomite-se</strong></a></p></td>
+<td><p><a class="reference external" href="https://github.com/BiocPy/SummarizedExperiment"><code class="docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a>, <code class="docutils literal notranslate"><span class="pre">RangedSummarizedExperiment</span></code></p></td>
+<td><p><a class="reference external" href="https://pypi.org/project/dolomite-se/"><img alt="" src="https://img.shields.io/pypi/v/dolomite-se.svg" /></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://github.com/ArtifactDB/dolomite-sce"><strong>dolomite-sce</strong></a></p></td>
+<td><p><a class="reference external" href="https://github.com/BiocPy/SingleCellExperiment"><code class="docutils literal notranslate"><span class="pre">SingleCellExperiment</span></code></a></p></td>
+<td><p><a class="reference external" href="https://pypi.org/project/dolomite-sce/"><img alt="" src="https://img.shields.io/pypi/v/dolomite-sce.svg" /></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://github.com/ArtifactDB/dolomite-mae"><strong>dolomite-mae</strong></a></p></td>
+<td><p><a class="reference external" href="https://bioconductor.org/packages/MultiAssayExperiment"><code class="docutils literal notranslate"><span class="pre">MultiAssayExperiment</span></code></a></p></td>
+<td><p><a class="reference external" href="https://pypi.org/project/dolomite-mae/"><img alt="" src="https://img.shields.io/pypi/v/dolomite-mae.svg" /></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Each class’s on-disk representation is determined by the associated <a class="reference external" href="https://github.com/ArtifactDB/takane"><strong>takane</strong> specification</a>.
+For more complex objects, the on-disk representation may consist of multiple files, or even subdirectories containing “child” objects from internal <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> calls.
+Each call to <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> will automatically enforce the relevant specification by validating the directory contents with <strong>dolomite-base</strong>’s <code class="docutils literal notranslate"><span class="pre">validate_object()</span></code> function.
+This provides some guarantees on the file structure within the directory, allowing developers to reliably implement readers in a variety of frameworks -
+for example, the <a class="reference external" href="https://github.com/ArtifactDB/alabaster.base"><strong>alabaster</strong></a> will run the same validators on its directory contents to guarantee interoperability.</p>
+<p>All of the listed packages are available from PyPI and can be installed with the usual <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> procedure.
+Alternatively, to install all packages in one go, users can install the <a class="reference external" href="https://pypi.org/project/dolomite"><strong>dolomite</strong></a> umbrella package.</p>
+</section>
+<section id="operating-on-directories">
+<h2>Operating on directories<a class="headerlink" href="#operating-on-directories" title="Link to this heading">#</a></h2>
+<p>Users can move freely rename or relocate directories and <code class="docutils literal notranslate"><span class="pre">read_object()</span></code> function will still work.
+For example, we can easily copy the entire directory to a new file system and everything will still be correctly referenced within the directory.
+The simplest way to share objects is to just <code class="docutils literal notranslate"><span class="pre">zip</span></code> or <code class="docutils literal notranslate"><span class="pre">tar</span></code> the staging directory for <em>ad hoc</em> distribution.
+For more serious applications, <code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">self</span></code> can be used in conjunction with storage systems like AWS S3 for easier distribution.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Mocking up an object:</span>
+<span class="kn">import</span> <span class="nn">biocframe</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">({</span>
+    <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)),</span>
+    <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="p">]</span>
+<span class="p">})</span>
+
+<span class="c1"># Saving to one location:</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">dolomite_base</span>
+<span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;my_df&quot;</span><span class="p">)</span>
+<span class="n">dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+<span class="c1"># Reading from another location:</span>
+<span class="n">alt_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;foobar&quot;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">alt_path</span><span class="p">)</span>
+<span class="n">alt_out</span> <span class="o">=</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">read_object</span><span class="p">(</span><span class="n">alt_path</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>That said, it is unwise to manipulate the files inside the directory created by <code class="docutils literal notranslate"><span class="pre">save_object()</span></code>.
+Reading functions will usually depend on specific file names or subdirectory structures within the directory, and fiddling with them may cause unexpected results.
+Advanced users can exploit this by loading components from subdirectories if the full object is not required:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Creating a nested DF:</span>
+<span class="n">nested</span> <span class="o">=</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">({</span> <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">df</span> <span class="p">})</span>
+<span class="n">nest_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;nesting&quot;</span><span class="p">)</span>
+<span class="n">dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="p">(</span><span class="n">nested</span><span class="p">,</span> <span class="n">nest_path</span><span class="p">)</span>
+
+<span class="c1"># Now reading in the nested DF:</span>
+<span class="n">redf</span> <span class="o">=</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">read_object</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nest_path</span><span class="p">,</span> <span class="s2">&quot;other_columns&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="extending-to-new-classes">
+<h2>Extending to new classes<a class="headerlink" href="#extending-to-new-classes" title="Link to this heading">#</a></h2>
+<p>The <em>dolomite</em> framework is easily extended to new classes by:</p>
+<ol class="arabic simple">
+<li><p>Writing a method for <code class="docutils literal notranslate"><span class="pre">save_object()</span></code>.
+This should accept an instance of the object and a path to a directory, and save the contents of the object inside the directory.
+It should also produce an <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> file that specifies the type of the object, e.g., <code class="docutils literal notranslate"><span class="pre">data_frame</span></code>, <code class="docutils literal notranslate"><span class="pre">hdf5_sparse_matrix</span></code>.</p></li>
+<li><p>Writing a function for <code class="docutils literal notranslate"><span class="pre">read_object()</span></code> and registering it in the <code class="docutils literal notranslate"><span class="pre">read_object_registry</span></code>.
+This should accept a path to a directory and read its contents to reconstruct the object.
+The registered type should be the same as that used in the <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> file.</p></li>
+<li><p>Writing a function for <code class="docutils literal notranslate"><span class="pre">validate_object()</span></code> and registering it in the <code class="docutils literal notranslate"><span class="pre">validate_object_registry</span></code>.
+This should accept a path to a directory and read its contents to determine if it is a valid on-disk representation.
+The registered type should be the same as that used in the <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> file.</p>
+<ul class="simple">
+<li><p>(optional) Devleopers can alternatively formalize the on-disk representation by adding a specification to the <a class="reference external" href="https://github.com/ArtifactDB/takane"><strong>takane</strong></a> repository.
+This aims to provide C+±based validators for each representation, allowing us to enforce consistency across multiple languages (e.g., R).
+Any <strong>takane</strong> validator is automatically used by <code class="docutils literal notranslate"><span class="pre">validate_object()</span></code> so no registration is required.</p></li>
+</ul>
+</li>
+</ol>
+<p>To illustrate, let’s extend <em>dolomite</em> to a new custom class:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Coffee</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beans</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">milk</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beans</span> <span class="o">=</span> <span class="n">beans</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">milk</span> <span class="o">=</span> <span class="n">milk</span>
+</pre></div>
+</div>
+<p>First we implement the saving method.
+Note that we add a <code class="docutils literal notranslate"><span class="pre">&#64;validate_saves</span></code> decorator to instruct <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> to automatically run <code class="docutils literal notranslate"><span class="pre">validate_object()</span></code> on the generated directory, to confirm that the output is valid.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dolomite_base</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="nd">@dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="o">.</span><span class="n">register</span>
+<span class="nd">@dolomite_base</span><span class="o">.</span><span class="n">validate_saves</span>
+<span class="k">def</span> <span class="nf">save_object_for_Coffee</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Coffee</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;bean_type&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">beans</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;has_milk&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;true&quot;</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">milk</span> <span class="k">else</span> <span class="s2">&quot;false&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;OBJECT&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;coffee&quot;</span><span class="p">,</span> <span class="s2">&quot;coffee&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1&quot;</span> <span class="p">}</span> <span class="p">},</span> <span class="n">handle</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then the reading method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+
+<span class="k">def</span> <span class="nf">read_Coffee</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Coffee</span><span class="p">:</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;coffee&quot;</span><span class="p">][</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="c1"># possibly do something different based on version</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;bean_type&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">beans</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;has_milk&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">milk</span> <span class="o">=</span> <span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Coffee</span><span class="p">(</span><span class="n">beans</span><span class="p">,</span> <span class="n">milk</span><span class="p">)</span>
+
+<span class="n">dolomite_base</span><span class="o">.</span><span class="n">read_object_registry</span><span class="p">[</span><span class="s2">&quot;coffee&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">read_Coffee</span>
+</pre></div>
+</div>
+<p>And finally, the validation method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">validate_Coffee</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;coffee&quot;</span><span class="p">][</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="c1"># possibly do something different based on version</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;bean_type&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">beans</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">beans</span> <span class="ow">in</span> <span class="p">[</span> <span class="s2">&quot;arabica&quot;</span><span class="p">,</span> <span class="s2">&quot;robusta&quot;</span><span class="p">,</span> <span class="s2">&quot;excelsa&quot;</span><span class="p">,</span> <span class="s2">&quot;liberica&quot;</span> <span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;wrong bean type &#39;&quot;</span> <span class="o">+</span> <span class="n">beans</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;has_milk&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">milk</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">milk</span> <span class="ow">in</span> <span class="p">[</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span> <span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid milk &#39;&quot;</span> <span class="o">+</span> <span class="n">milk</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+
+<span class="n">dolomite_base</span><span class="o">.</span><span class="n">validate_object_registry</span><span class="p">[</span><span class="s2">&quot;coffee&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">validate_Coffee</span>
+</pre></div>
+</div>
+<p>Let’s run them and see how it works:</p>
+<p>For more complex objects that are composed of multiple smaller “child” objects, developers should consider saving each of their children in subdirectories of <code class="docutils literal notranslate"><span class="pre">path</span></code>.
+This can be achieved by calling <code class="docutils literal notranslate"><span class="pre">alt_save_object()</span></code> and <code class="docutils literal notranslate"><span class="pre">alt_read_object()</span></code> in the saving and loading functions, respectively.
+(We use the <code class="docutils literal notranslate"><span class="pre">alt_*</span></code> versions of these functions to respect application overrides, see below.)</p>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="creating-applications">
+<h1>Creating applications<a class="headerlink" href="#creating-applications" title="Link to this heading">#</a></h1>
+<p>Developers can also create applications that customize the machinery of the <em>dolomite</em> framework for specific needs.
+In most cases, this involves storing more metadata to describe the object in more detail.
+For example, we might want to remember the identity of the author for each object.
+This is achieved by creating an application-specific saving generic with the same signature as <code class="docutils literal notranslate"><span class="pre">save_object()</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span> <span class="nn">dolomite_base</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">import</span> <span class="nn">biocframe</span>
+
+<span class="k">def</span> <span class="nf">dump_extra_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">extra</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+    <span class="n">user_id</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">()</span>
+    <span class="c1"># File names with leading underscores are reserved for application-specific</span>
+    <span class="c1"># use, so they won&#39;t clash with anything produced by save_object().</span>
+    <span class="n">metapath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;_metadata.json&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">metapath</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span> <span class="o">**</span><span class="n">extra</span><span class="p">,</span> <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="n">user_id</span> <span class="p">},</span> <span class="n">handle</span><span class="p">)</span>
+
+<span class="nd">@singledispatch</span>
+<span class="k">def</span> <span class="nf">app_save_object</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="c1"># does the real work</span>
+    <span class="n">dump_extra_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">{})</span> <span class="c1"># adding some application-specific metadata</span>
+
+<span class="nd">@app_save_object</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">app_save_object_for_BiocFrame</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="c1"># does the real work</span>
+    <span class="c1"># We can also override specific methods to add object+application-specific metadata:</span>
+    <span class="n">dump_extra_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">{</span> <span class="s2">&quot;columns&quot;</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">()</span><span class="o">.</span><span class="n">as_list</span><span class="p">()</span> <span class="p">})</span>
+</pre></div>
+</div>
+<p>Applications should call <code class="docutils literal notranslate"><span class="pre">alt_save_object_function()</span></code> to instruct <code class="docutils literal notranslate"><span class="pre">alt_save_object()</span></code> to use this new generic.
+This ensures that the customizations are applied to all child objects, such as the nested <code class="docutils literal notranslate"><span class="pre">BiocFrame</span></code> below.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a friendly user-visible function to handle the generic override; this</span>
+<span class="c1"># is reversed on function exit to avoid interfering with other applications.</span>
+<span class="k">def</span> <span class="nf">save_for_application</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">old</span> <span class="o">=</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">alt_save_object_function</span><span class="p">(</span><span class="n">app_save_object</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dolomite_base</span><span class="o">.</span><span class="n">alt_save_object</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">dolomite_base</span><span class="o">.</span><span class="n">alt_save_object_function</span><span class="p">(</span><span class="n">old</span><span class="p">)</span>
+
+<span class="c1"># Saving our nested BiocFrames with our overrides active.</span>
+<span class="kn">import</span> <span class="nn">biocframe</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">({</span>
+    <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+    <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">({</span>
+        <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">]</span>
+    <span class="p">})</span>
+<span class="p">})</span>
+
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+<span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;foobar&quot;</span><span class="p">)</span>
+<span class="n">save_for_application</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+<span class="c1"># Both the parent and child BiocFrames have new metadata.</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;_metadata.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<span class="c1">## {&quot;columns&quot;: [&quot;A&quot;, &quot;B&quot;], &quot;author&quot;: &quot;aaron&quot;}</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;other_columns&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;_metadata.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<span class="c1">## {&quot;columns&quot;: [&quot;C&quot;], &quot;author&quot;: &quot;aaron&quot;}</span>
+</pre></div>
+</div>
+<p>The reading function can be similarly overridden by setting <code class="docutils literal notranslate"><span class="pre">alt_read_object_function()</span></code> to instruct all <code class="docutils literal notranslate"><span class="pre">alt_read_object()</span></code> calls to use the override.
+This allows applications to, e.g., do something with the metadata that we just added.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">app_read_object</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;OBJECT&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+
+    <span class="c1"># Print custom message based on the type and application-specific metadata.</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;_metadata.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">appmeta</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I am a &quot;</span> <span class="o">+</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; created by &quot;</span> <span class="o">+</span> <span class="n">appmeta</span><span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;data_frame&quot;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;I have the following columns: &quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">appmeta</span><span class="p">[</span><span class="s2">&quot;columns&quot;</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">read_object</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="c1"># Creating a user-friendly function to set the override before the read.</span>
+<span class="k">def</span> <span class="nf">read_for_application</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">old</span> <span class="o">=</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">alt_read_object_function</span><span class="p">(</span><span class="n">app_read_object</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">alt_read_object</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">dolomite_base</span><span class="o">.</span><span class="n">alt_read_object_function</span><span class="p">(</span><span class="n">old</span><span class="p">)</span>
+
+<span class="c1"># This diverts to the override with printing of custom messages.</span>
+<span class="n">read_for_application</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+<span class="c1">## I am a data_frame created by aaron</span>
+<span class="c1">## I have the following columns: A, B</span>
+<span class="c1">## I am a data_frame created by aaron</span>
+<span class="c1">## I have the following columns: C</span>
+</pre></div>
+</div>
+<p>By overriding the saving and reading process for one or more classes, each application can customize the behavior of <em>dolomite</em> to their own needs.
+In general, applications should avoid modifying the files created by <code class="docutils literal notranslate"><span class="pre">save_object()</span></code>, to avoid violating any <strong>takane</strong> format specifications
+(unless the application maintainer really knows what they’re doing).
+Applications are free to write to any path starting with an underscore as this will not be used by any specification.</p>
 </section>
 
         </article>
@@ -262,8 +615,31 @@ Implementations of methods for these generics can be found in the other <strong>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Save and load Bioconductor objects in Python</a><ul>
+<li><a class="reference internal" href="#quick-start">Quick start</a></li>
+<li><a class="reference internal" href="#supported-classes">Supported classes</a></li>
+<li><a class="reference internal" href="#operating-on-directories">Operating on directories</a></li>
+<li><a class="reference internal" href="#extending-to-new-classes">Extending to new classes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-applications">Creating applications</a></li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
