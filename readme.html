@@ -155,8 +155,7 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Save and load Bioconductor objects in Python</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#creating-applications">Creating applications</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributions &amp; Help</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
@@ -508,9 +507,8 @@ This confirms that the output is valid according to our (yet to be added) valida
 This can be achieved by calling <code class="docutils literal notranslate"><span class="pre">alt_save_object()</span></code> and <code class="docutils literal notranslate"><span class="pre">alt_read_object()</span></code> in the saving and loading functions, respectively.
 (We use the <code class="docutils literal notranslate"><span class="pre">alt_*</span></code> versions of these functions to respect application overrides, see below.)</p>
 </section>
-</section>
-<section class="tex2jax_ignore mathjax_ignore" id="creating-applications">
-<h1>Creating applications<a class="headerlink" href="#creating-applications" title="Link to this heading">#</a></h1>
+<section id="creating-applications">
+<h2>Creating applications<a class="headerlink" href="#creating-applications" title="Link to this heading">#</a></h2>
 <p>Developers can also create applications that customize the machinery of the <em>dolomite</em> framework for specific needs.
 In most cases, this involves storing more metadata to describe the object in more detail.
 For example, we might want to remember the identity of the author for each object.
@@ -615,6 +613,7 @@ This allows applications to, e.g., do something with the metadata that we just a
 </div>
 <p>By overriding the saving and reading process for one or more classes, each application can customize the behavior of the <strong>dolomite</strong> framework to their own needs.</p>
 </section>
+</section>
 
         </article>
       </div>
@@ -677,9 +676,9 @@ This allows applications to, e.g., do something with the metadata that we just a
 <li><a class="reference internal" href="#operating-on-directories">Operating on directories</a></li>
 <li><a class="reference internal" href="#validating-files">Validating files</a></li>
 <li><a class="reference internal" href="#extending-to-new-classes">Extending to new classes</a></li>
+<li><a class="reference internal" href="#creating-applications">Creating applications</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#creating-applications">Creating applications</a></li>
 </ul>
 
           </div>
