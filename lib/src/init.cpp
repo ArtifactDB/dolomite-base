@@ -5,7 +5,7 @@
 // Declarations:
 pybind11::object load_list_json(std::string, pybind11::list);
 pybind11::object load_list_hdf5(std::string, std::string, pybind11::list);
-void validate(std::string);
+void validate(std::string, pybind11::handle, pybind11::dict);
 
 // Binding:
 PYBIND11_MODULE(lib_dolomite_base, m) {
