@@ -31,7 +31,7 @@ def load_string_vector_from_hdf5(handle: h5py.Dataset) -> List[str]:
     output = handle[:]
     if len(output):
         for i, x in enumerate(output):
-            output[i] = x.decode("UTF-8") if isinstance(x, bytes) else x
+            output[i] = x.decode("UTF-8") if not isinstance(x, str) else x
     return output
 
 
