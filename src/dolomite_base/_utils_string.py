@@ -1,5 +1,6 @@
 from typing import List
 import h5py
+import numpy
 
 
 def save_fixed_length_strings(handle: h5py.Group, name: str, x: List[str]) -> h5py.Dataset:
@@ -19,7 +20,7 @@ def save_fixed_length_strings(handle: h5py.Group, name: str, x: List[str]) -> h5
         ``x`` is saved into the group as a fixed-length string dataset,
         and a NumPy dataset handle is returned.
     """
-    tmp = [ y.encode("UTF8") for y in x ]
+    tmp = [ y.encode("UTF-8") for y in x ]
     maxed = 1
     for b in tmp:
         if len(b) > maxed:
@@ -29,14 +30,20 @@ def save_fixed_length_strings(handle: h5py.Group, name: str, x: List[str]) -> h5
 
 def load_string_vector_from_hdf5(handle: h5py.Dataset) -> List[str]:
     output = handle[:]
+
     if len(output):
-        for i, x in enumerate(output):
-            output[i] = x.decode("UTF-8") if not isinstance(x, str) else x
+        _output = []
+        for x in output:
+            _out = x
+            if isinstance(x, bytes) or isinstance(x, numpy.bytes_):
+                _out = x.decode("UTF-8") 
+            _output.append(_out)
+        output = _output
     return output
 
 
 def load_scalar_string_attribute_from_hdf5(handle, name: str) -> str:
     output = handle.attrs[name]
-    if isinstance(output, bytes):
+    if isinstance(output, bytes) or isinstance(output, numpy.bytes_):
         output = output.decode("UTF-8")
     return output
