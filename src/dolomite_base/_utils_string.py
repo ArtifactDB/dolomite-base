@@ -34,9 +34,7 @@ def load_string_vector_from_hdf5(handle: h5py.Dataset) -> List[str]:
     if len(output):
         _output = []
         for x in output:
-            _out = x
-            if isinstance(x, bytes) or isinstance(x, numpy.bytes_):
-                _out = x.decode("UTF-8") 
+            _out = x.decode("UTF-8") if isinstance(x, (bytes, numpy.bytes_)) else x
             _output.append(_out)
         output = _output
     return output
@@ -44,6 +42,6 @@ def load_string_vector_from_hdf5(handle: h5py.Dataset) -> List[str]:
 
 def load_scalar_string_attribute_from_hdf5(handle, name: str) -> str:
     output = handle.attrs[name]
-    if isinstance(output, bytes) or isinstance(output, numpy.bytes_):
+    if isinstance(output, (bytes, numpy.bytes_)):
         output = output.decode("UTF-8")
     return output
