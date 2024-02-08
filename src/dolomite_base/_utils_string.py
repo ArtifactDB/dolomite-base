@@ -28,7 +28,7 @@ def save_fixed_length_strings(handle: h5py.Group, name: str, x: List[str]) -> h5
 
 
 def load_string_vector_from_hdf5(handle: h5py.Dataset) -> List[str]:
-    output = list(handle)
+    output = handle[:]
     if len(output) and isinstance(output[0], bytes):
         for i, x in enumerate(output):
             output[i] = x.decode("UTF-8")
