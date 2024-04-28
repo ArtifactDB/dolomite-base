@@ -68,6 +68,14 @@ dolomite\_base.read\_object module
    :undoc-members:
    :show-inheritance:
 
+dolomite\_base.read\_object\_file module
+----------------------------------------
+
+.. automodule:: dolomite_base.read_object_file
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dolomite\_base.read\_simple\_list module
 ----------------------------------------
 
@@ -104,6 +112,14 @@ dolomite\_base.save\_object module
 ----------------------------------
 
 .. automodule:: dolomite_base.save_object
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dolomite\_base.save\_object\_file module
+----------------------------------------
+
+.. automodule:: dolomite_base.save_object_file
    :members:
    :undoc-members:
    :show-inheritance:

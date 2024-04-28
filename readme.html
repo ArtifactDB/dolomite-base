@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Contributing" href="contributing.html" /><link rel="prev" title="Documentation for dolomite-base" href="index.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.7 and Furo 2024.04.27 -->
         <title>Save and load Bioconductor objects in Python - dolomite-base unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=437aa6ec" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
     
     
@@ -112,6 +112,8 @@
   <div class="visually-hidden">Hide table of contents sidebar</div>
 </label>
 
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
 
 
 <div class="page">
@@ -197,7 +199,7 @@
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
-        <article role="main">
+        <article role="main" id="furo-main-content">
           <!-- These are examples of badges you might want to add to your README:
      please update the URLs accordingly
 
@@ -212,7 +214,7 @@
 <a class="reference external" href="https://pepy.tech/project/dolomite-base"><img alt="Monthly Downloads" src="https://pepy.tech/badge/dolomite-base/month" /></a>
 <img alt="Unit tests" src="https://github.com/ArtifactDB/dolomite-base/actions/workflows/run-tests.yml/badge.svg" /></p>
 <section class="tex2jax_ignore mathjax_ignore" id="save-and-load-bioconductor-objects-in-python">
-<h1>Save and load Bioconductor objects in Python<a class="headerlink" href="#save-and-load-bioconductor-objects-in-python" title="Link to this heading">#</a></h1>
+<h1>Save and load Bioconductor objects in Python<a class="headerlink" href="#save-and-load-bioconductor-objects-in-python" title="Link to this heading">¶</a></h1>
 <p>The <strong>dolomite-base</strong> package is the Python counterpart to the <a class="reference external" href="https://github.com/ArtifactDB/alabaster.base"><strong>alabaster.base</strong></a> R package
 for language-agnostic reading and writing of Bioconductor objects (see the <a class="reference external" href="https://github.com/BiocPy"><strong>BiocPy</strong></a> project).
 This is a more robust and portable alternative to the typical approach of pickling Python objects to save them to disk.</p>
@@ -228,7 +230,7 @@ We can easily read or update part of an object without having to consider the ot
 Implementations of these methods for various Bioconductor classes can be found in the other <strong>dolomite</strong> packages like
 <a class="reference external" href="https://github.com/ArtifactDB/dolomite-ranges"><strong>dolomite-ranges</strong></a> and <a class="reference external" href="https://github.com/ArtifactDB/dolomite-se"><strong>dolomite-se</strong></a>.</p>
 <section id="quick-start">
-<h2>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading">#</a></h2>
+<h2>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
 <p>First, we’ll install the <strong>dolomite-base</strong> package.
 This package is available from <a class="reference external" href="https://pypi.org/project/dolomite-base">PyPI</a> so we can use the standard installation process:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>dolomite-base
@@ -294,7 +296,7 @@ though the contents of the columns will be unchanged.</p>
 <p>Check out the <a class="reference external" href="https://artifactdb.github.io/dolomite-base/api/modules.html">API reference</a> for more details.</p>
 </section>
 <section id="supported-classes">
-<h2>Supported classes<a class="headerlink" href="#supported-classes" title="Link to this heading">#</a></h2>
+<h2>Supported classes<a class="headerlink" href="#supported-classes" title="Link to this heading">¶</a></h2>
 <p>The saving/reading process can be applied to a range of <a class="reference external" href="https://github.com/BiocPy"><strong>BiocPy</strong></a> data structures,
 provided the appropriate <strong>dolomite</strong> package is installed.
 Each package implements a saving and reading function for its associated classes,
@@ -340,7 +342,7 @@ which are automatically used from <strong>dolomite-base</strong>’s <code class
 Alternatively, to install all packages in one go, users can install the <a class="reference external" href="https://pypi.org/project/dolomite"><strong>dolomite</strong></a> umbrella package.</p>
 </section>
 <section id="operating-on-directories">
-<h2>Operating on directories<a class="headerlink" href="#operating-on-directories" title="Link to this heading">#</a></h2>
+<h2>Operating on directories<a class="headerlink" href="#operating-on-directories" title="Link to this heading">¶</a></h2>
 <p>Users can move freely rename or relocate directories and the <code class="docutils literal notranslate"><span class="pre">read_object()</span></code> function will still work.
 For example, we can easily copy the entire directory to a new file system and everything will still be correctly referenced within the directory.
 The simplest way to share objects is to just <code class="docutils literal notranslate"><span class="pre">zip</span></code> or <code class="docutils literal notranslate"><span class="pre">tar</span></code> the staging directory for <em>ad hoc</em> distribution,
@@ -380,7 +382,7 @@ Advanced users can exploit this by loading components from subdirectories if the
 </div>
 </section>
 <section id="validating-files">
-<h2>Validating files<a class="headerlink" href="#validating-files" title="Link to this heading">#</a></h2>
+<h2>Validating files<a class="headerlink" href="#validating-files" title="Link to this heading">¶</a></h2>
 <p>Each Bioconductor class’s on-disk representation is determined by the associated <a class="reference external" href="https://github.com/ArtifactDB/takane"><strong>takane</strong> specification</a>.
 For example, <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> will save a <code class="docutils literal notranslate"><span class="pre">BiocFrame</span></code> according to the <a class="reference external" href="https://github.com/ArtifactDB/takane/blob/gh-pages/docs/specifications/data_frame/1.0.md"><code class="docutils literal notranslate"><span class="pre">data_frame</span></code> specification</a>.
 More complex objects may be represented by multiple files, possibly including subdirectories with “child” objects.</p>
@@ -416,7 +418,7 @@ which ensures that <strong>dolomite-base</strong> is able to read those objects 
 </div>
 </section>
 <section id="extending-to-new-classes">
-<h2>Extending to new classes<a class="headerlink" href="#extending-to-new-classes" title="Link to this heading">#</a></h2>
+<h2>Extending to new classes<a class="headerlink" href="#extending-to-new-classes" title="Link to this heading">¶</a></h2>
 <p>The <strong>dolomite</strong> framework is easily extended to new classes by:</p>
 <ol class="arabic simple">
 <li><p>Writing a method for <code class="docutils literal notranslate"><span class="pre">save_object()</span></code>.
@@ -508,7 +510,7 @@ This can be achieved by calling <code class="docutils literal notranslate"><span
 (We use the <code class="docutils literal notranslate"><span class="pre">alt_*</span></code> versions of these functions to respect application overrides, see below.)</p>
 </section>
 <section id="creating-applications">
-<h2>Creating applications<a class="headerlink" href="#creating-applications" title="Link to this heading">#</a></h2>
+<h2>Creating applications<a class="headerlink" href="#creating-applications" title="Link to this heading">¶</a></h2>
 <p>Developers can also create applications that customize the machinery of the <em>dolomite</em> framework for specific needs.
 In most cases, this involves storing more metadata to describe the object in more detail.
 For example, we might want to remember the identity of the author for each object.
@@ -689,8 +691,8 @@ This allows applications to, e.g., do something with the metadata that we just a
     </aside>
   </div>
 </div><script src="_static/documentation_options.js?v=3f1b9271"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="_static/scripts/furo.js?v=4e2eecee"></script>
     </body>
 </html>

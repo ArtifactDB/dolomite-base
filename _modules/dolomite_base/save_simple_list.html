@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.7 and Furo 2024.04.27 -->
         <title>dolomite_base.save_simple_list - dolomite-base unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=437aa6ec" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=36a5483c" />
     
     
@@ -111,6 +111,8 @@
   <div class="visually-hidden">Hide table of contents sidebar</div>
 </label>
 
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
 
 
 <div class="page">
@@ -195,7 +197,7 @@
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
-        <article role="main">
+        <article role="main" id="furo-main-content">
           <h1>Source code for dolomite_base.save_simple_list</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Literal</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -208,6 +210,7 @@
 <span class="kn">import</span> <span class="nn">h5py</span>
 
 <span class="kn">from</span> <span class="nn">.save_object</span> <span class="kn">import</span> <span class="n">save_object</span><span class="p">,</span> <span class="n">validate_saves</span>
+<span class="kn">from</span> <span class="nn">.save_object_file</span> <span class="kn">import</span> <span class="n">save_object_file</span>
 <span class="kn">from</span> <span class="nn">.alt_save_object</span> <span class="kn">import</span> <span class="n">alt_save_object</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_utils_misc</span> <span class="k">as</span> <span class="n">misc</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_utils_string</span> <span class="k">as</span> <span class="n">strings</span>
@@ -308,11 +311,11 @@
 
 <span class="k">def</span> <span class="nf">_save_simple_list_internal</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">NamedList</span><span class="p">],</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">simple_list_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;OBJECT&quot;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
-        <span class="n">format2</span> <span class="o">=</span> <span class="n">simple_list_mode</span> 
-        <span class="k">if</span> <span class="n">format2</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span><span class="p">:</span>
-            <span class="n">format2</span> <span class="o">=</span> <span class="s2">&quot;json.gz&quot;</span>
-        <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;{ &quot;type&quot;: &quot;simple_list&quot;, &quot;simple_list&quot;: { &quot;version&quot;: &quot;1.0&quot;, &quot;format&quot;: &quot;&#39;</span> <span class="o">+</span> <span class="n">format2</span> <span class="o">+</span> <span class="s1">&#39;&quot; } }&#39;</span><span class="p">)</span>
+
+    <span class="n">format2</span> <span class="o">=</span> <span class="n">simple_list_mode</span> 
+    <span class="k">if</span> <span class="n">format2</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span><span class="p">:</span>
+        <span class="n">format2</span> <span class="o">=</span> <span class="s2">&quot;json.gz&quot;</span>
+    <span class="n">save_object_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;simple_list&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="s2">&quot;simple_list&quot;</span><span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0&quot;</span><span class="p">,</span> <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="n">format2</span> <span class="p">}</span> <span class="p">})</span>
 
     <span class="n">externals</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -708,8 +711,8 @@
     </aside>
   </div>
 </div><script src="../../_static/documentation_options.js?v=3f1b9271"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>
+    <script src="../../_static/scripts/furo.js?v=4e2eecee"></script>
     </body>
 </html>
