@@ -8,6 +8,7 @@ import numpy
 import h5py
 
 from .save_object import save_object
+from .save_object_file import save_object_file
 from .alt_save_object import alt_save_object
 from . import _utils_string as strings
 from . import write_vector_to_hdf5 as write
@@ -97,8 +98,7 @@ def save_data_frame(
             cd = cd.set_row_names(None)
         alt_save_object(cd, os.path.join(path, "column_annotations"), data_frame_convert_list_to_vector=data_frame_convert_list_to_vector, **kwargs)
 
-    with open(os.path.join(path, "OBJECT"), "w") as handle:
-        handle.write('{ "type": "data_frame", "data_frame": { "version": "1.0" } }')
+    save_object_file(path, "data_frame", { "data_frame": { "version": "1.0" } })
     return
 
 

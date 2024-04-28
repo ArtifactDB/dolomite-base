@@ -1,7 +1,6 @@
 from typing import Any, Optional
 from importlib import import_module
-import os
-import json
+from .read_object_file import read_object_file
 
 
 read_object_registry = {
@@ -53,8 +52,7 @@ def read_object(path: str, metadata: Optional[dict] = None, **kwargs) -> Any:
         Some kind of object.
     """
     if metadata is None:
-        with open(os.path.join(path, "OBJECT"), "rb") as handle:
-            metadata = json.load(handle)
+        metadata = read_object_file(path)
 
     tt = metadata["type"]
     if tt not in read_object_registry:

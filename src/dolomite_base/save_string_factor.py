@@ -3,8 +3,10 @@ import os
 import h5py
 
 from .save_object import save_object, validate_saves
+from .save_object_file import save_object_file
 from . import _utils_string as strings
 from ._utils_factor import save_factor_to_hdf5
+
 
 @save_object.register
 @validate_saves
@@ -27,8 +29,7 @@ def save_string_factor(x: Factor, path: str, **kwargs):
         `x` is saved to `path`.
     """
     os.mkdir(path)
-    with open(os.path.join(path, "OBJECT"), 'w', encoding="utf-8") as handle:
-        handle.write('{ "type": "string_factor", "string_factor": { "version": "1.0" } }')
+    save_object_file(path, "string_factor", { "string_factor": { "version": "1.0" } })
 
     with h5py.File(os.path.join(path, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("string_factor")

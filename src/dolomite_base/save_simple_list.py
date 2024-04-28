@@ -9,6 +9,7 @@ import gzip
 import h5py
 
 from .save_object import save_object, validate_saves
+from .save_object_file import save_object_file
 from .alt_save_object import alt_save_object
 from . import _utils_misc as misc
 from . import _utils_string as strings
@@ -100,11 +101,11 @@ def save_simple_list_from_NamedList(x: NamedList, path: str, simple_list_mode: L
 
 def _save_simple_list_internal(x: Union[dict, list, NamedList], path: str, simple_list_mode: Literal["hdf5", "json"] = None, **kwargs):
     os.mkdir(path)
-    with open(os.path.join(path, "OBJECT"), 'w', encoding="utf-8") as handle:
-        format2 = simple_list_mode 
-        if format2 == "json":
-            format2 = "json.gz"
-        handle.write('{ "type": "simple_list", "simple_list": { "version": "1.0", "format": "' + format2 + '" } }')
+
+    format2 = simple_list_mode 
+    if format2 == "json":
+        format2 = "json.gz"
+    save_object_file(path, "simple_list", { "simple_list": { "version": "1.0", "format": format2 } })
 
     externals = []
 

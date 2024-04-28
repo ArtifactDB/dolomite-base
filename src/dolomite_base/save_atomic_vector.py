@@ -4,6 +4,7 @@ import h5py
 import numpy
 
 from .save_object import save_object, validate_saves
+from .save_object_file import save_object_file
 from . import _utils_string as strings
 from . import write_vector_to_hdf5 as write
 
@@ -29,8 +30,7 @@ def save_atomic_vector_from_string_list(x: StringList, path: str, **kwargs):
         `x` is saved to `path`.
     """
     os.mkdir(path)
-    with open(os.path.join(path, "OBJECT"), 'w', encoding="utf-8") as handle:
-        handle.write('{ "type": "atomic_vector", "atomic_vector": { "version": "1.0" } }')
+    save_object_file(path, "atomic_vector", { "atomic_vector": { "version": "1.0" } })
 
     with h5py.File(os.path.join(path, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("atomic_vector")
@@ -64,8 +64,7 @@ def save_atomic_vector_from_integer_list(x: IntegerList, path: str, **kwargs):
         `x` is saved to `path`.
     """
     os.mkdir(path)
-    with open(os.path.join(path, "OBJECT"), 'w', encoding="utf-8") as handle:
-        handle.write('{ "type": "atomic_vector", "atomic_vector": { "version": "1.0" } }')
+    save_object_file(path, "atomic_vector", { "atomic_vector": { "version": "1.0" } })
 
     with h5py.File(os.path.join(path, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("atomic_vector")
@@ -105,8 +104,7 @@ def save_atomic_vector_from_float_list(x: FloatList, path: str, **kwargs):
         `x` is saved to `path`.
     """
     os.mkdir(path)
-    with open(os.path.join(path, "OBJECT"), 'w', encoding="utf-8") as handle:
-        handle.write('{ "type": "atomic_vector", "atomic_vector": { "version": "1.0" } }')
+    save_object_file(path, "atomic_vector", { "atomic_vector": { "version": "1.0" } })
 
     with h5py.File(os.path.join(path, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("atomic_vector")
@@ -140,8 +138,7 @@ def save_atomic_vector_from_boolean_list(x: BooleanList, path: str, **kwargs):
         `x` is saved to `path`.
     """
     os.mkdir(path)
-    with open(os.path.join(path, "OBJECT"), 'w', encoding="utf-8") as handle:
-        handle.write('{ "type": "atomic_vector", "atomic_vector": { "version": "1.0" } }')
+    save_object_file(path, "atomic_vector", { "atomic_vector": { "version": "1.0" } })
 
     with h5py.File(os.path.join(path, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("atomic_vector")

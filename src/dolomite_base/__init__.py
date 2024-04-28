@@ -17,6 +17,7 @@ finally:
 
 from .save_object import save_object, validate_saves
 from .alt_save_object import alt_save_object, alt_save_object_function
+from .save_object_file import save_object_file
 
 from .save_atomic_vector import save_atomic_vector_from_string_list, save_atomic_vector_from_integer_list, save_atomic_vector_from_float_list, save_atomic_vector_from_boolean_list
 from .save_string_factor import save_string_factor
@@ -25,6 +26,7 @@ from .save_data_frame import save_data_frame
 
 from .read_object import read_object, read_object_registry
 from .alt_read_object import alt_read_object, alt_read_object_function
+from .read_object_file import read_object_file
 
 from .read_atomic_vector import read_atomic_vector
 from .read_string_factor import read_string_factor
