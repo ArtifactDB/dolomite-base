@@ -192,8 +192,8 @@ def test_simple_list_large_integers():
 
 def test_simple_list_special_float():
     everything = {
-        "a": np.NaN,
-        "b": FloatList([np.Inf, -np.Inf, np.NaN])
+        "a": np.nan,
+        "b": FloatList([np.inf, -np.inf, np.nan])
     }
 
     # Stage as JSON.
@@ -202,8 +202,8 @@ def test_simple_list_special_float():
 
     roundtrip = dl.read_object(dir)
     assert np.isnan(roundtrip["a"])
-    assert roundtrip["b"][0] == np.Inf
-    assert roundtrip["b"][1] == -np.Inf
+    assert roundtrip["b"][0] == np.inf
+    assert roundtrip["b"][1] == -np.inf
     assert np.isnan(roundtrip["b"][2])
 
     # Stage as HDF5.
@@ -212,8 +212,8 @@ def test_simple_list_special_float():
 
     roundtrip = dl.read_object(dir)
     assert np.isnan(roundtrip["a"])
-    assert roundtrip["b"][0] == np.Inf
-    assert roundtrip["b"][1] == -np.Inf
+    assert roundtrip["b"][0] == np.inf
+    assert roundtrip["b"][1] == -np.inf
     assert np.isnan(roundtrip["b"][2])
 
 
@@ -254,6 +254,9 @@ def test_simple_list_factor():
     meta = dl.save_object(everything, dir, simple_list_mode="json")
 
     roundtrip = dl.read_object(dir)
+    print(dir)
+    print(everything)
+    print(roundtrip)
     assert isinstance(roundtrip["regular"], Factor)
     assert list(roundtrip["regular"]) == list(everything["regular"])
     assert not roundtrip["regular"].get_ordered()

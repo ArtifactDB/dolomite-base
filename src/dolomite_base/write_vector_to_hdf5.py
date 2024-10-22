@@ -133,7 +133,7 @@ def write_integer_vector_to_hdf5(
         if not allow_float_promotion:
             raise ValueError("cannot save out-of-range integers without type promotion")
         if missed:
-            placeholder = numpy.NaN
+            placeholder = numpy.nan
             x = _fill_with_placeholder(x, numpy.float64, placeholder)
     else:
         if missed:
@@ -142,7 +142,7 @@ def write_integer_vector_to_hdf5(
                 exceeds = True
                 if not allow_float_promotion:
                     raise ValueError("cannot find a suitable missing value placeholder without type promotion")
-                placeholder = numpy.NaN
+                placeholder = numpy.nan
                 x = _fill_with_placeholder(x, numpy.float64, placeholder)
             else:
                 x = _fill_with_placeholder(x, placeholder.dtype.type, placeholder)

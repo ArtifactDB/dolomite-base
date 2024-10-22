@@ -337,7 +337,7 @@ def _save_simple_list_recursive_MaskedConstant(x: np.ma.core.MaskedConstant, ext
     if handle is None:
         return { "type": "number", "values": None}
     else:
-        _save_scalar_hdf5(handle, x=np.NaN, dtype=float, missing_placeholder=np.NaN)
+        _save_scalar_hdf5(handle, x=np.nan, dtype=float, missing_placeholder=np.nan)
         return
 
 
@@ -431,9 +431,9 @@ def _save_simple_list_recursive_none(x: None, externals: list, handle):
 def _sanitize_float_json(x):
     if np.isnan(x):
         return "NaN"
-    elif x == np.Inf:
+    elif x == np.inf:
         return "Inf"
-    elif x == -np.Inf:
+    elif x == -np.inf:
         return "-Inf"
     return float(x)
 
