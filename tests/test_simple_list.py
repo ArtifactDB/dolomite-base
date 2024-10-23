@@ -254,9 +254,6 @@ def test_simple_list_factor():
     meta = dl.save_object(everything, dir, simple_list_mode="json")
 
     roundtrip = dl.read_object(dir)
-    print(dir)
-    print(everything)
-    print(roundtrip)
     assert isinstance(roundtrip["regular"], Factor)
     assert list(roundtrip["regular"]) == list(everything["regular"])
     assert not roundtrip["regular"].get_ordered()
