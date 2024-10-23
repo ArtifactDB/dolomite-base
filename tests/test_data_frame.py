@@ -239,15 +239,15 @@ def test_data_frame_large_integers():
 
 def test_data_frame_special_floats():
     df = BiocFrame({
-        "sumire": [ np.NaN, np.Inf, -np.Inf ],
-        "kanon": np.array([ np.NaN, np.Inf, -np.Inf ]),
-        "chisato": np.ma.array([ np.NaN, 4, 5 ], mask=[0, 1, 1]) # distinguish NaN from missing.
+        "sumire": [ np.nan, np.inf, -np.inf ],
+        "kanon": np.array([ np.nan, np.inf, -np.inf ]),
+        "chisato": np.ma.array([ np.nan, 4, 5 ], mask=[0, 1, 1]) # distinguish NaN from missing.
     })
 
     def as_expected(x):
         assert np.isnan(x[0])
-        assert x[1] == np.Inf
-        assert x[2] == -np.Inf
+        assert x[1] == np.inf
+        assert x[2] == -np.inf
 
     def as_expected_masked(x):
         assert np.isnan(x[0])

@@ -77,7 +77,7 @@ def choose_missing_float_placeholder(x: Sequence[float], dtype: type = numpy.flo
             can_nan = False
             break
     if can_nan:
-        return dtype(numpy.NaN)
+        return dtype(numpy.nan)
 
     if not numpy.inf in x:
         return dtype(numpy.inf)

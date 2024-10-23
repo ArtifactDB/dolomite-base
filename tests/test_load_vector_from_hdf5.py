@@ -75,7 +75,7 @@ def test_load_vector_from_hdf5_floats():
         ghandle = handle.create_group("yourmom")
         dl.write_float_vector_to_hdf5(ghandle, "FOO1", [1.1, 2.2, 3.3, 4.4])
         dl.write_float_vector_to_hdf5(ghandle, "FOO2", [1.1, 2.2, 4.4, None])
-        dl.write_float_vector_to_hdf5(ghandle, "FOO3", [1.1, 2.2, 4.4, None, numpy.NaN]) # check for correct behavior with non-NaN placeholders
+        dl.write_float_vector_to_hdf5(ghandle, "FOO3", [1.1, 2.2, 4.4, None, numpy.nan]) # check for correct behavior with non-NaN placeholders
         dl.write_integer_vector_to_hdf5(ghandle, "FOO4", [1, 2, 3, 2**32], h5type="u8") # check for correct promotion of integer storage types.
 
     with h5py.File(path, "r") as handle:
