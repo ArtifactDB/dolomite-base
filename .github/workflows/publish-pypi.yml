@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "*"
+  pull_request:
 
 jobs:
   build_linux_x86_64:
@@ -18,8 +19,8 @@ jobs:
         env:
           CIBW_ARCHS: x86_64
           CIBW_PROJECT_REQUIRES_PYTHON: ">=3.9"
-          CIBW_MANYLINUX_X86_64_IMAGE: ghcr.io/artifactdb/prebuilt-hdf5/manylinux_x86_64:0.0.4
-          CIBW_MUSLLINUX_X86_64_IMAGE: ghcr.io/artifactdb/prebuilt-hdf5/musllinux_x86_64:0.0.4
+          CIBW_MANYLINUX_X86_64_IMAGE: ghcr.io/artifactdb/prebuilt-hdf5/manylinux_x86_64:0.1.1
+          CIBW_MUSLLINUX_X86_64_IMAGE: ghcr.io/artifactdb/prebuilt-hdf5/musllinux_x86_64:0.1.1
           CIBW_SKIP: pp*
 
       - uses: actions/upload-artifact@v4
@@ -36,7 +37,7 @@ jobs:
 
       - name: Grab prebuilt dependencies
         run: |
-            curl -L https://github.com/ArtifactDB/prebuilt-hdf5/releases/download/0.0.4/macosx_x86_64.tar.gz > bundle.tar.gz
+            curl -L https://github.com/ArtifactDB/prebuilt-hdf5/releases/download/0.1.1/macosx_x86_64.tar.gz > bundle.tar.gz
             tar -xvf bundle.tar.gz
 
       - name: Build wheels
@@ -47,7 +48,7 @@ jobs:
           CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed -DCMAKE_OSX_ARCHITECTURES=x86_64\""
           CIBW_BUILD_VERBOSITY: 3
           CIBW_SKIP: pp*
-          MACOSX_DEPLOYMENT_TARGET: 11.7
+          MACOSX_DEPLOYMENT_TARGET: 13.7
 
       - uses: actions/upload-artifact@v4
         with:
@@ -63,7 +64,7 @@ jobs:
 
       - name: Grab prebuilt dependencies
         run: |
-            curl -L https://github.com/ArtifactDB/prebuilt-hdf5/releases/download/0.0.4-manual/macosx_arm64.tar.gz > bundle.tar.gz
+            curl -L https://github.com/ArtifactDB/prebuilt-hdf5/releases/download/0.1.1/macosx_arm64.tar.gz > bundle.tar.gz
             tar -xvf bundle.tar.gz
 
       - name: Build wheels
@@ -74,7 +75,7 @@ jobs:
           CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed -DCMAKE_OSX_ARCHITECTURES=arm64\""
           CIBW_BUILD_VERBOSITY: 3
           CIBW_SKIP: pp*
-          MACOSX_DEPLOYMENT_TARGET: 13.0
+          MACOSX_DEPLOYMENT_TARGET: 14.0
 
       - uses: actions/upload-artifact@v4
         with:
@@ -132,6 +133,7 @@ jobs:
           path: dist/*.tar.gz
 
   upload_pypi:
+    if: startsWith(github.ref, 'refs/tags/')
     needs: [build_linux_x86_64, build_macosx_x86_64, build_macosx_arm64, build_sdist]
     runs-on: ubuntu-latest
     steps:
