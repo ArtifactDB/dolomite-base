@@ -48,6 +48,7 @@ jobs:
           CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed -DCMAKE_OSX_ARCHITECTURES=x86_64\""
           CIBW_BUILD_VERBOSITY: 3
           CIBW_SKIP: pp*
+          MACOSX_DEPLOYMENT_TARGET: 13.7
 
       - uses: actions/upload-artifact@v4
         with:
@@ -74,6 +75,7 @@ jobs:
           CIBW_ENVIRONMENT: "MORE_CMAKE_OPTIONS=\"-DCMAKE_INSTALL_PREFIX=$(pwd)/installed -DCMAKE_OSX_ARCHITECTURES=arm64\""
           CIBW_BUILD_VERBOSITY: 3
           CIBW_SKIP: pp*
+          MACOSX_DEPLOYMENT_TARGET: 14.0
 
       - uses: actions/upload-artifact@v4
         with:
