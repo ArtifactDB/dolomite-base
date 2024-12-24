@@ -37,7 +37,7 @@ jobs:
 
       - name: Grab prebuilt dependencies
         run: |
-            curl -L https://github.com/ArtifactDB/prebuilt-hdf5/releases/download/0.1.0/macosx_x86_64.tar.gz > bundle.tar.gz
+            curl -L https://github.com/ArtifactDB/prebuilt-hdf5/releases/download/0.1.1/macosx_x86_64.tar.gz > bundle.tar.gz
             tar -xvf bundle.tar.gz
 
       - name: Build wheels
@@ -64,7 +64,7 @@ jobs:
 
       - name: Grab prebuilt dependencies
         run: |
-            curl -L https://github.com/ArtifactDB/prebuilt-hdf5/releases/download/0.1.0/macosx_arm64.tar.gz > bundle.tar.gz
+            curl -L https://github.com/ArtifactDB/prebuilt-hdf5/releases/download/0.1.1/macosx_arm64.tar.gz > bundle.tar.gz
             tar -xvf bundle.tar.gz
 
       - name: Build wheels
