@@ -34,6 +34,7 @@ from .read_simple_list import read_simple_list
 from .read_data_frame import read_data_frame
 
 from .validate_object import validate_object, validate_object_registry
+from .list_objects import list_objects
 
 from .choose_missing_placeholder import choose_missing_integer_placeholder, choose_missing_float_placeholder, choose_missing_string_placeholder
 from .write_vector_to_hdf5 import write_string_vector_to_hdf5, write_float_vector_to_hdf5, write_integer_vector_to_hdf5, write_boolean_vector_to_hdf5
