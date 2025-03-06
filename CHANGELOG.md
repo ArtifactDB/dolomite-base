@@ -1,5 +1,19 @@
 # Changelog
 
+## Version 0.4.3
+
+- Bugfix for the `read_object()` dispatcher on `ranged_summarized_experiment`.
+- Implemented `validate_directory()` to validate all objects in a directory.
+- Implemented `list_objects()` to list all objects in a directory.
+
+## Version 0.4.2
+
+- More fixes to the wheel building.
+
+## Version 0.4.1
+
+- Fixes to the wheel building.
+
 ## Version 0.4.0
 
 - chore: Remove Python 3.8 (EOL).
