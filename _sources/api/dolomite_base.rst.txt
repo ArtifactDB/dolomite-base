@@ -9,157 +9,173 @@ dolomite\_base.alt\_read\_object module
 
 .. automodule:: dolomite_base.alt_read_object
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.alt\_save\_object module
 ---------------------------------------
 
 .. automodule:: dolomite_base.alt_save_object
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.choose\_missing\_placeholder module
 --------------------------------------------------
 
 .. automodule:: dolomite_base.choose_missing_placeholder
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.lib\_dolomite\_base module
 -----------------------------------------
 
 .. automodule:: dolomite_base.lib_dolomite_base
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
+
+dolomite\_base.list\_objects module
+-----------------------------------
+
+.. automodule:: dolomite_base.list_objects
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.load\_vector\_from\_hdf5 module
 ----------------------------------------------
 
 .. automodule:: dolomite_base.load_vector_from_hdf5
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.read\_atomic\_vector module
 ------------------------------------------
 
 .. automodule:: dolomite_base.read_atomic_vector
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.read\_data\_frame module
 ---------------------------------------
 
 .. automodule:: dolomite_base.read_data_frame
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.read\_object module
 ----------------------------------
 
 .. automodule:: dolomite_base.read_object
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.read\_object\_file module
 ----------------------------------------
 
 .. automodule:: dolomite_base.read_object_file
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.read\_simple\_list module
 ----------------------------------------
 
 .. automodule:: dolomite_base.read_simple_list
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.read\_string\_factor module
 ------------------------------------------
 
 .. automodule:: dolomite_base.read_string_factor
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.save\_atomic\_vector module
 ------------------------------------------
 
 .. automodule:: dolomite_base.save_atomic_vector
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.save\_data\_frame module
 ---------------------------------------
 
 .. automodule:: dolomite_base.save_data_frame
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.save\_object module
 ----------------------------------
 
 .. automodule:: dolomite_base.save_object
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.save\_object\_file module
 ----------------------------------------
 
 .. automodule:: dolomite_base.save_object_file
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.save\_simple\_list module
 ----------------------------------------
 
 .. automodule:: dolomite_base.save_simple_list
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.save\_string\_factor module
 ------------------------------------------
 
 .. automodule:: dolomite_base.save_string_factor
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
+
+dolomite\_base.validate\_directory module
+-----------------------------------------
+
+.. automodule:: dolomite_base.validate_directory
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.validate\_object module
 --------------------------------------
 
 .. automodule:: dolomite_base.validate_object
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 dolomite\_base.write\_vector\_to\_hdf5 module
 ---------------------------------------------
 
 .. automodule:: dolomite_base.write_vector_to_hdf5
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Module contents
 ---------------
 
 .. automodule:: dolomite_base
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

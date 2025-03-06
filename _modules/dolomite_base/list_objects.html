@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>dolomite_base.read_object - dolomite-base 0.4.3 documentation</title>
+        <title>dolomite_base.list_objects - dolomite-base 0.4.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
@@ -241,89 +241,64 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>Source code for dolomite_base.read_object</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">importlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">import_module</span>
+          <h1>Source code for dolomite_base.list_objects</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">biocframe</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">.read_object_file</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_object_file</span>
 
 
-<span class="n">read_object_registry</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;atomic_vector&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_base.read_atomic_vector&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;string_factor&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_base.read_string_factor&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;simple_list&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_base.read_simple_list&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;data_frame&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_base.read_data_frame&quot;</span><span class="p">,</span>
-
-    <span class="s2">&quot;dense_array&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_matrix.read_dense_array&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;compressed_sparse_matrix&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_matrix.read_compressed_sparse_matrix&quot;</span><span class="p">,</span>
-    
-    <span class="s2">&quot;genomic_ranges&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_ranges.read_genomic_ranges&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;genomic_ranges_list&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_ranges.read_genomic_ranges_list&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;sequence_information&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_ranges.read_sequence_information&quot;</span><span class="p">,</span>
-    
-    <span class="s2">&quot;summarized_experiment&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_se.read_summarized_experiment&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ranged_summarized_experiment&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_se.read_ranged_summarized_experiment&quot;</span><span class="p">,</span>
-    
-    <span class="s2">&quot;single_cell_experiment&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_sce.read_single_cell_experiment&quot;</span><span class="p">,</span>
-    
-    <span class="s2">&quot;multi_sample_dataset&quot;</span><span class="p">:</span> <span class="s2">&quot;dolomite_mae.read_multi_assay_experiment&quot;</span><span class="p">,</span>
-<span class="p">}</span>
-
-
-<div class="viewcode-block" id="read_object">
-<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.read_object.read_object">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">read_object</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Read an object from its on-disk representation. This will dispatch to</span>
-<span class="sd">    individual reading functions - possibly from different packages in the</span>
-<span class="sd">    **dolomite** framework based on the ``metadata`` from the ``OBJECT`` file. </span>
-
-<span class="sd">    Application developers can control the dispatch process by modifying</span>
-<span class="sd">    ``read_object_registry``. Each key is a string containing the object type,</span>
-<span class="sd">    e.g., ``data_frame``, while the value can either be a string specifying the</span>
-<span class="sd">    fully qualified name of a reader function (including all modules, which</span>
-<span class="sd">    will be loaded upon dispatch) or the reader function itself.</span>
-
-<span class="sd">    Any reader functions should accept the same arguments as</span>
-<span class="sd">    :py:func`~dolomite_base.read-object.read_object` and return the loaded</span>
-<span class="sd">    object. Readers may assume that the ``metadata`` argument is available,</span>
-<span class="sd">    i.e., no need to account for the None case.</span>
+<div class="viewcode-block" id="list_objects">
+<a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.list_objects.list_objects">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_objects</span><span class="p">(</span><span class="nb">dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">include_children</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List all objects in a directory, along with their types.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        path: </span>
-<span class="sd">            Path to a directory containing the object.</span>
+<span class="sd">        dir:</span>
+<span class="sd">            Path to a directory in which one or more objects were saved, typically via :py:func:`~dolomite_base.save_object.save_object`.</span>
 
-<span class="sd">        metadata: </span>
-<span class="sd">            Metadata for the object. If None, the metadata is read from the</span>
-<span class="sd">            ``OBJECT`` file inside ``path``. </span>
-
-<span class="sd">        kwargs: </span>
-<span class="sd">            Further arguments, passed to individual methods.</span>
+<span class="sd">        include_children:</span>
+<span class="sd">            Whether to include child objects (i.e., objects that are components of other objects) in the listing.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Some kind of object.</span>
+<span class="sd">        A :py:class:`~biocframe.BiocFrame.BiocFrame` where each row corresponds to an object in ``dir``.</span>
+<span class="sd">        It contains the following columns:</span>
+
+<span class="sd">        - ``path``, the relative path to the object&#39;s subdirectory inside ``dir``.</span>
+<span class="sd">        - ``type``, the type of the object.</span>
+<span class="sd">        - ``child``, whether the object is a child of another object.</span>
+
+<span class="sd">        If ``include_children=False``, the listing will only contain non-child objects. </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">metadata</span> <span class="o">=</span> <span class="n">read_object_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">(</span><span class="n">_traverse_directory_listing</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">include_children</span><span class="o">=</span><span class="n">include_children</span><span class="p">))</span></div>
 
-    <span class="n">tt</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">tt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">read_object_registry</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;could not find a Python function to read &#39;&quot;</span> <span class="o">+</span> <span class="n">tt</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
 
-    <span class="n">command</span> <span class="o">=</span> <span class="n">read_object_registry</span><span class="p">[</span><span class="n">tt</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> 
-        <span class="n">first_period</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
-        <span class="n">mod_name</span> <span class="o">=</span> <span class="n">command</span><span class="p">[:</span><span class="n">first_period</span><span class="p">]</span>
 
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">mod_name</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ModuleNotFoundError</span><span class="p">(</span><span class="s2">&quot;no module named &#39;&quot;</span> <span class="o">+</span> <span class="n">mod_name</span> <span class="o">+</span> <span class="s2">&quot;&#39; for reading an instance of &#39;&quot;</span> <span class="o">+</span> <span class="n">tt</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_traverse_directory_listing</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">already_child</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">include_children</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+    <span class="n">full</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="nb">dir</span><span class="p">)</span>
+    <span class="n">is_obj</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">full</span><span class="p">,</span> <span class="s2">&quot;OBJECT&quot;</span><span class="p">))</span>
 
-        <span class="n">command</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">command</span><span class="p">[</span><span class="n">first_period</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:])</span>
-        <span class="n">read_object_registry</span><span class="p">[</span><span class="n">tt</span><span class="p">]</span> <span class="o">=</span> <span class="n">command</span>
+    <span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">childs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">is_obj</span><span class="p">:</span>
+        <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dir</span><span class="p">)</span>
+        <span class="n">types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">read_object_file</span><span class="p">(</span><span class="n">full</span><span class="p">)[</span><span class="s2">&quot;type&quot;</span><span class="p">])</span>
+        <span class="n">childs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">already_child</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">command</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">include_children</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">is_obj</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">next</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">full</span><span class="p">))[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="nb">dir</span> <span class="o">!=</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span>
+                <span class="n">subdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">subdir</span> <span class="o">=</span> <span class="n">k</span>
+            <span class="n">sub</span> <span class="o">=</span> <span class="n">_traverse_directory_listing</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">subdir</span><span class="p">,</span> <span class="n">already_child</span><span class="o">=</span><span class="p">(</span><span class="n">already_child</span> <span class="ow">or</span> <span class="n">is_obj</span><span class="p">),</span> <span class="n">include_children</span><span class="o">=</span><span class="n">include_children</span><span class="p">)</span>
+            <span class="n">paths</span> <span class="o">+=</span> <span class="n">sub</span><span class="p">[</span><span class="s2">&quot;path&quot;</span><span class="p">]</span>
+            <span class="n">types</span> <span class="o">+=</span> <span class="n">sub</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+            <span class="n">childs</span> <span class="o">+=</span> <span class="n">sub</span><span class="p">[</span><span class="s2">&quot;child&quot;</span><span class="p">]</span>
 
+    <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">paths</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">types</span><span class="p">,</span> <span class="s2">&quot;child&quot;</span><span class="p">:</span> <span class="n">childs</span> <span class="p">}</span>
 </pre></div>
         </article>
       </div>

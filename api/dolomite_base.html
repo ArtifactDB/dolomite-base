@@ -5,9 +5,9 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="dolomite_base" href="modules.html" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>dolomite_base package - dolomite-base 0.4.2 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>dolomite_base package - dolomite-base 0.4.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
     
@@ -166,7 +166,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">dolomite-base 0.4.2 documentation</div></a>
+      <a href="../index.html"><div class="brand">dolomite-base 0.4.3 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -190,7 +190,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
-  <span class="sidebar-brand-text">dolomite-base 0.4.2 documentation</span>
+  <span class="sidebar-brand-text">dolomite-base 0.4.3 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -456,6 +456,37 @@ casting may be required.</p>
 <dd></dd></dl>
 
 </section>
+<section id="module-dolomite_base.list_objects">
+<span id="dolomite-base-list-objects-module"></span><h2>dolomite_base.list_objects module<a class="headerlink" href="#module-dolomite_base.list_objects" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.list_objects.list_objects">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.list_objects.</span></span><span class="sig-name descname"><span class="pre">list_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_children</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/list_objects.html#list_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.list_objects.list_objects" title="Link to this definition">¶</a></dt>
+<dd><p>List all objects in a directory, along with their types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a directory in which one or more objects were saved, typically via <a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-func docutils literal notranslate"><span class="pre">save_object()</span></code></a>.</p></li>
+<li><p><strong>include_children</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to include child objects (i.e., objects that are components of other objects) in the listing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.6.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>A <a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.6.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a> where each row corresponds to an object in <code class="docutils literal notranslate"><span class="pre">dir</span></code>.
+It contains the following columns:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">path</span></code>, the relative path to the object’s subdirectory inside <code class="docutils literal notranslate"><span class="pre">dir</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type</span></code>, the type of the object.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">child</span></code>, whether the object is a child of another object.</p></li>
+</ul>
+<p>If <code class="docutils literal notranslate"><span class="pre">include_children=False</span></code>, the listing will only contain non-child objects.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="module-dolomite_base.load_vector_from_hdf5">
 <span id="dolomite-base-load-vector-from-hdf5-module"></span><h2>dolomite_base.load_vector_from_hdf5 module<a class="headerlink" href="#module-dolomite_base.load_vector_from_hdf5" title="Link to this heading">¶</a></h2>
 <dl class="py function">
@@ -541,7 +572,7 @@ this flag to <code class="docutils literal notranslate"><span class="pre">False<
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.6.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></span></p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A data frame.</p>
@@ -749,7 +780,7 @@ to their corresponding file representation, see
 <span id="dolomite-base-save-data-frame-module"></span><h2>dolomite_base.save_data_frame module<a class="headerlink" href="#module-dolomite_base.save_data_frame" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dolomite_base.save_data_frame.</span></span><span class="sig-name descname"><span class="pre">Hdf5ColumnOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">otherable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_list_to_vector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_1darray_to_vector</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dolomite_base.save_data_frame.</span></span><span class="sig-name descname"><span class="pre">Hdf5ColumnOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">otherable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_list_to_vector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_1darray_to_vector</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#tuple" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.__getnewargs__">
@@ -764,7 +795,7 @@ to their corresponding file representation, see
 
 <dl class="py method">
 <dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.__new__">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">__new__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">otherable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_list_to_vector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_1darray_to_vector</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__new__" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">__new__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">otherable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_list_to_vector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_1darray_to_vector</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__new__" title="Link to this definition">¶</a></dt>
 <dd><p>Create new instance of Hdf5ColumnOutput(handle, otherable, convert_list_to_vector, convert_1darray_to_vector)</p>
 </dd></dl>
 
@@ -808,13 +839,13 @@ to their corresponding file representation, see
 <dl class="py function">
 <dt class="sig sig-object py" id="dolomite_base.save_data_frame.save_data_frame">
 <span class="sig-prename descclassname"><span class="pre">dolomite_base.save_data_frame.</span></span><span class="sig-name descname"><span class="pre">save_data_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_frame_convert_list_to_vector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_frame_convert_1darray_to_vector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_data_frame.html#save_data_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_data_frame.save_data_frame" title="Link to this definition">¶</a></dt>
-<dd><p>Method for saving <a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>
+<dd><p>Method for saving <a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.6.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>
 objects to the corresponding file representations, see
 <a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a> for details.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></span>) – Object to be saved.</p></li>
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.6.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></span>) – Object to be saved.</p></li>
 <li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a directory in which to save <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p></li>
 <li><p><strong>data_frame_convert_list_to_vector</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – If a column is a regular Python list where all entries are of the
 same basic type (integer, string, float, boolean) or None, should
@@ -993,6 +1024,28 @@ corresponding file representation, see
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><cite>x</cite> is saved to <cite>path</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-dolomite_base.validate_directory">
+<span id="dolomite-base-validate-directory-module"></span><h2>dolomite_base.validate_directory module<a class="headerlink" href="#module-dolomite_base.validate_directory" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.validate_directory.validate_directory">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.validate_directory.</span></span><span class="sig-name descname"><span class="pre">validate_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/validate_directory.html#validate_directory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.validate_directory.validate_directory" title="Link to this definition">¶</a></dt>
+<dd><p>Check whether each object in a directory is valid by calling <a class="reference internal" href="#dolomite_base.validate_object.validate_object" title="dolomite_base.validate_object.validate_object"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_object()</span></code></a> on each non-child object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dir</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a directory with subdirectories populated by <a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-func docutils literal notranslate"><span class="pre">save_object()</span></code></a>.
+<code class="docutils literal notranslate"><span class="pre">dir</span></code> itself may also correspond to an object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.12/library/typing.html#typing.List" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of the paths inside <code class="docutils literal notranslate"><span class="pre">dir</span></code> that were validated.
+This contains only <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">dir</span></code> itself corresponds to an object.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1218,6 +1271,10 @@ placeholder, if <code class="docutils literal notranslate"><span class="pre">x</
 <li><a class="reference internal" href="#dolomite_base.lib_dolomite_base.validate"><code class="docutils literal notranslate"><span class="pre">validate()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-dolomite_base.list_objects">dolomite_base.list_objects module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.list_objects.list_objects"><code class="docutils literal notranslate"><span class="pre">list_objects()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-dolomite_base.load_vector_from_hdf5">dolomite_base.load_vector_from_hdf5 module</a><ul>
 <li><a class="reference internal" href="#dolomite_base.load_vector_from_hdf5.load_vector_from_hdf5"><code class="docutils literal notranslate"><span class="pre">load_vector_from_hdf5()</span></code></a></li>
 </ul>
@@ -1288,6 +1345,10 @@ placeholder, if <code class="docutils literal notranslate"><span class="pre">x</
 <li><a class="reference internal" href="#dolomite_base.save_string_factor.save_string_factor"><code class="docutils literal notranslate"><span class="pre">save_string_factor()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-dolomite_base.validate_directory">dolomite_base.validate_directory module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.validate_directory.validate_directory"><code class="docutils literal notranslate"><span class="pre">validate_directory()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-dolomite_base.validate_object">dolomite_base.validate_object module</a><ul>
 <li><a class="reference internal" href="#dolomite_base.validate_object.validate_object"><code class="docutils literal notranslate"><span class="pre">validate_object()</span></code></a></li>
 </ul>
@@ -1311,7 +1372,7 @@ placeholder, if <code class="docutils literal notranslate"><span class="pre">x</
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=ff822928"></script>
+</div><script src="../_static/documentation_options.js?v=5bfaad31"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/furo.js?v=5fa4622c"></script>

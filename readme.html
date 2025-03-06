@@ -5,9 +5,9 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Contributing" href="contributing.html" /><link rel="prev" title="Documentation for dolomite-base" href="index.html" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Save and load Bioconductor objects in Python - dolomite-base 0.4.2 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>Save and load Bioconductor objects in Python - dolomite-base 0.4.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
     
@@ -166,7 +166,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">dolomite-base 0.4.2 documentation</div></a>
+      <a href="index.html"><div class="brand">dolomite-base 0.4.3 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -190,7 +190,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">dolomite-base 0.4.2 documentation</span>
+  <span class="sidebar-brand-text">dolomite-base 0.4.3 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -286,7 +286,7 @@ This package is available from <a class="reference external" href="https://pypi.
 </div>
 <p>The simplest example involves saving a <a class="reference external" href="https://github.com/BiocPy/BiocFrame"><code class="docutils literal notranslate"><span class="pre">BiocFrame</span></code></a> inside a staging directory.
 Let’s mock one up:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">biocframe</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">biocframe</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">({</span>
     <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)),</span>
     <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="p">]</span>
@@ -309,11 +309,11 @@ Let’s mock one up:</p>
 </div>
 <p>We save our <code class="docutils literal notranslate"><span class="pre">BiocFrame</span></code> to a user-specified directory with the <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> function.
 This function saves its input object to file according to the relevant <a class="reference external" href="https://github.com/ArtifactDB/takane">specification</a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
 
-<span class="kn">import</span> <span class="nn">dolomite_base</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dolomite_base</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;my_df&quot;</span><span class="p">)</span>
 <span class="n">dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
@@ -396,16 +396,16 @@ For example, we can easily copy the entire directory to a new file system and ev
 The simplest way to share objects is to just <code class="docutils literal notranslate"><span class="pre">zip</span></code> or <code class="docutils literal notranslate"><span class="pre">tar</span></code> the staging directory for <em>ad hoc</em> distribution,
 though more serious applications will use storage systems like AWS S3 for easier distribution.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Mocking up an object:</span>
-<span class="kn">import</span> <span class="nn">biocframe</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">biocframe</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">({</span>
     <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)),</span>
     <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="p">]</span>
 <span class="p">})</span>
 
 <span class="c1"># Saving to one location:</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">dolomite_base</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dolomite_base</span>
 <span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;my_df&quot;</span><span class="p">)</span>
 <span class="n">dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
@@ -440,16 +440,16 @@ Conversely, the <a class="reference external" href="https://github.com/ArtifactD
 which ensures that <strong>dolomite-base</strong> is able to read those objects into a Python environment.</p>
 <p>Users can also call <code class="docutils literal notranslate"><span class="pre">validate_object()</span></code> themselves, if they have modified the directory after calling <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> and they want to check that the contents are still valid:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Mocking up an object:</span>
-<span class="kn">import</span> <span class="nn">biocframe</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">biocframe</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">({</span>
     <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)),</span>
     <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;e&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span> <span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="s2">&quot;j&quot;</span> <span class="p">]</span>
 <span class="p">})</span>
 
 <span class="c1"># Saving to one location:</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">dolomite_base</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dolomite_base</span>
 <span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;my_df&quot;</span><span class="p">)</span>
 <span class="n">dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
@@ -486,8 +486,8 @@ Any <strong>takane</strong> validator is automatically used by <code class="docu
 </li>
 </ol>
 <p>To illustrate, let’s extend <strong>dolomite</strong> to a new custom class:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Coffee</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beans</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">milk</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Coffee</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beans</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">milk</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">beans</span> <span class="o">=</span> <span class="n">beans</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">milk</span> <span class="o">=</span> <span class="n">milk</span>
 </pre></div>
@@ -495,13 +495,13 @@ Any <strong>takane</strong> validator is automatically used by <code class="docu
 <p>First we implement the saving method.
 Note that we add a <code class="docutils literal notranslate"><span class="pre">&#64;validate_saves</span></code> decorator to instruct <code class="docutils literal notranslate"><span class="pre">save_object()</span></code> to automatically run <code class="docutils literal notranslate"><span class="pre">validate_object()</span></code> on the directory by the <code class="docutils literal notranslate"><span class="pre">Coffee</span></code> method.
 This confirms that the output is valid according to our (yet to be added) validator method.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dolomite_base</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">json</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">dolomite_base</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
 <span class="nd">@dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="o">.</span><span class="n">register</span>
 <span class="nd">@dolomite_base</span><span class="o">.</span><span class="n">validate_saves</span>
-<span class="k">def</span> <span class="nf">save_object_for_Coffee</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Coffee</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_object_for_Coffee</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Coffee</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;bean_type&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
         <span class="n">handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">beans</span><span class="p">)</span>
@@ -512,9 +512,9 @@ This confirms that the output is valid according to our (yet to be added) valida
 </pre></div>
 </div>
 <p>Then we implement and register the reading method:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
 
-<span class="k">def</span> <span class="nf">read_Coffee</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Coffee</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_Coffee</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Coffee</span><span class="p">:</span>
     <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;coffee&quot;</span><span class="p">][</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="c1"># possibly do something different based on version</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;bean_type&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
         <span class="n">beans</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -526,7 +526,7 @@ This confirms that the output is valid according to our (yet to be added) valida
 </pre></div>
 </div>
 <p>And finally, the validation method:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">validate_Coffee</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">validate_Coffee</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
     <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;coffee&quot;</span><span class="p">][</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="c1"># possibly do something different based on version</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;bean_type&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
         <span class="n">beans</span> <span class="o">=</span> <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -543,7 +543,7 @@ This confirms that the output is valid according to our (yet to be added) valida
 <p>Let’s run them and see how it works:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cup</span> <span class="o">=</span> <span class="n">Coffee</span><span class="p">(</span><span class="s2">&quot;arabica&quot;</span><span class="p">,</span> <span class="n">milk</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;stuff&quot;</span><span class="p">)</span>
 <span class="n">dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="p">(</span><span class="n">cup</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
@@ -563,15 +563,15 @@ This can be achieved by calling <code class="docutils literal notranslate"><span
 In most cases, this involves storing more metadata to describe the object in more detail.
 For example, we might want to remember the identity of the author for each object.
 This is achieved by creating an application-specific saving generic with the same signature as <code class="docutils literal notranslate"><span class="pre">save_object()</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
-<span class="kn">import</span> <span class="nn">dolomite_base</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">getpass</span>
-<span class="kn">import</span> <span class="nn">biocframe</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">singledispatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dolomite_base</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">getpass</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">biocframe</span>
 
-<span class="k">def</span> <span class="nf">dump_extra_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">extra</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dump_extra_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">extra</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
     <span class="n">user_id</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">()</span>
     <span class="c1"># File names with leading underscores are reserved for application-specific</span>
     <span class="c1"># use, so they won&#39;t clash with anything produced by save_object().</span>
@@ -580,12 +580,12 @@ This is achieved by creating an application-specific saving generic with the sam
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span> <span class="o">**</span><span class="n">extra</span><span class="p">,</span> <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="n">user_id</span> <span class="p">},</span> <span class="n">handle</span><span class="p">)</span>
 
 <span class="nd">@singledispatch</span>
-<span class="k">def</span> <span class="nf">app_save_object</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">app_save_object</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="c1"># does the real work</span>
     <span class="n">dump_extra_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">{})</span> <span class="c1"># adding some application-specific metadata</span>
 
 <span class="nd">@app_save_object</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">app_save_object_for_BiocFrame</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">app_save_object_for_BiocFrame</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">dolomite_base</span><span class="o">.</span><span class="n">save_object</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="c1"># does the real work</span>
     <span class="c1"># We can also override specific methods to add object+application-specific metadata:</span>
     <span class="n">dump_extra_metadata</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">{</span> <span class="s2">&quot;columns&quot;</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">()</span><span class="o">.</span><span class="n">as_list</span><span class="p">()</span> <span class="p">})</span>
@@ -598,7 +598,7 @@ Applications are free to write to any path starting with an underscore as this w
 This ensures that the customizations are applied to all child objects, such as the nested <code class="docutils literal notranslate"><span class="pre">BiocFrame</span></code> below.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a friendly user-visible function to perform the generic override; this</span>
 <span class="c1"># is reversed on function exit to avoid interfering with other applications.</span>
-<span class="k">def</span> <span class="nf">save_for_application</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_for_application</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">old</span> <span class="o">=</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">alt_save_object_function</span><span class="p">(</span><span class="n">app_save_object</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">dolomite_base</span><span class="o">.</span><span class="n">alt_save_object</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -606,7 +606,7 @@ This ensures that the customizations are applied to all child objects, such as t
         <span class="n">dolomite_base</span><span class="o">.</span><span class="n">alt_save_object_function</span><span class="p">(</span><span class="n">old</span><span class="p">)</span>
 
 <span class="c1"># Saving our nested BiocFrames with our overrides active.</span>
-<span class="kn">import</span> <span class="nn">biocframe</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">biocframe</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">({</span>
     <span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
     <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">({</span>
@@ -614,7 +614,7 @@ This ensures that the customizations are applied to all child objects, such as t
     <span class="p">})</span>
 <span class="p">})</span>
 
-<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="n">tmp</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
 <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;foobar&quot;</span><span class="p">)</span>
 <span class="n">save_for_application</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
@@ -631,7 +631,7 @@ This ensures that the customizations are applied to all child objects, such as t
 </div>
 <p>The reading function can be similarly overridden by setting <code class="docutils literal notranslate"><span class="pre">alt_read_object_function()</span></code> to instruct all <code class="docutils literal notranslate"><span class="pre">alt_read_object()</span></code> calls to use the override.
 This allows applications to, e.g., do something with the metadata that we just added.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">app_read_object</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">app_read_object</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;OBJECT&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
             <span class="n">metadata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
@@ -646,7 +646,7 @@ This allows applications to, e.g., do something with the metadata that we just a
     <span class="k">return</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">read_object</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <span class="c1"># Creating a user-friendly function to set the override before the read operation.</span>
-<span class="k">def</span> <span class="nf">read_for_application</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_for_application</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">old</span> <span class="o">=</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">alt_read_object_function</span><span class="p">(</span><span class="n">app_read_object</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">dolomite_base</span><span class="o">.</span><span class="n">alt_read_object</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -738,7 +738,7 @@ This allows applications to, e.g., do something with the metadata that we just a
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=ff822928"></script>
+</div><script src="_static/documentation_options.js?v=5bfaad31"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>

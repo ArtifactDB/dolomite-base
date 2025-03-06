@@ -4,9 +4,9 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>dolomite_base.save_simple_list - dolomite-base 0.4.2 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>dolomite_base.save_simple_list - dolomite-base 0.4.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
     
@@ -165,7 +165,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">dolomite-base 0.4.2 documentation</div></a>
+      <a href="../../index.html"><div class="brand">dolomite-base 0.4.3 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -189,7 +189,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">dolomite-base 0.4.2 documentation</span>
+  <span class="sidebar-brand-text">dolomite-base 0.4.3 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -242,29 +242,29 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for dolomite_base.save_simple_list</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Literal</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
-<span class="kn">from</span> <span class="nn">biocutils</span> <span class="kn">import</span> <span class="n">Factor</span><span class="p">,</span> <span class="n">StringList</span><span class="p">,</span> <span class="n">NamedList</span><span class="p">,</span> <span class="n">IntegerList</span><span class="p">,</span> <span class="n">BooleanList</span><span class="p">,</span> <span class="n">FloatList</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">gzip</span>
-<span class="kn">import</span> <span class="nn">h5py</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Literal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">singledispatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">biocutils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Factor</span><span class="p">,</span> <span class="n">StringList</span><span class="p">,</span> <span class="n">NamedList</span><span class="p">,</span> <span class="n">IntegerList</span><span class="p">,</span> <span class="n">BooleanList</span><span class="p">,</span> <span class="n">FloatList</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gzip</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
 
-<span class="kn">from</span> <span class="nn">.save_object</span> <span class="kn">import</span> <span class="n">save_object</span><span class="p">,</span> <span class="n">validate_saves</span>
-<span class="kn">from</span> <span class="nn">.save_object_file</span> <span class="kn">import</span> <span class="n">save_object_file</span>
-<span class="kn">from</span> <span class="nn">.alt_save_object</span> <span class="kn">import</span> <span class="n">alt_save_object</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_utils_misc</span> <span class="k">as</span> <span class="n">misc</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_utils_string</span> <span class="k">as</span> <span class="n">strings</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">write_vector_to_hdf5</span> <span class="k">as</span> <span class="n">write</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.save_object</span><span class="w"> </span><span class="kn">import</span> <span class="n">save_object</span><span class="p">,</span> <span class="n">validate_saves</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.save_object_file</span><span class="w"> </span><span class="kn">import</span> <span class="n">save_object_file</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.alt_save_object</span><span class="w"> </span><span class="kn">import</span> <span class="n">alt_save_object</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_utils_misc</span> <span class="k">as</span> <span class="n">misc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_utils_string</span> <span class="k">as</span> <span class="n">strings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_vector_to_hdf5</span> <span class="k">as</span> <span class="n">write</span>
 
 
 <div class="viewcode-block" id="save_simple_list_from_dict">
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.save_simple_list.save_simple_list_from_dict">[docs]</a>
 <span class="nd">@save_object</span><span class="o">.</span><span class="n">register</span>
 <span class="nd">@validate_saves</span>
-<span class="k">def</span> <span class="nf">save_simple_list_from_dict</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">simple_list_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_simple_list_from_dict</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">simple_list_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Method for saving dictionaries (Python analogues to R-style named lists)</span>
 <span class="sd">    to the corresponding file representations, see</span>
 <span class="sd">    :py:meth:`~dolomite_base.save_object.save_object` for details.</span>
@@ -294,7 +294,7 @@
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.save_simple_list.save_simple_list_from_list">[docs]</a>
 <span class="nd">@save_object</span><span class="o">.</span><span class="n">register</span>
 <span class="nd">@validate_saves</span>
-<span class="k">def</span> <span class="nf">save_simple_list_from_list</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">simple_list_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_simple_list_from_list</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">simple_list_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Method for saving lists (Python analogues to R-style unnamed lists) to</span>
 <span class="sd">    the corresponding file representations, see</span>
 <span class="sd">    :py:meth:`~dolomite_base.save_object.save_object` for details.</span>
@@ -324,7 +324,7 @@
 <a class="viewcode-back" href="../../api/dolomite_base.html#dolomite_base.save_simple_list.save_simple_list_from_NamedList">[docs]</a>
 <span class="nd">@save_object</span><span class="o">.</span><span class="n">register</span>
 <span class="nd">@validate_saves</span>
-<span class="k">def</span> <span class="nf">save_simple_list_from_NamedList</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">NamedList</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">simple_list_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_simple_list_from_NamedList</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">NamedList</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">simple_list_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Method for saving a NamedList to its corresponding file representation,</span>
 <span class="sd">    see :py:meth:`~dolomite_base.save_object.save_object` for details.</span>
 
@@ -352,7 +352,7 @@
 <span class="c1">##########################################################################</span>
 
 
-<span class="k">def</span> <span class="nf">_save_simple_list_internal</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">NamedList</span><span class="p">],</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">simple_list_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_internal</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">NamedList</span><span class="p">],</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">simple_list_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hdf5&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
     <span class="n">format2</span> <span class="o">=</span> <span class="n">simple_list_mode</span> 
@@ -385,11 +385,11 @@
 
 
 <span class="nd">@singledispatch</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">_save_simple_list_recursive_Any</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">externals</span><span class="p">,</span> <span class="n">handle</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_Any</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_Any</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="n">externals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;external&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">externals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">}</span>
@@ -400,7 +400,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_StringList</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">StringList</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_StringList</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">StringList</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="n">nms</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_names</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -418,7 +418,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_IntegerList</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">IntegerList</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_IntegerList</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">IntegerList</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="n">nms</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_names</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -442,7 +442,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_FloatList</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">FloatList</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_FloatList</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">FloatList</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="n">nms</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_names</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -461,7 +461,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_BooleanList</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">BooleanList</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_BooleanList</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">BooleanList</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="n">nms</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_names</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -479,7 +479,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_list</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_list</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">collected</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">vals</span> <span class="p">}</span>
@@ -496,7 +496,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_dict</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_dict</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
@@ -522,7 +522,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_NamedList</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">NamedList</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_NamedList</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">NamedList</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">get_names</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_save_simple_list_recursive_list</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">as_list</span><span class="p">(),</span> <span class="n">externals</span><span class="p">,</span> <span class="n">handle</span><span class="p">)</span>
 
@@ -543,7 +543,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_bool</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_bool</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">}</span>
     <span class="k">else</span><span class="p">:</span>
@@ -552,7 +552,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_int</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_int</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">misc</span><span class="o">.</span><span class="n">scalar_exceeds_int32</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">}</span>
@@ -568,7 +568,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_str</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_str</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">}</span>
     <span class="k">else</span><span class="p">:</span>
@@ -577,7 +577,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_float</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_float</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">_sanitize_float_json</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">}</span>
     <span class="k">else</span><span class="p">:</span>
@@ -586,7 +586,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_MaskedConstant</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">MaskedConstant</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_MaskedConstant</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">MaskedConstant</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
     <span class="k">else</span><span class="p">:</span>
@@ -595,7 +595,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_MaskedConstant</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_MaskedConstant</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_save_simple_list_recursive</span><span class="p">(</span><span class="n">x</span><span class="p">[()],</span> <span class="n">externals</span><span class="p">,</span> <span class="n">handle</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -603,7 +603,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_numpy_generic</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">generic</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_numpy_generic</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">generic</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="n">final_type</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">misc</span><span class="o">.</span><span class="n">scalar_exceeds_int32</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
@@ -638,7 +638,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_factor</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Factor</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_factor</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Factor</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="n">nms</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_names</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -670,7 +670,7 @@
 
 
 <span class="nd">@_save_simple_list_recursive</span><span class="o">.</span><span class="n">register</span>
-<span class="k">def</span> <span class="nf">_save_simple_list_recursive_none</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_simple_list_recursive_none</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="n">externals</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;nothing&quot;</span> <span class="p">}</span>
     <span class="k">else</span><span class="p">:</span>
@@ -681,7 +681,7 @@
 <span class="c1">##########################################################################</span>
 
 
-<span class="k">def</span> <span class="nf">_sanitize_float_json</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_sanitize_float_json</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;NaN&quot;</span>
     <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
@@ -691,7 +691,7 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_sanitize_masked_float_json</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_sanitize_masked_float_json</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">return</span> <span class="n">_sanitize_float_json</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -700,7 +700,7 @@
 <span class="c1">##########################################################################</span>
 
 
-<span class="k">def</span> <span class="nf">_save_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">missing_placeholder</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_save_scalar_hdf5</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">missing_placeholder</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="n">handle</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;uzuki_object&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;vector&quot;</span>
 
     <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">:</span>
@@ -753,7 +753,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=ff822928"></script>
+</div><script src="../../_static/documentation_options.js?v=5bfaad31"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
