@@ -5,6 +5,7 @@
 - Bugfix for the `read_object()` dispatcher on `ranged_summarized_experiment`.
 - Implemented `validate_directory()` to validate all objects in a directory.
 - Implemented `list_objects()` to list all objects in a directory.
+- Removed unnecessary dependency on **dolomite-schemas**. 
 
 ## Version 0.4.2
 
