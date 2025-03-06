@@ -17,7 +17,7 @@ read_object_registry = {
     "sequence_information": "dolomite_ranges.read_sequence_information",
     
     "summarized_experiment": "dolomite_se.read_summarized_experiment",
-    "range_summarized_experiment": "dolomite_se.read_ranged_summarized_experiment",
+    "ranged_summarized_experiment": "dolomite_se.read_ranged_summarized_experiment",
     
     "single_cell_experiment": "dolomite_sce.read_single_cell_experiment",
     
