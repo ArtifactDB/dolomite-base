@@ -34,7 +34,7 @@ class build_ext(build_ext_orig):
             cmd = [ 
                 "cmake", 
                 "-S", "lib",
-                "-B", build_temp,
+                "-B", str(build_temp),
                 "-Dpybind11_DIR=" + os.path.join(os.path.dirname(pybind11.__file__), "share", "cmake", "pybind11"),
                 "-DPYTHON_EXECUTABLE=" + sys.executable
             ]
@@ -47,7 +47,7 @@ class build_ext(build_ext_orig):
             self.spawn(cmd)
 
         if not self.dry_run:
-            cmd = ['cmake', '--build', build_temp]
+            cmd = ['cmake', '--build', str(build_temp)]
             if os.name == "nt":
                 cmd += ["--config", "Release"]
             self.spawn(cmd)

@@ -44,14 +44,42 @@ def read_atomic_vector(path: str, metadata: dict, atomic_vector_use_numeric_1dar
     with h5py.File(os.path.join(path, "contents.h5"), "r") as handle:
         ghandle = handle["atomic_vector"]
         vectype = strings.load_scalar_string_attribute_from_hdf5(ghandle, "type")
-        dhandle = ghandle["values"]
 
-        expected_type = misc.translate_type(vectype)
-        output = load_vector_from_hdf5(dhandle, expected_type, atomic_vector_use_numeric_1darray)
+        if vectype == "vls":
+            pset = ghandle["pointers"]
+            placeholder = None 
+            if "missing-value-placeholder" in pset.attrs:
+                placeholder = strings.load_scalar_string_attribute_from_hdf5(mset, "missing-value-placeholder")
+
+            heap = ghandle["heap"]
+            all_pointers = pset[:]
+            all_heap = heap[:]
+            output = [None] * len(all_pointers)
+            for i, payload in enumerate(all_pointers):
+                start, length = payload
+                output[i] = bytes(all_heap[start:start + length]).decode("UTF-8")
+
+            if atomic_vector_use_numeric_1darray:
+                output = numpy.array(output)
+                if placeholder is not None:
+                    mask = output == placeholder
+                    output = numpy.ma.MaskedArray(output, mask=mask)
+            else:
+                if placeholder is not None:
+                    for j, y in enumerate(output):
+                        if y == placeholder:
+                            output[j] = None
+                output = StringList(output)
+
+        else:
+            dhandle = ghandle["values"]
+            expected_type = misc.translate_type(vectype)
+            output = load_vector_from_hdf5(dhandle, expected_type, atomic_vector_use_numeric_1darray)
 
         if "names" in ghandle:
             if isinstance(output, NamedList):
                 output.set_names(strings.load_string_vector_from_hdf5(ghandle["names"]), in_place=True)
             else:
                 warnings.warn("skipping names when reading atomic vectors as 1-dimensional NumPy arrays")
+
         return output
