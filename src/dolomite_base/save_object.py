@@ -14,6 +14,12 @@ _save_object_implementations = {
     "csr_matrix": "dolomite_matrix",
     "coo_matrix": "dolomite_matrix",
     "DelayedArray": "dolomite_matrix",
+
+    "SummarizedExperiment": "dolomite_se",
+    "RangedSummarizedExperiment": "dolomite_se",
+
+    "SingleCellExperiment": "dolomite_sce",
+    "MultiAssayExperiment": "dolomite_mae"
 }
 
 
