@@ -49,7 +49,7 @@ def read_atomic_vector(path: str, metadata: dict, atomic_vector_use_numeric_1dar
             pset = ghandle["pointers"]
             placeholder = None 
             if "missing-value-placeholder" in pset.attrs:
-                placeholder = strings.load_scalar_string_attribute_from_hdf5(mset, "missing-value-placeholder")
+                placeholder = strings.load_scalar_string_attribute_from_hdf5(pset, "missing-value-placeholder")
 
             heap = ghandle["heap"]
             all_pointers = pset[:]

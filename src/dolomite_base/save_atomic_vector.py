@@ -100,7 +100,7 @@ def save_atomic_vector_from_string_list(x: StringList, path: str, string_list_vl
         else:
             # No VLS is a lot simpler as it's handled by h5py.
             ghandle.attrs["type"] = "string"
-            dset = handle.create_dataset(name, data=tmp, dtype="S" + str(maxed), compression="gzip", chunks=True)
+            dset = ghandle.create_dataset("values", data=x_encoded, dtype="S" + str(maxed), compression="gzip", chunks=True)
             if has_missing:
                 dset.attrs["missing-value-placeholder"] = placeholder
 
