@@ -361,3 +361,48 @@ def test_data_frame_metadata():
     dl.save_object(df2, dir)
     roundtrip = dl.read_object(dir)
     assert roundtrip.get_column_data(with_names = False).get_row_names() is None
+
+
+def test_data_frame_string_vls():
+    df = BiocFrame({ "A": StringList([1,"2"*100,3,"4"*50]) })
+    dir = os.path.join(mkdtemp(), "temp")
+    dl.save_object(df, dir, data_frame_string_list_vls = True)
+    roundtrip = dl.read_object(dir)
+    assert roundtrip.get_column("A") == df.get_column("A")
+
+    # Works with NumPy arrays.
+    df = BiocFrame({ "A": np.array(["1","2"*100,"3","4"*50]) })
+    dir = os.path.join(mkdtemp(), "temp")
+    dl.save_object(df, dir, data_frame_string_list_vls = True)
+    roundtrip = dl.read_object(dir)
+    assert roundtrip.get_column("A") == StringList(df.get_column("A"))
+
+    # Works with masked NumPy arrays.
+    df = BiocFrame({ "A": np.ma.array(["1","2"*100,"3","4"*50], mask=[False, False, True, False]) })
+    dir = os.path.join(mkdtemp(), "temp")
+    dl.save_object(df, dir, data_frame_string_list_vls = True)
+    roundtrip = dl.read_object(dir)
+    copy = list(df.get_column("A"))
+    copy[2] = None
+    assert roundtrip.get_column("A").as_list() == copy
+
+    # Works with regular lists.
+    df = BiocFrame({ "A": [1,"2"*100,3,"4"*50] })
+    dir = os.path.join(mkdtemp(), "temp")
+    dl.save_object(df, dir, data_frame_string_list_vls = True)
+    roundtrip = dl.read_object(dir)
+    assert roundtrip.get_column("A").as_list() == df.get_column("A")
+
+    # Adding some missing values.
+    df = BiocFrame({ "A": StringList([1,"2"*100,None,"4"*50]) })
+    dir = os.path.join(mkdtemp(), "temp")
+    dl.save_object(df, dir, data_frame_string_list_vls = True)
+    roundtrip = dl.read_object(dir)
+    assert roundtrip.get_column("A") == df.get_column("A")
+
+    # Auto-detection works as expected.
+    df = BiocFrame({ "A": StringList([1,"2"*100,3,"4"*50]) })
+    dir = os.path.join(mkdtemp(), "temp")
+    dl.save_object(df, dir, data_frame_string_list_vls = None)
+    roundtrip = dl.read_object(dir)
+    assert roundtrip.get_column("A") == df.get_column("A")

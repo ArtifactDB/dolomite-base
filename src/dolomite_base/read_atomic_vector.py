@@ -44,14 +44,18 @@ def read_atomic_vector(path: str, metadata: dict, atomic_vector_use_numeric_1dar
     with h5py.File(os.path.join(path, "contents.h5"), "r") as handle:
         ghandle = handle["atomic_vector"]
         vectype = strings.load_scalar_string_attribute_from_hdf5(ghandle, "type")
-        dhandle = ghandle["values"]
 
-        expected_type = misc.translate_type(vectype)
-        output = load_vector_from_hdf5(dhandle, expected_type, atomic_vector_use_numeric_1darray)
+        if vectype == "vls":
+            output = strings.read_vls(ghandle, "pointers", "heap", as_numpy=atomic_vector_use_numeric_1darray)
+        else:
+            dhandle = ghandle["values"]
+            expected_type = misc.translate_type(vectype)
+            output = load_vector_from_hdf5(dhandle, expected_type, atomic_vector_use_numeric_1darray)
 
         if "names" in ghandle:
             if isinstance(output, NamedList):
                 output.set_names(strings.load_string_vector_from_hdf5(ghandle["names"]), in_place=True)
             else:
                 warnings.warn("skipping names when reading atomic vectors as 1-dimensional NumPy arrays")
+
         return output

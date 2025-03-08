@@ -174,3 +174,45 @@ def test_boolean_list_names():
     roundtrip = dl.read_object(dir)
     assert isinstance(roundtrip, BooleanList)
     assert roundtrip == sl
+
+
+def test_string_list_vls():
+    sl = StringList([1,"2"*100,3,"4"*50])
+    dir = os.path.join(mkdtemp(), "temp")
+    dl.save_object(sl, dir, string_list_vls = True)
+    roundtrip = dl.read_object(dir)
+    assert roundtrip == sl
+    roundtrip = dl.read_object(dir, atomic_vector_use_numeric_1darray=True)
+    assert isinstance(roundtrip, numpy.ndarray)
+    assert StringList(roundtrip) == sl
+
+    # Adding some names 
+    sl = StringList([1,"2"*100,3,"4"*50])
+    sl = sl.set_names(["A", "B", "C", "D"])
+    dir = os.path.join(mkdtemp(), "temp")
+    dl.save_object(sl, dir, string_list_vls = True)
+    roundtrip = dl.read_object(dir)
+    assert roundtrip == sl
+
+    # Adding some missing values.
+    sl = StringList([1,"2"*100,None,"4"*50])
+    dir = os.path.join(mkdtemp(), "temp")
+    dl.save_object(sl, dir, string_list_vls = True)
+    roundtrip = dl.read_object(dir)
+    assert roundtrip == sl
+    roundtrip = dl.read_object(dir, atomic_vector_use_numeric_1darray=True)
+    assert isinstance(roundtrip, numpy.ma.MaskedArray)
+    assert list(numpy.where(roundtrip.mask)[0]) == [2]
+    converted = StringList(roundtrip)
+    converted[2] = None
+    assert converted == sl
+
+    # Auto-detection works as expected.
+    sl = StringList([1,"2"*100,3,"4"*50])
+    dir = os.path.join(mkdtemp(), "temp")
+    dl.save_object(sl, dir, string_list_vls = None)
+    roundtrip = dl.read_object(dir)
+    assert roundtrip == sl
+    roundtrip = dl.read_object(dir, atomic_vector_use_numeric_1darray=True)
+    assert isinstance(roundtrip, numpy.ndarray)
+    assert StringList(roundtrip) == sl

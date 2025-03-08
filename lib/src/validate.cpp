@@ -13,6 +13,7 @@ std::shared_ptr<millijson::Base> convert_to_millijson(const pybind11::handle& x)
     } else if (pybind11::isinstance<pybind11::float_>(x)) {
         output.reset(new millijson::Number(pybind11::cast<double>(x)));
     } else if (pybind11::isinstance<pybind11::str>(x)) {
+        std::cout << new millijson::String(pybind11::cast<std::string>(x)) << std::endl;
         output.reset(new millijson::String(pybind11::cast<std::string>(x)));
     } else if (pybind11::isinstance<pybind11::list>(x)) {
         auto y = pybind11::reinterpret_borrow<pybind11::list>(x);
