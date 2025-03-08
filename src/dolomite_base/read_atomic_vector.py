@@ -46,31 +46,7 @@ def read_atomic_vector(path: str, metadata: dict, atomic_vector_use_numeric_1dar
         vectype = strings.load_scalar_string_attribute_from_hdf5(ghandle, "type")
 
         if vectype == "vls":
-            pset = ghandle["pointers"]
-            placeholder = None 
-            if "missing-value-placeholder" in pset.attrs:
-                placeholder = strings.load_scalar_string_attribute_from_hdf5(pset, "missing-value-placeholder")
-
-            heap = ghandle["heap"]
-            all_pointers = pset[:]
-            all_heap = heap[:]
-            output = [None] * len(all_pointers)
-            for i, payload in enumerate(all_pointers):
-                start, length = payload
-                output[i] = bytes(all_heap[start:start + length]).decode("UTF-8")
-
-            if atomic_vector_use_numeric_1darray:
-                output = numpy.array(output)
-                if placeholder is not None:
-                    mask = output == placeholder
-                    output = numpy.ma.MaskedArray(output, mask=mask)
-            else:
-                if placeholder is not None:
-                    for j, y in enumerate(output):
-                        if y == placeholder:
-                            output[j] = None
-                output = StringList(output)
-
+            output = strings.read_vls(ghandle, "pointers", "heap", as_numpy=atomic_vector_use_numeric_1darray)
         else:
             dhandle = ghandle["values"]
             expected_type = misc.translate_type(vectype)

@@ -182,44 +182,17 @@ def _process_list_column_for_hdf5(x: list, index: int, output: Hdf5ColumnOutput)
 
 
 def _process_string_column_for_hdf5(x_encoded: list, index: int, placeholder: Optional[str], output: Hdf5ColumnOutput):
-    maxed = 1
-    total = 0
-    for b in x_encoded:
-        bn = len(b)
-        total += bn
-        if bn > maxed:
-            maxed = bn
-
     # Deciding whether to use the custom VLS layout. Note that we use 2
     # uint64's to store the pointer for each string, hence the 16.
-    nstr = len(x_encoded)
+    maxed, total = strings.collect_stats(x_encoded)
     use_vls = output.use_vls
     if use_vls is None:
-        use_vls = (maxed * nstr > total + nstr * 16)
+        use_vls = strings.use_vls(maxed, total, len(x_encoded))
 
     if use_vls:
         ghandle = output.handle.create_group(str(index))
+        strings.dump_vls(ghandle, x_encoded, placeholder)
         ghandle.attrs["type"] = "vls"
-
-        pointers = [None] * nstr
-        cumulative = 0
-        for i, b in enumerate(x_encoded):
-            bn = len(b)
-            pointers[i] = (cumulative, bn)
-            cumulative += bn
-
-        dtype = numpy.dtype([('offset', 'u8'), ('length', 'u8')])
-        pset = ghandle.create_dataset("pointers", data=pointers, dtype=dtype, compression="gzip", chunks=True)
-        if placeholder is not None:
-            pset.attrs["missing-value-placeholder"] = placeholder
-
-        heap = numpy.ndarray(cumulative, dtype=numpy.dtype("u1"))
-        cumulative = 0
-        for i, b in enumerate(x_encoded):
-            start = cumulative
-            cumulative += len(b)
-            heap[start:cumulative] = list(b)
-        ghandle.create_dataset("heap", data=heap, dtype='u1', compression="gzip", chunks=True)
 
     else:
         # No VLS is a lot simpler as it's handled by h5py.

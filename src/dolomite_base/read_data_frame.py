@@ -56,10 +56,7 @@ def read_data_frame(path: str, metadata: dict, data_frame_represent_numeric_colu
                 if curtype == "factor":
                     contents[col] = load_factor_from_hdf5(xhandle)
                 elif curtype == "vls":
-                    contents[col] = _read_vls_data_frame_column(
-                        xhandle,
-                        data_frame_represent_numeric_column_as_1darray
-                    )
+                    contents[col] = strings.read_vls(xhandle, "pointers", "heap", as_numpy=False)
                 else:
                     expected_type = misc.translate_type(curtype)
                     contents[col] = load_vector_from_hdf5(
@@ -84,25 +81,3 @@ def read_data_frame(path: str, metadata: dict, data_frame_represent_numeric_colu
         df.set_column_data(alt_read_object(mcol_dir, **kwargs), in_place=True)
 
     return df
-
-
-def _read_vls_data_frame_column(ghandle: h5py.Group, data_frame_represent_numeric_column_as_1darray: bool): 
-    pset = ghandle["pointers"]
-    placeholder = None 
-    if "missing-value-placeholder" in pset.attrs:
-        placeholder = strings.load_scalar_string_attribute_from_hdf5(pset, "missing-value-placeholder")
-
-    heap = ghandle["heap"]
-    all_pointers = pset[:]
-    all_heap = heap[:]
-    output = [None] * len(all_pointers)
-    for i, payload in enumerate(all_pointers):
-        start, length = payload
-        output[i] = bytes(all_heap[start:start + length]).decode("UTF-8")
-
-    if placeholder is not None:
-        for j, y in enumerate(output):
-            if y == placeholder:
-                output[j] = None
-
-    return biocutils.StringList(output)

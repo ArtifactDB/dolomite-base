@@ -38,16 +38,15 @@ def save_atomic_vector_from_string_list(x: StringList, path: str, string_list_vl
     save_object_file(path, "atomic_vector", { "atomic_vector": { "version": "1.1" } })
 
     # Gathering some preliminary statistics.
-    has_missing = False
+    placeholder = None
     for val in x:
         if val is None:
-            has_missing = True
-    if has_missing:
-        placeholder = ch.choose_missing_string_placeholder(x)
-        placeholder_encoded = placeholder.encode("UTF-8")
+            placeholder = ch.choose_missing_string_placeholder(x)
+            placeholder_encoded = placeholder.encode("UTF-8")
+            break
 
     x_encoded = [None] * len(x)
-    if has_missing:
+    if placeholder is not None:
         for i, val in enumerate(x):
             if val is None:
                 x_encoded[i] = placeholder_encoded
@@ -57,51 +56,23 @@ def save_atomic_vector_from_string_list(x: StringList, path: str, string_list_vl
         for i, val in enumerate(x):
             x_encoded[i] = val.encode("UTF-8")
 
-    maxed = 1
-    total = 0
-    for b in x_encoded:
-        bn = len(b)
-        total += bn
-        if bn > maxed:
-            maxed = bn
-
     with h5py.File(os.path.join(path, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("atomic_vector")
 
         # Deciding whether to use the custom VLS layout. Note that we use 2
         # uint64's to store the pointer for each string, hence the 16.
-        nstr = len(x_encoded)
+        maxed, total = strings.collect_stats(x_encoded)
         if string_list_vls is None:
-            string_list_vls = (maxed * nstr > total + nstr * 16)
+            string_list_vls = strings.use_vls(maxed, total, len(x_encoded))
 
         if string_list_vls:
+            strings.dump_vls(ghandle, x_encoded, placeholder=placeholder)
             ghandle.attrs["type"] = "vls"
-            dtype = numpy.dtype([('offset', 'u8'), ('length', 'u8')])
-
-            pointers = [None] * nstr
-            cumulative = 0
-            for i, b in enumerate(x_encoded):
-                bn = len(b)
-                pointers[i] = (cumulative, bn)
-                cumulative += bn
-
-            pset = ghandle.create_dataset("pointers", data=pointers, dtype=dtype, compression="gzip", chunks=True)
-            if has_missing:
-                pset.attrs["missing-value-placeholder"] = placeholder
-            
-            heap = numpy.ndarray(cumulative, dtype=numpy.dtype("u1"))
-            cumulative = 0
-            for i, b in enumerate(x_encoded):
-                start = cumulative
-                cumulative += len(b)
-                heap[start:cumulative] = list(b)
-            ghandle.create_dataset("heap", data=heap, dtype='u1', compression="gzip", chunks=True)
-
         else:
             # No VLS is a lot simpler as it's handled by h5py.
             ghandle.attrs["type"] = "string"
             dset = ghandle.create_dataset("values", data=x_encoded, dtype="S" + str(maxed), compression="gzip", chunks=True)
-            if has_missing:
+            if placeholder is not None:
                 dset.attrs["missing-value-placeholder"] = placeholder
 
         nms = x.get_names()
