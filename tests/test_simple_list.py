@@ -302,3 +302,42 @@ def test_simple_list_named():
     assert roundtrip["factor"].get_names() == everything["factor"].get_names()
     assert list(roundtrip["string"]) == list(everything["string"])
     assert roundtrip["string"].get_names() == everything["string"].get_names()
+
+
+def test_simple_list_vls():
+    everything = {
+        "string": StringList(["A" * 1000, "B" * 100, "C" * 10, "D"])
+    }
+    dir = os.path.join(mkdtemp(), "hdf5")
+    meta = dl.save_object(everything, dir, simple_list_mode="hdf5", simple_list_string_list_vls=True)
+    roundtrip = dl.read_object(dir)
+    assert everything["string"] == roundtrip["string"]
+
+    # Works with some missing values.
+    everything = {
+        "string": StringList(["A" * 1000, "B" * 100, None, "D"])
+    }
+    dir = os.path.join(mkdtemp(), "hdf5")
+    meta = dl.save_object(everything, dir, simple_list_mode="hdf5", simple_list_string_list_vls=True)
+    roundtrip = dl.read_object(dir)
+    assert everything["string"] == roundtrip["string"]
+
+    # Works with auto-choosing.
+    everything = {
+        "string": StringList(["A" * 1000, "B" * 100, None, "D"])
+    }
+    dir = os.path.join(mkdtemp(), "hdf5")
+    meta = dl.save_object(everything, dir, simple_list_mode="hdf5", simple_list_string_list_vls=None)
+    roundtrip = dl.read_object(dir)
+    assert everything["string"] == roundtrip["string"]
+
+    # Works with deeper nesting.
+    everything = {
+        "alpha": [{
+            "bravo": StringList(["A" * 1000, "B" * 100, None, "D"])
+        }]
+    }
+    dir = os.path.join(mkdtemp(), "hdf5")
+    meta = dl.save_object(everything, dir, simple_list_mode="hdf5", simple_list_string_list_vls=True)
+    roundtrip = dl.read_object(dir)
+    assert everything["alpha"][0]["bravo"] == roundtrip["alpha"][0]["bravo"]

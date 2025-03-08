@@ -63,28 +63,28 @@ def use_vls(maxed: int, total: int, nstr: int) -> bool:
     return (maxed * nstr > total + nstr * 16)
 
 
-def dump_vls(ghandle: h5py.Group, x_encoded: list, placeholder: Optional[str]):
+def dump_vls(ghandle: h5py.Group, pointers: str, heap: str, x_encoded: list, placeholder: Optional[str]):
     dtype = numpy.dtype([('offset', 'u8'), ('length', 'u8')])
 
     nstr = len(x_encoded)
-    pointers = [None] * nstr
+    x_pointers = [None] * nstr
     cumulative = 0
     for i, b in enumerate(x_encoded):
         bn = len(b)
-        pointers[i] = (cumulative, bn)
+        x_pointers[i] = (cumulative, bn)
         cumulative += bn
 
-    phandle = ghandle.create_dataset("pointers", data=pointers, dtype=dtype, compression="gzip", chunks=True)
+    phandle = ghandle.create_dataset(pointers, data=x_pointers, dtype=dtype, compression="gzip", chunks=True)
     if placeholder is not None:
         phandle.attrs["missing-value-placeholder"] = placeholder
 
-    heap = numpy.ndarray(cumulative, dtype=numpy.dtype("u1"))
+    x_heap = numpy.ndarray(cumulative, dtype=numpy.dtype("u1"))
     cumulative = 0
     for i, b in enumerate(x_encoded):
         start = cumulative
         cumulative += len(b)
-        heap[start:cumulative] = list(b)
-    ghandle.create_dataset("heap", data=heap, dtype='u1', compression="gzip", chunks=True)
+        x_heap[start:cumulative] = list(b)
+    ghandle.create_dataset(heap, data=x_heap, dtype='u1', compression="gzip", chunks=True)
 
 
 def read_vls(ghandle: h5py.Group, pointers: str, heap: str, as_numpy: bool):

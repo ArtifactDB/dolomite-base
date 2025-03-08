@@ -191,7 +191,7 @@ def _process_string_column_for_hdf5(x_encoded: list, index: int, placeholder: Op
 
     if use_vls:
         ghandle = output.handle.create_group(str(index))
-        strings.dump_vls(ghandle, x_encoded, placeholder)
+        strings.dump_vls(ghandle, "pointers", "heap", x_encoded, placeholder)
         ghandle.attrs["type"] = "vls"
 
     else:

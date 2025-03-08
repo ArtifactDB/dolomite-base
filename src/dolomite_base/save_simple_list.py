@@ -11,6 +11,7 @@ import h5py
 from .save_object import save_object, validate_saves
 from .save_object_file import save_object_file
 from .alt_save_object import alt_save_object
+from . import choose_missing_placeholder as ch
 from . import _utils_misc as misc
 from . import _utils_string as strings
 from . import write_vector_to_hdf5 as write
@@ -18,7 +19,7 @@ from . import write_vector_to_hdf5 as write
 
 @save_object.register
 @validate_saves
-def save_simple_list_from_dict(x: dict, path: str, simple_list_mode: Literal["hdf5", "json"] = "json", **kwargs):
+def save_simple_list_from_dict(x: dict, path: str, simple_list_mode: Literal["hdf5", "json"] = "json", simple_list_string_list_vls: bool = False, **kwargs):
     """Method for saving dictionaries (Python analogues to R-style named lists)
     to the corresponding file representations, see
     :py:meth:`~dolomite_base.save_object.save_object` for details.
@@ -39,13 +40,13 @@ def save_simple_list_from_dict(x: dict, path: str, simple_list_mode: Literal["hd
     Returns:
         `x` is saved to `path`.
     """
-    _save_simple_list_internal(x, path, simple_list_mode, **kwargs)
+    _save_simple_list_internal(x, path, simple_list_mode, simple_list_string_list_vls=simple_list_string_list_vls, **kwargs)
     return
 
 
 @save_object.register
 @validate_saves
-def save_simple_list_from_list(x: list, path: str, simple_list_mode: Literal["hdf5", "json"] = "json", **kwargs):
+def save_simple_list_from_list(x: list, path: str, simple_list_mode: Literal["hdf5", "json"] = "json", simple_list_string_list_vls: bool = False, **kwargs):
     """Method for saving lists (Python analogues to R-style unnamed lists) to
     the corresponding file representations, see
     :py:meth:`~dolomite_base.save_object.save_object` for details.
@@ -66,13 +67,13 @@ def save_simple_list_from_list(x: list, path: str, simple_list_mode: Literal["hd
     Returns:
         `x` is saved to `path`.
     """
-    _save_simple_list_internal(x, path, simple_list_mode, **kwargs)
+    _save_simple_list_internal(x, path, simple_list_mode, simple_list_string_list_vls=simple_list_string_list_vls, **kwargs)
     return
 
 
 @save_object.register
 @validate_saves
-def save_simple_list_from_NamedList(x: NamedList, path: str, simple_list_mode: Literal["hdf5", "json"] = "json", **kwargs):
+def save_simple_list_from_NamedList(x: NamedList, path: str, simple_list_mode: Literal["hdf5", "json"] = "json", simple_list_string_list_vls: bool = False, **kwargs):
     """Method for saving a NamedList to its corresponding file representation,
     see :py:meth:`~dolomite_base.save_object.save_object` for details.
 
@@ -86,20 +87,30 @@ def save_simple_list_from_NamedList(x: NamedList, path: str, simple_list_mode: L
         simple_list_mode: 
             Whether to save in HDF5 or JSON mode.
 
+        simple_list_string_list_vls:
+            Whether to save :py:class:`~biocutils.StringList.StringList` objects of variable-length strings into a custom VLS array format for HDF5.
+            If ``None``, this is automatically determined by comparing the required storage with that of fixed-length strings.
+            Only relevant if ``simple_list_mode = "hdf5"`.
+
         kwargs: 
             Further arguments, ignored.
 
     Returns:
         `x` is saved to `path`.
     """
-    _save_simple_list_internal(x, path, simple_list_mode, **kwargs)
+    _save_simple_list_internal(x, path, simple_list_mode, simple_list_string_list_vls=simple_list_string_list_vls, **kwargs)
     return
 
 
 ##########################################################################
 
 
-def _save_simple_list_internal(x: Union[dict, list, NamedList], path: str, simple_list_mode: Literal["hdf5", "json"] = None, **kwargs):
+def _save_simple_list_internal(
+    x: Union[dict, list, NamedList],
+    path: str,
+    simple_list_mode: Literal["hdf5", "json"] = None,
+    **kwargs
+):
     os.mkdir(path)
 
     format2 = simple_list_mode 
@@ -110,7 +121,7 @@ def _save_simple_list_internal(x: Union[dict, list, NamedList], path: str, simpl
     externals = []
 
     if simple_list_mode == "json":
-        transformed = _save_simple_list_recursive(x, externals, None)
+        transformed = _save_simple_list_recursive(x, externals, None, **kwargs)
         transformed["version"] = "1.2"
         opath = os.path.join(path, "list_contents.json.gz")
         with gzip.open(opath, "wt") as handle:
@@ -120,8 +131,8 @@ def _save_simple_list_internal(x: Union[dict, list, NamedList], path: str, simpl
         opath = os.path.join(path, "list_contents.h5")
         with h5py.File(opath, "w") as handle:
             ghandle = handle.create_group("simple_list")
-            ghandle.attrs["uzuki_version"] = "1.3"
-            _save_simple_list_recursive(x, externals, ghandle)
+            ghandle.attrs["uzuki_version"] = "1.4"
+            _save_simple_list_recursive(x, externals, ghandle, **kwargs)
 
     if len(externals):
         exdir = os.path.join(path, "other_contents")
@@ -132,11 +143,11 @@ def _save_simple_list_internal(x: Union[dict, list, NamedList], path: str, simpl
 
 
 @singledispatch
-def _save_simple_list_recursive(x: Any, externals: list, handle):
-    return _save_simple_list_recursive_Any(x, externals, handle)
+def _save_simple_list_recursive(x: Any, externals: list, handle, **kwargs):
+    return _save_simple_list_recursive_Any(x, externals, handle, **kwargs)
 
 
-def _save_simple_list_recursive_Any(x: Any, externals: list, handle):
+def _save_simple_list_recursive_Any(x: Any, externals: list, handle, **kwargs):
     externals.append(x)
     if handle is None:
         return { "type": "external", "index": len(externals) - 1 }
@@ -147,7 +158,7 @@ def _save_simple_list_recursive_Any(x: Any, externals: list, handle):
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_StringList(x: StringList, externals: list, handle):
+def _save_simple_list_recursive_StringList(x: StringList, externals: list, handle, simple_list_string_list_vls: bool = False, **kwargs):
     nms = x.get_names()
 
     if handle is None:
@@ -157,15 +168,46 @@ def _save_simple_list_recursive_StringList(x: StringList, externals: list, handl
         return output
 
     handle.attrs["uzuki_object"] = "vector"
-    handle.attrs["uzuki_type"] = "string"
-    write.write_string_vector_to_hdf5(handle, "data", x.as_list())
+
+    placeholder = None
+    for val in x:
+        if val is None:
+            placeholder = ch.choose_missing_string_placeholder(x)
+            placeholder_encoded = placeholder.encode("UTF-8")
+            break
+
+    x_encoded = [None] * len(x)
+    if placeholder is not None:
+        for i, val in enumerate(x):
+            if val is None:
+                x_encoded[i] = placeholder_encoded
+            else:
+                x_encoded[i] = val.encode("UTF-8")
+    else:
+        for i, val in enumerate(x):
+            x_encoded[i] = val.encode("UTF-8")
+
+    maxed, total = strings.collect_stats(x_encoded)
+    use_vls = simple_list_string_list_vls
+    if use_vls is None:
+        use_vls = strings.use_vls(maxed, total, len(x_encoded))
+
+    if use_vls:
+        strings.dump_vls(handle, "data", "heap", x_encoded, placeholder=placeholder)
+        handle.attrs["uzuki_type"] = "vls"
+    else:
+        dset = handle.create_dataset("data", data=x_encoded, dtype="S" + str(maxed), compression="gzip", chunks=True)
+        handle.attrs["uzuki_type"] = "string"
+        if placeholder is not None:
+            dset.attrs["missing-value-placeholder"] = placeholder
+
     if nms is not None:
         strings.save_fixed_length_strings(handle, "names", nms.as_list())
     return
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_IntegerList(x: IntegerList, externals: list, handle):
+def _save_simple_list_recursive_IntegerList(x: IntegerList, externals: list, handle, **kwargs):
     nms = x.get_names()
 
     if handle is None:
@@ -189,7 +231,7 @@ def _save_simple_list_recursive_IntegerList(x: IntegerList, externals: list, han
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_FloatList(x: FloatList, externals: list, handle):
+def _save_simple_list_recursive_FloatList(x: FloatList, externals: list, handle, **kwargs):
     nms = x.get_names()
 
     if handle is None:
@@ -208,7 +250,7 @@ def _save_simple_list_recursive_FloatList(x: FloatList, externals: list, handle)
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_BooleanList(x: BooleanList, externals: list, handle):
+def _save_simple_list_recursive_BooleanList(x: BooleanList, externals: list, handle, **kwargs):
     nms = x.get_names()
 
     if handle is None:
@@ -226,24 +268,24 @@ def _save_simple_list_recursive_BooleanList(x: BooleanList, externals: list, han
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_list(x: list, externals: list, handle):
+def _save_simple_list_recursive_list(x: list, externals: list, handle, **kwargs):
     if handle is None:
         vals = []
         collected = { "type": "list", "values": vals }
         for i, y in enumerate(x):
-            vals.append(_save_simple_list_recursive(y, externals, None))
+            vals.append(_save_simple_list_recursive(y, externals, None, **kwargs))
         return collected
     else:
         handle.attrs["uzuki_object"] = "list"
         dhandle = handle.create_group("data")
         for i, y in enumerate(x):
             ghandle = dhandle.create_group(str(i))
-            _save_simple_list_recursive(y, externals, ghandle)
+            _save_simple_list_recursive(y, externals, ghandle, **kwargs)
         return
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_dict(x: dict, externals: list, handle):
+def _save_simple_list_recursive_dict(x: dict, externals: list, handle, **kwargs):
     if handle is None:
         vals = []
         names = []
@@ -252,7 +294,7 @@ def _save_simple_list_recursive_dict(x: dict, externals: list, handle):
             if not isinstance(k, str):
                 warn("converting non-string key with value " + str(k) + " to a string", UserWarning)
             names.append(str(k))
-            vals.append(_save_simple_list_recursive(v, externals, None))
+            vals.append(_save_simple_list_recursive(v, externals, None, **kwargs))
         return collected
     else:
         handle.attrs["uzuki_object"] = "list"
@@ -260,7 +302,7 @@ def _save_simple_list_recursive_dict(x: dict, externals: list, handle):
         names = []
         for k, v in x.items():
             ghandle = dhandle.create_group(str(len(names)))
-            _save_simple_list_recursive(v, externals, ghandle)
+            _save_simple_list_recursive(v, externals, ghandle, **kwargs)
             if not isinstance(k, str):
                 warn("converting non-string key with value " + str(k) + " to a string", UserWarning)
             names.append(str(k))
@@ -269,7 +311,7 @@ def _save_simple_list_recursive_dict(x: dict, externals: list, handle):
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_NamedList(x: NamedList, externals: list, handle):
+def _save_simple_list_recursive_NamedList(x: NamedList, externals: list, handle, **kwargs):
     if x.get_names() is None:
         return _save_simple_list_recursive_list(x.as_list(), externals, handle)
 
@@ -277,20 +319,20 @@ def _save_simple_list_recursive_NamedList(x: NamedList, externals: list, handle)
         vals = []
         collected = { "type": "list", "values": vals, "names": x.get_names().as_list() }
         for v in x.as_list():
-            vals.append(_save_simple_list_recursive(v, externals, None))
+            vals.append(_save_simple_list_recursive(v, externals, None, **kwargs))
         return collected
     else:
         handle.attrs["uzuki_object"] = "list"
         dhandle = handle.create_group("data")
         for i, v in enumerate(x.as_list()):
             ghandle = dhandle.create_group(str(i))
-            _save_simple_list_recursive(v, externals, ghandle)
+            _save_simple_list_recursive(v, externals, ghandle, **kwargs)
         strings.save_fixed_length_strings(handle, "names", x.get_names().as_list())
         return
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_bool(x: bool, externals: list, handle):
+def _save_simple_list_recursive_bool(x: bool, externals: list, handle, **kwargs):
     if handle is None:
         return { "type": "boolean", "values": bool(x) }
     else:
@@ -299,7 +341,7 @@ def _save_simple_list_recursive_bool(x: bool, externals: list, handle):
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_int(x: int, externals: list, handle):
+def _save_simple_list_recursive_int(x: int, externals: list, handle, **kwargs):
     if not misc.scalar_exceeds_int32(x):
         if handle is None:
             return { "type": "integer", "values": int(x) }
@@ -315,7 +357,7 @@ def _save_simple_list_recursive_int(x: int, externals: list, handle):
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_str(x: str, externals: list, handle):
+def _save_simple_list_recursive_str(x: str, externals: list, handle, **kwargs):
     if handle is None:
         return { "type": "string", "values": str(x) }
     else:
@@ -324,7 +366,7 @@ def _save_simple_list_recursive_str(x: str, externals: list, handle):
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_float(x: float, externals: list, handle):
+def _save_simple_list_recursive_float(x: float, externals: list, handle, **kwargs):
     if handle is None:
         return { "type": "number", "values": _sanitize_float_json(x) }
     else:
@@ -333,7 +375,7 @@ def _save_simple_list_recursive_float(x: float, externals: list, handle):
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_MaskedConstant(x: np.ma.core.MaskedConstant, externals: list, handle):
+def _save_simple_list_recursive_MaskedConstant(x: np.ma.core.MaskedConstant, externals: list, handle, **kwargs):
     if handle is None:
         return { "type": "number", "values": None}
     else:
@@ -342,15 +384,15 @@ def _save_simple_list_recursive_MaskedConstant(x: np.ma.core.MaskedConstant, ext
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_MaskedConstant(x: np.ndarray, externals: list, handle):
+def _save_simple_list_recursive_MaskedConstant(x: np.ndarray, externals: list, handle, **kwargs):
     if len(x.shape) == 0:
-        return _save_simple_list_recursive(x[()], externals, handle)
+        return _save_simple_list_recursive(x[()], externals, handle, **kwargs)
     else:
-        return _save_simple_list_recursive_Any(x, externals, handle)
+        return _save_simple_list_recursive_Any(x, externals, handle, **kwargs)
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_numpy_generic(x: np.generic, externals: list, handle):
+def _save_simple_list_recursive_numpy_generic(x: np.generic, externals: list, handle, **kwargs):
     final_type = None
     if np.issubdtype(x.dtype, np.integer):
         if not misc.scalar_exceeds_int32(x):
@@ -385,7 +427,7 @@ def _save_simple_list_recursive_numpy_generic(x: np.generic, externals: list, ha
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_factor(x: Factor, externals: list, handle):
+def _save_simple_list_recursive_factor(x: Factor, externals: list, handle, **kwargs):
     nms = x.get_names()
 
     if handle is None:
@@ -417,7 +459,7 @@ def _save_simple_list_recursive_factor(x: Factor, externals: list, handle):
 
 
 @_save_simple_list_recursive.register
-def _save_simple_list_recursive_none(x: None, externals: list, handle):
+def _save_simple_list_recursive_none(x: None, externals: list, handle, **kwargs):
     if handle is None:
         return { "type": "nothing" }
     else:

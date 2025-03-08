@@ -66,7 +66,7 @@ def save_atomic_vector_from_string_list(x: StringList, path: str, string_list_vl
             string_list_vls = strings.use_vls(maxed, total, len(x_encoded))
 
         if string_list_vls:
-            strings.dump_vls(ghandle, x_encoded, placeholder=placeholder)
+            strings.dump_vls(ghandle, "pointers", "heap", x_encoded, placeholder=placeholder)
             ghandle.attrs["type"] = "vls"
         else:
             # No VLS is a lot simpler as it's handled by h5py.
