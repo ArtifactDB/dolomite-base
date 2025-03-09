@@ -1,4 +1,5 @@
 from biocframe import BiocFrame
+import biocutils
 import h5py
 import os
 
@@ -54,11 +55,22 @@ def read_data_frame(path: str, metadata: dict, data_frame_represent_numeric_colu
                 curtype = strings.load_scalar_string_attribute_from_hdf5(xhandle, "type")
                 if curtype == "factor":
                     contents[col] = load_factor_from_hdf5(xhandle)
+                elif curtype == "vls":
+                    contents[col] = strings.read_vls(xhandle, "pointers", "heap", as_numpy=False)
                 else:
                     expected_type = misc.translate_type(curtype)
-                    contents[col] = load_vector_from_hdf5(xhandle, expected_type, report_1darray=(expected_type != str and data_frame_represent_numeric_column_as_1darray))
+                    contents[col] = load_vector_from_hdf5(
+                        xhandle,
+                        expected_type,
+                        report_1darray=(expected_type != str and data_frame_represent_numeric_column_as_1darray)
+                    )
 
-    df = BiocFrame(contents, number_of_rows=expected_rows, row_names=row_names, column_names=column_names)
+    df = BiocFrame(
+        contents,
+        number_of_rows=expected_rows,
+        row_names=row_names,
+        column_names=column_names
+    )
 
     other_dir = os.path.join(path, "other_annotations")
     if os.path.exists(other_dir):

@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from collections import namedtuple
 from functools import singledispatch
 import os
@@ -13,6 +13,7 @@ from .alt_save_object import alt_save_object
 from . import _utils_string as strings
 from . import write_vector_to_hdf5 as write
 from ._utils_factor import save_factor_to_hdf5
+from . import choose_missing_placeholder as ch
 
 
 @save_object.register
@@ -21,6 +22,7 @@ def save_data_frame(
     path: str, 
     data_frame_convert_list_to_vector: bool = True, 
     data_frame_convert_1darray_to_vector: bool = True, 
+    data_frame_string_list_vls: bool = False,
     **kwargs
 ) -> Dict[str, Any]:
     """Method for saving :py:class:`~biocframe.BiocFrame.BiocFrame`
@@ -51,9 +53,12 @@ def save_data_frame(
             set this flag to ``False`` to save all 1D NumPy arrays as an 
             external "dense array" object instead.
 
+        data_frame_string_list_vls:
+            Whether to save columns of variable-length strings into a custom VLS array format.
+            If ``None``, this is automatically determined by comparing the required storage with that of fixed-length strings.
+
         kwargs: 
-            Further arguments, passed to internal
-            :py:func:`~dolomite_base.alt_save_object.alt_save_object` calls.
+            Further arguments, passed to internal :py:func:`~dolomite_base.alt_save_object.alt_save_object` calls.
 
     Returns:
         `x` is saved to `path`.
@@ -72,7 +77,8 @@ def save_data_frame(
             handle=dhandle, 
             otherable=other, 
             convert_list_to_vector=data_frame_convert_list_to_vector, 
-            convert_1darray_to_vector=data_frame_convert_1darray_to_vector
+            convert_1darray_to_vector=data_frame_convert_1darray_to_vector,
+            use_vls=data_frame_string_list_vls
         )
         for i in range(x.shape[1]):
             _process_column_for_hdf5(x.get_column(i), i, output)
@@ -105,7 +111,16 @@ def save_data_frame(
 ########################################################
 
 
-Hdf5ColumnOutput = namedtuple('Hdf5ColumnOutput', ['handle', 'otherable', 'convert_list_to_vector', 'convert_1darray_to_vector'])
+Hdf5ColumnOutput = namedtuple(
+    'Hdf5ColumnOutput',
+    [
+        'handle',
+        'otherable',
+        'convert_list_to_vector',
+        'convert_1darray_to_vector',
+        'use_vls'
+    ]
+)
 
 
 @singledispatch
@@ -141,8 +156,7 @@ def _process_list_column_for_hdf5(x: list, index: int, output: Hdf5ColumnOutput)
             final_type = None
 
         if final_type == str:
-            dhandle = write.write_string_vector_to_hdf5(output.handle, str(index), x)
-            dhandle.attrs["type"] = "string"
+            _process_column_for_hdf5.registry[StringList](x, index, output)
             return
 
         elif final_type == int:
@@ -167,10 +181,56 @@ def _process_list_column_for_hdf5(x: list, index: int, output: Hdf5ColumnOutput)
     return
 
 
+def _process_string_column_for_hdf5(x_encoded: list, index: int, placeholder: Optional[str], output: Hdf5ColumnOutput):
+    # Deciding whether to use the custom VLS layout. Note that we use 2
+    # uint64's to store the pointer for each string, hence the 16.
+    maxed, total = strings.collect_stats(x_encoded)
+    use_vls = output.use_vls
+    if use_vls is None:
+        use_vls = strings.use_vls(maxed, total, len(x_encoded))
+
+    if use_vls:
+        ghandle = output.handle.create_group(str(index))
+        strings.dump_vls(ghandle, "pointers", "heap", x_encoded, placeholder)
+        ghandle.attrs["type"] = "vls"
+
+    else:
+        # No VLS is a lot simpler as it's handled by h5py.
+        dhandle = output.handle.create_dataset(
+            str(index),
+            data=x_encoded,
+            dtype="S" + str(maxed),
+            compression="gzip",
+            chunks=True
+        )
+        dhandle.attrs["type"] = "string"
+        if placeholder is not None:
+            dhandle.attrs["missing-value-placeholder"] = placeholder
+
+    return
+
+
 @_process_column_for_hdf5.register
 def _process_StringList_column_for_hdf5(x: StringList, index: int, output: Hdf5ColumnOutput):
-    dhandle = write.write_string_vector_to_hdf5(output.handle, str(index), x.as_list())
-    dhandle.attrs["type"] = "string"
+    placeholder = None
+    for val in x:
+        if val is None:
+            placeholder = ch.choose_missing_string_placeholder(x)
+            placeholder_encoded = placeholder.encode("UTF-8")
+            break
+
+    x_encoded = [None] * len(x)
+    if placeholder is not None:
+        for i, val in enumerate(x):
+            if val is None:
+                x_encoded[i] = placeholder_encoded
+            else:
+                x_encoded[i] = val.encode("UTF-8")
+    else:
+        for i, val in enumerate(x):
+            x_encoded[i] = val.encode("UTF-8")
+
+    _process_string_column_for_hdf5(x_encoded, index, placeholder, output)
     return
 
 
@@ -217,8 +277,23 @@ def _process_ndarray_column_for_hdf5(x: numpy.ndarray, index: int, output: Hdf5C
                 dhandle.attrs["type"] = "integer"
 
         elif numpy.issubdtype(x.dtype, numpy.str_):
-            dhandle = write.write_string_vector_to_hdf5(output.handle, str(index), x)
-            dhandle.attrs["type"] = "string"
+            placeholder = None
+            if numpy.ma.is_masked(x) and x.mask.any():
+                placeholder = ch.choose_missing_string_placeholder(x)
+                placeholder_encoded = placeholder.encode("UTF-8")
+
+            x_encoded = [None] * len(x)
+            if placeholder is not None:
+                for i, val in enumerate(x):
+                    if x.mask[i]:
+                        x_encoded[i] = placeholder_encoded
+                    else:
+                        x_encoded[i] = val.encode("UTF-8")
+            else:
+                for i, val in enumerate(x):
+                    x_encoded[i] = val.encode("UTF-8")
+
+            _process_string_column_for_hdf5(x_encoded, index, placeholder, output)
 
         else:
             raise NotImplementedError("cannot save column of type '" + x.dtype.name + "'")
