@@ -8,7 +8,6 @@ from .save_object import save_object, validate_saves
 from .save_object_file import save_object_file
 from . import _utils_string as strings
 from . import write_vector_to_hdf5 as write
-from . import choose_missing_placeholder as ch
 
 
 @save_object.register
@@ -37,33 +36,17 @@ def save_atomic_vector_from_string_list(x: StringList, path: str, string_list_vl
     os.mkdir(path)
     save_object_file(path, "atomic_vector", { "atomic_vector": { "version": "1.1" } })
 
-    # Gathering some preliminary statistics.
-    placeholder = None
-    for val in x:
-        if val is None:
-            placeholder = ch.choose_missing_string_placeholder(x)
-            placeholder_encoded = placeholder.encode("UTF-8")
-            break
+    placeholder = strings.choose_missing_placeholder(x)
+    x_encoded = strings.encode_strings(x, placeholder)
 
-    x_encoded = [None] * len(x)
-    if placeholder is not None:
-        for i, val in enumerate(x):
-            if val is None:
-                x_encoded[i] = placeholder_encoded
-            else:
-                x_encoded[i] = val.encode("UTF-8")
-    else:
-        for i, val in enumerate(x):
-            x_encoded[i] = val.encode("UTF-8")
+    # Deciding whether to use the custom VLS layout. Note that we use 2
+    # uint64's to store the pointer for each string, hence the 16.
+    maxed, total = strings.collect_stats(x_encoded)
+    if string_list_vls is None:
+        string_list_vls = strings.use_vls(maxed, total, len(x_encoded))
 
     with h5py.File(os.path.join(path, "contents.h5"), "w") as handle:
         ghandle = handle.create_group("atomic_vector")
-
-        # Deciding whether to use the custom VLS layout. Note that we use 2
-        # uint64's to store the pointer for each string, hence the 16.
-        maxed, total = strings.collect_stats(x_encoded)
-        if string_list_vls is None:
-            string_list_vls = strings.use_vls(maxed, total, len(x_encoded))
 
         if string_list_vls:
             strings.dump_vls(ghandle, "pointers", "heap", x_encoded, placeholder=placeholder)

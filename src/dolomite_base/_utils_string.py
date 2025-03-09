@@ -1,7 +1,9 @@
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Sequence
 import h5py
 import numpy
 import biocutils
+
+from . import choose_missing_placeholder as ch
 
 
 def save_fixed_length_strings(handle: h5py.Group, name: str, x: List[str]) -> h5py.Dataset:
@@ -46,6 +48,28 @@ def load_scalar_string_attribute_from_hdf5(handle, name: str) -> str:
     if isinstance(output, (bytes, numpy.bytes_)):
         output = output.decode("UTF-8")
     return output
+
+
+def choose_missing_placeholder(x: Sequence) -> Optional[str]:
+    for val in x:
+        if val is None:
+            return ch.choose_missing_string_placeholder(x)
+    return None
+
+
+def encode_strings(x: Sequence, placeholder: Optional[str]) -> list:
+    x_encoded = [None] * len(x)
+    if placeholder is not None:
+        placeholder_encoded = placeholder.encode("UTF-8")
+        for i, val in enumerate(x):
+            if val is None:
+                x_encoded[i] = placeholder_encoded
+            else:
+                x_encoded[i] = val.encode("UTF-8")
+    else:
+        for i, val in enumerate(x):
+            x_encoded[i] = val.encode("UTF-8")
+    return x_encoded
 
 
 def collect_stats(x_encoded: list) -> Tuple:

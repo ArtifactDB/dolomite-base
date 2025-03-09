@@ -11,7 +11,6 @@ import h5py
 from .save_object import save_object, validate_saves
 from .save_object_file import save_object_file
 from .alt_save_object import alt_save_object
-from . import choose_missing_placeholder as ch
 from . import _utils_misc as misc
 from . import _utils_string as strings
 from . import write_vector_to_hdf5 as write
@@ -169,23 +168,8 @@ def _save_simple_list_recursive_StringList(x: StringList, externals: list, handl
 
     handle.attrs["uzuki_object"] = "vector"
 
-    placeholder = None
-    for val in x:
-        if val is None:
-            placeholder = ch.choose_missing_string_placeholder(x)
-            placeholder_encoded = placeholder.encode("UTF-8")
-            break
-
-    x_encoded = [None] * len(x)
-    if placeholder is not None:
-        for i, val in enumerate(x):
-            if val is None:
-                x_encoded[i] = placeholder_encoded
-            else:
-                x_encoded[i] = val.encode("UTF-8")
-    else:
-        for i, val in enumerate(x):
-            x_encoded[i] = val.encode("UTF-8")
+    placeholder = strings.choose_missing_placeholder(x)
+    x_encoded = strings.encode_strings(x, placeholder)
 
     maxed, total = strings.collect_stats(x_encoded)
     use_vls = simple_list_string_list_vls

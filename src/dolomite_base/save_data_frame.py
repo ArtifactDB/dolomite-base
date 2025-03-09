@@ -212,24 +212,8 @@ def _process_string_column_for_hdf5(x_encoded: list, index: int, placeholder: Op
 
 @_process_column_for_hdf5.register
 def _process_StringList_column_for_hdf5(x: StringList, index: int, output: Hdf5ColumnOutput):
-    placeholder = None
-    for val in x:
-        if val is None:
-            placeholder = ch.choose_missing_string_placeholder(x)
-            placeholder_encoded = placeholder.encode("UTF-8")
-            break
-
-    x_encoded = [None] * len(x)
-    if placeholder is not None:
-        for i, val in enumerate(x):
-            if val is None:
-                x_encoded[i] = placeholder_encoded
-            else:
-                x_encoded[i] = val.encode("UTF-8")
-    else:
-        for i, val in enumerate(x):
-            x_encoded[i] = val.encode("UTF-8")
-
+    placeholder = strings.choose_missing_placeholder(x)
+    x_encoded = strings.encode_strings(x, placeholder)
     _process_string_column_for_hdf5(x_encoded, index, placeholder, output)
     return
 
@@ -280,10 +264,10 @@ def _process_ndarray_column_for_hdf5(x: numpy.ndarray, index: int, output: Hdf5C
             placeholder = None
             if numpy.ma.is_masked(x) and x.mask.any():
                 placeholder = ch.choose_missing_string_placeholder(x)
-                placeholder_encoded = placeholder.encode("UTF-8")
 
             x_encoded = [None] * len(x)
             if placeholder is not None:
+                placeholder_encoded = placeholder.encode("UTF-8")
                 for i, val in enumerate(x):
                     if x.mask[i]:
                         x_encoded[i] = placeholder_encoded
