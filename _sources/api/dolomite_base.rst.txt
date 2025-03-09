@@ -28,14 +28,6 @@ dolomite\_base.choose\_missing\_placeholder module
    :show-inheritance:
    :undoc-members:
 
-dolomite\_base.lib\_dolomite\_base module
------------------------------------------
-
-.. automodule:: dolomite_base.lib_dolomite_base
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
 dolomite\_base.list\_objects module
 -----------------------------------
 
