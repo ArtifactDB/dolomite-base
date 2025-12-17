@@ -41,4 +41,4 @@ jobs:
         run: |
           export DOLOMITE_INSTALLED_PATH=$(pwd)/installed
           pip install tox
-          tox
+          tox -vvv
