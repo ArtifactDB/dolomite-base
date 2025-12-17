@@ -243,11 +243,11 @@ struct PythonExternals {
 /** General methods. **/
 
 pybind11::object load_list_json(std::string path, pybind11::list children) {
-    auto parsed = uzuki2::json::parse_file<PythonProvisioner>(path, PythonExternals(children));
+    auto parsed = uzuki2::json::parse_file<PythonProvisioner>(path, PythonExternals(children), {});
     return dynamic_cast<PythonBase*>(parsed.get())->extract();
 }
 
 pybind11::object load_list_hdf5(std::string path, std::string name, pybind11::list children) {
-    auto parsed = uzuki2::hdf5::parse<PythonProvisioner>(path, name, PythonExternals(children));
+    auto parsed = uzuki2::hdf5::parse<PythonProvisioner>(path, name, PythonExternals(children), {});
     return dynamic_cast<PythonBase*>(parsed.get())->extract();
 }
