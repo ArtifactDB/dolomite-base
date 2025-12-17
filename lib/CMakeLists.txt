@@ -8,6 +8,7 @@ project(dolomite_base
 # Defining the targets.
 set(TARGET dolomite_base)
 
+find_package(Python ${PYBIND11_PYTHON_VERSION} EXACT COMPONENTS Interpreter Development)
 find_package(pybind11 CONFIG REQUIRED)
 
 # pybind11 method:
@@ -19,7 +20,11 @@ pybind11_add_module(${TARGET}
 
 set_property(TARGET ${TARGET} PROPERTY CXX_STANDARD 17)
 
-# Need to set this to get access to filesystem.
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(dolomite_base PRIVATE -Wall -Wpedantic -Wextra)
+endif()
+
+# Need to set this to get access to std::filesystem.
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version" FORCE)
 
 target_include_directories(${TARGET} PRIVATE "${ASSORTHEAD_INCLUDE_DIR}")
@@ -40,7 +45,3 @@ set_target_properties(${TARGET} PROPERTIES
     OUTPUT_NAME lib_dolomite_base
     PREFIX ""
 )
-
-if(MSVC)
-    target_compile_definitions(${TARGET} PRIVATE H5_BUILT_AS_DYNAMIC_LIB=1)
-endif()

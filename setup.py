@@ -8,11 +8,7 @@
 """
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext as build_ext_orig
-from glob import glob
-import pathlib
 import os
-import shutil
-import sys
 
 
 def define_install_dir():
@@ -215,6 +211,7 @@ class build_ext(build_ext_orig):
         build_libaec(self)
         install_dir = build_hdf5(self)
 
+        import pathlib
         build_temp = pathlib.Path(self.build_temp)
         build_lib = pathlib.Path(self.build_lib)
         outpath = os.path.join(build_lib.absolute(), ext.name)
@@ -222,12 +219,13 @@ class build_ext(build_ext_orig):
         if not os.path.exists(build_temp):
             import assorthead
             import pybind11
+            import sys
             cmd = [ 
                 "cmake", 
                 "-S", "lib",
                 "-B", str(build_temp),
                 "-Dpybind11_DIR=" + os.path.join(os.path.dirname(pybind11.__file__), "share", "cmake", "pybind11"),
-                "-DPYTHON_EXECUTABLE=" + sys.executable,
+                "-DPYBIND11_PYTHON_VERSION=" + str(sys.version_info.major) + "." + str(sys.version_info.minor) + "." + str(sys.version_info.micro),
                 "-DASSORTHEAD_INCLUDE_DIR=" + assorthead.includes(),
                 "-DCMAKE_PREFIX_PATH=" + install_dir
             ]
@@ -245,6 +243,7 @@ class build_ext(build_ext_orig):
                 cmd += ["--config", "Release"]
             self.spawn(cmd)
             if os.name == "nt": 
+                import shutil
                 # Gave up trying to get MSVC to respect the output directory.
                 # Delvewheel also needs it to have a 'pyd' suffix... whatever.
                 shutil.copyfile(os.path.join(build_temp, "Release", "_core.dll"), os.path.join(outpath, "_core.pyd"))
