@@ -14,31 +14,33 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: 3.12
+          python-version: 3.14
           cache: 'pip'
 
-      - name: Set up HDF5
-        run: |
-          sudo apt-get update
-          sudo apt-get install libhdf5-dev
+      - name: Get latest CMake
+        uses: lukka/get-cmake@latest
 
-      - name: Install Python dependencies
+      - name: Cache installed
+        uses: actions/cache@v4
+        with:
+          path: installed
+          key: installed-${{ matrix.os }}-${{ matrix.python-version }}
+
+      - name: Set up dependencies
         run: |
-          python -m pip install --upgrade pip setuptools
-          pip install cmake pybind11 numpy assorthead tox
-          DEPENDENCIES=$(python -c 'from setuptools.config.setupcfg import read_configuration as c; a = c("setup.cfg"); print(" ".join(a["options"]["install_requires"][1:]))')
-          pip install ${DEPENDENCIES}
-          DOCDEPENDENCIES=$(python -c 'with open("docs/requirements.txt") as a: available = list(a); print(" ".join(map(lambda x : x.strip(), filter(lambda x : not x.startswith("#"), available))))')
-          pip install ${DOCDEPENDENCIES}
+            python -m pip install setuptools
+            python -c "import setup; setup.build_zlib(None); setup.build_libaec(None); setup.build_hdf5(None);"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
 
       - name: Build docs
         run: |
-          python setup.py build_ext --inplace
-          cp build/lib*/dolomite_base/lib_dolomite* src/dolomite_base/
           tox -e docs
-          touch ./docs/_build/html/.nojekyll
 
       - name: GH Pages Deployment
         if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')

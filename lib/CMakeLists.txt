@@ -19,6 +19,9 @@ pybind11_add_module(${TARGET}
 
 set_property(TARGET ${TARGET} PROPERTY CXX_STANDARD 17)
 
+# Need to set this to get access to filesystem.
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version" FORCE)
+
 target_include_directories(${TARGET} PRIVATE "${ASSORTHEAD_INCLUDE_DIR}")
 target_link_libraries(${TARGET} PRIVATE pybind11::pybind11)
 
