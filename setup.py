@@ -125,7 +125,7 @@ def build_hdf5(builder):
         "HDF5_ENABLE_ZLIB_SUPPORT=ON",
         "HDF5_ENABLE_SZIP_SUPPORT=ON",
         "HDF5_USE_LIBAEC_STATIC=ON",
-        "CMAKE_PREFIX_PATH=" + install_dir,
+        "CMAKE_PREFIX_PATH=" + install_dir
     ]
     if os.name != "nt":
         cmd.append("-DCMAKE_BUILD_TYPE=Release")
@@ -173,7 +173,8 @@ class build_ext(build_ext_orig):
                 "-B", str(build_temp),
                 "-Dpybind11_DIR=" + os.path.join(os.path.dirname(pybind11.__file__), "share", "cmake", "pybind11"),
                 "-DPYTHON_EXECUTABLE=" + sys.executable,
-                "-DASSORTHEAD_INCLUDE_DIR=" + assorthead.includes()
+                "-DASSORTHEAD_INCLUDE_DIR=" + assorthead.includes(),
+                "-DCMAKE_PREFIX_PATH=" + install_dir
             ]
             if os.name != "nt":
                 cmd.append("-DCMAKE_BUILD_TYPE=Release")
