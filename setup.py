@@ -39,6 +39,8 @@ def build_aec(builder):
     if os.path.exists(install_dir) and os.path.exists(os.path.join(install_dir, ".AEC")):
         return install_dir
 
+    builder = define_custom_builder(builder)
+
     version = "v1.1.4"
     if not os.path.exists("extern"):
         os.mkdir("extern")
@@ -87,6 +89,8 @@ def build_hdf5(builder):
     install_dir = define_install_dir()
     if os.path.exists(install_dir) and os.path.exists(os.path.join(install_dir, ".HDF5")):
         return install_dir
+
+    builder = define_custom_builder(builder)
 
     version = "2.0.0"
     if not os.path.exists("extern"):
