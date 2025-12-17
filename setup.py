@@ -117,15 +117,15 @@ def build_hdf5(builder):
         "-B", build_dir,
         "-DCMAKE_POSITION_INDEPENDENT_CODE=true",
         "-DCMAKE_INSTALL_PREFIX=" + install_dir,
-        "BUILD_TESTING=OFF",
-        "BUILD_SHARED_LIBS=OFF",
-        "HDF5_BUILD_CPP_LIB=ON",
-        "HDF5_BUILD_TOOLS=OFF",
-        "HDF5_BUILD_EXAMPLES=OFF",
-        "HDF5_ENABLE_ZLIB_SUPPORT=ON",
-        "HDF5_ENABLE_SZIP_SUPPORT=ON",
-        "HDF5_USE_LIBAEC_STATIC=ON",
-        "CMAKE_PREFIX_PATH=" + install_dir
+        "-DBUILD_TESTING=OFF",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-DHDF5_BUILD_CPP_LIB=ON",
+        "-DHDF5_BUILD_TOOLS=OFF",
+        "-DHDF5_BUILD_EXAMPLES=OFF",
+        "-DHDF5_ENABLE_ZLIB_SUPPORT=ON",
+        "-DHDF5_ENABLE_SZIP_SUPPORT=ON",
+        "-DHDF5_USE_LIBAEC_STATIC=ON",
+        "-DCMAKE_PREFIX_PATH=" + install_dir
     ]
     if os.name != "nt":
         cmd.append("-DCMAKE_BUILD_TYPE=Release")
