@@ -6,29 +6,39 @@ std::shared_ptr<millijson::Base> convert_to_millijson(const pybind11::handle& x)
 
     if (pybind11::isinstance<pybind11::none>(x)) {
         output.reset(new millijson::Nothing);
+
     } else if (pybind11::isinstance<pybind11::bool_>(x)) {
         output.reset(new millijson::Boolean(pybind11::cast<bool>(x)));
+
     } else if (pybind11::isinstance<pybind11::int_>(x)) {
         output.reset(new millijson::Number(pybind11::cast<double>(x)));
+
     } else if (pybind11::isinstance<pybind11::float_>(x)) {
         output.reset(new millijson::Number(pybind11::cast<double>(x)));
+
     } else if (pybind11::isinstance<pybind11::str>(x)) {
         output.reset(new millijson::String(pybind11::cast<std::string>(x)));
+
     } else if (pybind11::isinstance<pybind11::list>(x)) {
         auto y = pybind11::reinterpret_borrow<pybind11::list>(x);
-        auto aptr = new millijson::Array;
-        output.reset(aptr);
-        for (size_t e = 0, end = y.size(); e < end; ++e) {
-            aptr->add(convert_to_millijson(y[e]));
+        const std::size_t num = y.size();
+        std::vector<std::shared_ptr<millijson::Base> > contents;
+        contents.reserve(num);
+        for (size_t e = 0; e < num; ++e) {
+            contents.push_back(convert_to_millijson(y[e]));
         }
+        output.reset(new millijson::Array(std::move(contents)));
+
     } else if (pybind11::isinstance<pybind11::dict>(x)) {
         auto y = pybind11::reinterpret_borrow<pybind11::dict>(x);
-        auto optr = new millijson::Object;
-        output.reset(optr);
+        std::unordered_map<std::string, std::shared_ptr<millijson::Base> > contents;
+        contents.reserve(y.size());
         for (auto it = y.begin(); it != y.end(); ++it) {
             auto field = pybind11::cast<std::string>(it->first);
-            optr->add(std::move(field), convert_to_millijson(it->second));
+            contents[std::move(field)] = convert_to_millijson(it->second);
         } 
+        output.reset(new millijson::Object(std::move(contents)));
+
     } else {
         throw std::runtime_error("cannot convert unknown python object to JSON");
     }
@@ -40,20 +50,21 @@ pybind11::object convert_to_python(const millijson::Base* x) {
     if (x->type() == millijson::NOTHING) {
         return pybind11::none();
     } else if (x->type() == millijson::BOOLEAN) {
-        return pybind11::bool_(reinterpret_cast<const millijson::Boolean*>(x)->value);
+        return pybind11::bool_(reinterpret_cast<const millijson::Boolean*>(x)->value());
     } else if (x->type() == millijson::NUMBER) {
-        return pybind11::float_(reinterpret_cast<const millijson::Number*>(x)->value);
+        return pybind11::float_(reinterpret_cast<const millijson::Number*>(x)->value());
     } else if (x->type() == millijson::STRING) {
-        return pybind11::str(reinterpret_cast<const millijson::String*>(x)->value);
+        return pybind11::str(reinterpret_cast<const millijson::String*>(x)->value());
     } else if (x->type() == millijson::ARRAY) {
-        const auto& y = reinterpret_cast<const millijson::Array*>(x)->values;
+        const auto& y = reinterpret_cast<const millijson::Array*>(x)->value();
         pybind11::list output(y.size());
         for (size_t i = 0, end = y.size(); i < end; ++i) {
             output[i] = convert_to_python(y[i].get());
         }
         return output;
+
     } else if (x->type() == millijson::OBJECT) {
-        const auto& y = reinterpret_cast<const millijson::Object*>(x)->values;
+        const auto& y = reinterpret_cast<const millijson::Object*>(x)->value();
         pybind11::dict output;
         for (const auto& pair : y) {
             output[pair.first.c_str()] = convert_to_python(pair.second.get());

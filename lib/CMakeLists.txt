@@ -22,8 +22,16 @@ set_property(TARGET ${TARGET} PROPERTY CXX_STANDARD 17)
 target_include_directories(${TARGET} PRIVATE "${ASSORTHEAD_INCLUDE_DIR}")
 target_link_libraries(${TARGET} PRIVATE pybind11::pybind11)
 
+#set(ZLIB_USE_STATIC_LIBS ON)
+#find_package(ZLIB REQUIRED CONFIG CMAKE_FIND_ROOT_PATH_BOTH)
+
 find_package(HDF5 COMPONENTS C CXX REQUIRED)
 target_link_libraries(${TARGET} PRIVATE hdf5::hdf5 hdf5::hdf5_cpp)
+target_link_libraries(${TARGET} PRIVATE libaec::aec-static libaec::sz-static) # Static HDF5 doesn't include its transitive dependencies.
+
+# Need to use find_library() as our new Zlib doesn't come with cmake install scripts.
+find_library(ZLIB_PATH libz.a ${CMAKE_PREFIX_PATH})
+target_link_libraries(${TARGET} PRIVATE ${ZLIB_PATH})
 
 set_target_properties(${TARGET} PROPERTIES
     OUTPUT_NAME lib_dolomite_base
