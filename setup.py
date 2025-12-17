@@ -34,7 +34,59 @@ def define_custom_builder(builder):
     return Tmp()
 
 
-def build_aec(builder):
+def build_zlib(builder):
+    install_dir = define_install_dir()
+    if os.path.exists(install_dir) and os.path.exists(os.path.join(install_dir, ".ZLIB")):
+        return install_dir
+
+    builder = define_custom_builder(builder)
+
+    version = "v1.3.1"
+    if not os.path.exists("extern"):
+        os.mkdir("extern")
+
+    src_dir = os.path.join("extern", "zlib-" + version[1:])
+    if not os.path.exists(src_dir):
+        tarball = os.path.join("extern", "zlib.tar.gz")
+        if not os.path.exists(tarball):
+            import urllib.request
+            target_url = "https://github.com/madler/zlib/releases/download/" + version + "/zlib-" + version[1:] + ".tar.gz"
+            urllib.request.urlretrieve(target_url, tarball)
+        import tarfile
+        with tarfile.open(tarball, "r") as tf:
+            tf.extractall("extern")
+
+    build_dir = os.path.join("extern", "build-zlib-" + version)
+    if not os.path.exists(install_dir):
+        os.mkdir("installed")
+
+    cmd = [
+        "cmake",
+        "-S", src_dir,
+        "-B", build_dir,
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        "-DZLIB_BUILD_EXAMPLES=OFF",
+        "-DCMAKE_INSTALL_PREFIX=" + install_dir
+    ]
+    if os.name != "nt":
+        cmd.append("-DCMAKE_BUILD_TYPE=Release")
+    if "MORE_CMAKE_OPTIONS" in os.environ:
+        cmd += os.environ["MORE_CMAKE_OPTIONS"].split()
+    builder.spawn(cmd)
+
+    cmd = ['cmake', '--build', build_dir]
+    if os.name == "nt":
+        cmd += ["--config", "Release"]
+    builder.spawn(cmd)
+    cmd = ['cmake', '--install', build_dir]
+    builder.spawn(cmd)
+
+    with open(os.path.join(install_dir, ".ZLIB"), "w") as handle:
+        handle.write("")
+    return install_dir
+
+
+def build_libaec(builder):
     install_dir = define_install_dir()
     if os.path.exists(install_dir) and os.path.exists(os.path.join(install_dir, ".AEC")):
         return install_dir
@@ -64,7 +116,8 @@ def build_aec(builder):
         "cmake",
         "-S", src_dir,
         "-B", build_dir,
-        "-DCMAKE_POSITION_INDEPENDENT_CODE=true",
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
+        "-DBUILD_TESTING=OFF",
         "-DCMAKE_INSTALL_PREFIX=" + install_dir
     ]
     if os.name != "nt":
@@ -123,6 +176,7 @@ def build_hdf5(builder):
         "-DHDF5_BUILD_TOOLS=OFF",
         "-DHDF5_BUILD_EXAMPLES=OFF",
         "-DHDF5_ENABLE_ZLIB_SUPPORT=ON",
+        "-DHDF5_USE_ZLIB_STATIC=ON",
         "-DHDF5_ENABLE_SZIP_SUPPORT=ON",
         "-DHDF5_USE_LIBAEC_STATIC=ON",
         "-DCMAKE_PREFIX_PATH=" + install_dir
@@ -157,7 +211,8 @@ class build_ext(build_ext_orig):
             self.build_cmake(ext)
 
     def build_cmake(self, ext):
-        build_aec(self)
+        build_zlib(self)
+        build_libaec(self)
         install_dir = build_hdf5(self)
 
         build_temp = pathlib.Path(self.build_temp)
