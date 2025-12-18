@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 0.5.1
+
+- Build wheels for Python 3.14 and the latest MacOS. 
+
+## Version 0.5.0
+
+- Switch to HDF5 2.0.0 and the latest version of all **assorthead** libraries.
+
 ## Version 0.4.5
 
 - Added preliminary support for custom variable length string (VLS) arrays, which compress the heap for more efficient storage than HDF5's VLS implementation.
