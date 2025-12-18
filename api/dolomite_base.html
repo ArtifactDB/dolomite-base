@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="prev" title="dolomite_base" href="modules.html">
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
-        <title>dolomite_base package - dolomite-base unknown documentation</title>
+        <title>dolomite_base package - dolomite-base 0.0.post1.dev1+g724c73d24 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=580074bf" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -161,7 +161,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">dolomite-base unknown documentation</div></a>
+      <a href="../index.html"><div class="brand">dolomite-base 0.0.post1.dev1+g724c73d24 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -182,7 +182,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
-  <span class="sidebar-brand-text">dolomite-base unknown documentation</span>
+  <span class="sidebar-brand-text">dolomite-base 0.0.post1.dev1+g724c73d24 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -243,68 +243,962 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
 </section>
-<section id="dolomite-base-alt-read-object-module">
-<h2>dolomite_base.alt_read_object module<a class="headerlink" href="#dolomite-base-alt-read-object-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.alt_read_object">
+<span id="dolomite-base-alt-read-object-module"></span><h2>dolomite_base.alt_read_object module<a class="headerlink" href="#module-dolomite_base.alt_read_object" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.alt_read_object.alt_read_object">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.alt_read_object.</span></span><span class="sig-name descname"><span class="pre">alt_read_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/alt_read_object.html#alt_read_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.alt_read_object.alt_read_object" title="Link to this definition">¶</a></dt>
+<dd><p>Wrapper around <a class="reference internal" href="#dolomite_base.read_object.read_object" title="dolomite_base.read_object.read_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_object()</span></code></a>
+that respects application-defined overrides from
+<a class="reference internal" href="#dolomite_base.alt_read_object.alt_read_object_function" title="dolomite_base.alt_read_object.alt_read_object_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">alt_read_object_function()</span></code></a>.  This allows applications to
+customize the reading process for some or all of the object classes,
+assuming that developers of dolomite extensions (and the associated
+functions called by <code class="docutils literal notranslate"><span class="pre">read_object</span></code>) use <code class="docutils literal notranslate"><span class="pre">alt_read_object</span></code> internally for
+staging child objects instead of <code class="docutils literal notranslate"><span class="pre">read_object</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Directory containing the object to load.</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a> | <a class="reference external" href="https://docs.python.org/3.14/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Metadata for the object. If None, this should be read from the
+<code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> file inside <code class="docutils literal notranslate"><span class="pre">path</span></code>.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, passed to individual methods.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Some kind of object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.alt_read_object.alt_read_object_function">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.alt_read_object.</span></span><span class="sig-name descname"><span class="pre">alt_read_object_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fun</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/alt_read_object.html#alt_read_object_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.alt_read_object.alt_read_object_function" title="Link to this definition">¶</a></dt>
+<dd><p>Get or set the alternative reading function for use by
+<a class="reference internal" href="#dolomite_base.alt_read_object.alt_read_object" title="dolomite_base.alt_read_object.alt_read_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">alt_read_object()</span></code></a>. Typically set by applications prior to reading
+for customization, e.g., to attach more metadata to the loaded object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fun</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Callable" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a> | <a class="reference external" href="https://docs.python.org/3.14/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – The alternative reading function. This should accept the same
+arguments and return the same value as
+<a class="reference internal" href="#dolomite_base.read_object.read_object" title="dolomite_base.read_object.read_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_object()</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Callable" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>If <code class="docutils literal notranslate"><span class="pre">fun</span> <span class="pre">=</span> <span class="pre">None</span></code>, the current setting of the alternative reading
+function is returned.</p>
+<p>Otherwise, the alternative reading function is set to <code class="docutils literal notranslate"><span class="pre">fun</span></code>,
+and the previous function is returned.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-alt-save-object-module">
-<h2>dolomite_base.alt_save_object module<a class="headerlink" href="#dolomite-base-alt-save-object-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.alt_save_object">
+<span id="dolomite-base-alt-save-object-module"></span><h2>dolomite_base.alt_save_object module<a class="headerlink" href="#module-dolomite_base.alt_save_object" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.alt_save_object.alt_save_object">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.alt_save_object.</span></span><span class="sig-name descname"><span class="pre">alt_save_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/alt_save_object.html#alt_save_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.alt_save_object.alt_save_object" title="Link to this definition">¶</a></dt>
+<dd><p>Wrapper around <a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a> that
+respects application-defined overrides from
+<a class="reference internal" href="#dolomite_base.alt_save_object.alt_save_object_function" title="dolomite_base.alt_save_object.alt_save_object_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">alt_save_object_function()</span></code></a>.</p>
+<p>This allows applications to
+customize the saving process for some or all of the object classes,
+assuming that developers of dolomite extensions (and the associated
+<code class="docutils literal notranslate"><span class="pre">save_object</span></code> methods) use <code class="docutils literal notranslate"><span class="pre">alt_save_object</span></code> internally for saving
+child objects instead of <code class="docutils literal notranslate"><span class="pre">save_object</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>) – Object to be saved.</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a directory to save <cite>x</cite>.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments to be passed to individual methods.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><cite>x</cite> is saved to <cite>path</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.alt_save_object.alt_save_object_function">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.alt_save_object.</span></span><span class="sig-name descname"><span class="pre">alt_save_object_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fun</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/alt_save_object.html#alt_save_object_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.alt_save_object.alt_save_object_function" title="Link to this definition">¶</a></dt>
+<dd><p>Get or set the alternative saving function for use by
+<a class="reference internal" href="#dolomite_base.alt_save_object.alt_save_object" title="dolomite_base.alt_save_object.alt_save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">alt_save_object()</span></code></a>. Typically set by applications prior to
+saving for customization, e.g., to save extra metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fun</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Callable" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a> | <a class="reference external" href="https://docs.python.org/3.14/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – The alternative saving function. This should accept the same
+arguments and return the same value as
+<a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Callable" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>If <code class="docutils literal notranslate"><span class="pre">fun</span> <span class="pre">=</span> <span class="pre">None</span></code>, the current setting of the alternative saving
+function is returned.</p>
+<p>Otherwise, the alternative saving function is set to <code class="docutils literal notranslate"><span class="pre">fun</span></code>,
+and the previous function is returned.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-choose-missing-placeholder-module">
-<h2>dolomite_base.choose_missing_placeholder module<a class="headerlink" href="#dolomite-base-choose-missing-placeholder-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.choose_missing_placeholder">
+<span id="dolomite-base-choose-missing-placeholder-module"></span><h2>dolomite_base.choose_missing_placeholder module<a class="headerlink" href="#module-dolomite_base.choose_missing_placeholder" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.choose_missing_placeholder.choose_missing_float_placeholder">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.choose_missing_placeholder.</span></span><span class="sig-name descname"><span class="pre">choose_missing_float_placeholder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float64'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/choose_missing_placeholder.html#choose_missing_float_placeholder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.choose_missing_placeholder.choose_missing_float_placeholder" title="Link to this definition">¶</a></dt>
+<dd><p>Choose a missing placeholder for float sequences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.14/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>) – Sequence of floats, possibly containing masked or None values.</p></li>
+<li><p><strong>dtype</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a></span>) – Floating-point NumPy type to use for the placeholder. Ignored if
+<code class="docutils literal notranslate"><span class="pre">x</span></code> is already a NumPy floating-point array, in which case the
+<code class="docutils literal notranslate"><span class="pre">dtype</span></code> is just set to the <code class="docutils literal notranslate"><span class="pre">x.dtype</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.generic" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code></a> | <a class="reference external" href="https://docs.python.org/3.14/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>Value of the placeholder. If <code class="docutils literal notranslate"><span class="pre">x</span></code> is a NumPy floating-point array,
+this is guaranteed to be of the same type as <code class="docutils literal notranslate"><span class="pre">x.dtype</span></code>.</p>
+<p>If no suitable placeholder can be found, None is returned instead.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.choose_missing_placeholder.choose_missing_integer_placeholder">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.choose_missing_placeholder.</span></span><span class="sig-name descname"><span class="pre">choose_missing_integer_placeholder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dtype=&lt;class</span> <span class="pre">'numpy.int32'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/choose_missing_placeholder.html#choose_missing_integer_placeholder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.choose_missing_placeholder.choose_missing_integer_placeholder" title="Link to this definition">¶</a></dt>
+<dd><p>Choose a missing placeholder for integer sequences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.14/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span>) – Sequence of integers, possibly containing masked or None values.</p></li>
+<li><p><strong>max_dtype</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a></span>) – Integer NumPy type that is guaranteed to faithfully represent all
+(non-None, non-masked) values of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.generic" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">generic</span></code></a> | <a class="reference external" href="https://docs.python.org/3.14/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>Value of the placeholder. This is guaranteed to be of a type that can
+fit into <code class="docutils literal notranslate"><span class="pre">max_dtype</span></code>. It also may not be of the same type as
+<code class="docutils literal notranslate"><span class="pre">x.dtype</span></code> if <code class="docutils literal notranslate"><span class="pre">x</span></code> is a NumPy array, so some casting may be required
+when replacing missing values with the placeholder.</p>
+<p>If no suitable placeholder can be found, None is returned instead.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.choose_missing_placeholder.choose_missing_string_placeholder">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.choose_missing_placeholder.</span></span><span class="sig-name descname"><span class="pre">choose_missing_string_placeholder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/choose_missing_placeholder.html#choose_missing_string_placeholder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.choose_missing_placeholder.choose_missing_string_placeholder" title="Link to this definition">¶</a></dt>
+<dd><p>Choose a missing placeholder for string sequences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Sequence of strings, possibly containing missing or None values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>String to use as the placeholder. This may be longer than the maximum
+string length in <code class="docutils literal notranslate"><span class="pre">x</span></code> (for fixed-length-string arrays), so some
+casting may be required.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-list-objects-module">
-<h2>dolomite_base.list_objects module<a class="headerlink" href="#dolomite-base-list-objects-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.lib_dolomite_base">
+<span id="dolomite-base-lib-dolomite-base-module"></span><h2>dolomite_base.lib_dolomite_base module<a class="headerlink" href="#module-dolomite_base.lib_dolomite_base" title="Link to this heading">¶</a></h2>
 </section>
-<section id="dolomite-base-load-vector-from-hdf5-module">
-<h2>dolomite_base.load_vector_from_hdf5 module<a class="headerlink" href="#dolomite-base-load-vector-from-hdf5-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.list_objects">
+<span id="dolomite-base-list-objects-module"></span><h2>dolomite_base.list_objects module<a class="headerlink" href="#module-dolomite_base.list_objects" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.list_objects.list_objects">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.list_objects.</span></span><span class="sig-name descname"><span class="pre">list_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_children</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/list_objects.html#list_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.list_objects.list_objects" title="Link to this definition">¶</a></dt>
+<dd><p>List all objects in a directory, along with their types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a directory in which one or more objects were saved, typically via <a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-func docutils literal notranslate"><span class="pre">save_object()</span></code></a>.</p></li>
+<li><p><strong>include_children</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to include child objects (i.e., objects that are components of other objects) in the listing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.6.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>A <a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.6.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a> where each row corresponds to an object in <code class="docutils literal notranslate"><span class="pre">dir</span></code>.
+It contains the following columns:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">path</span></code>, the relative path to the object’s subdirectory inside <code class="docutils literal notranslate"><span class="pre">dir</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type</span></code>, the type of the object.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">child</span></code>, whether the object is a child of another object.</p></li>
+</ul>
+<p>If <code class="docutils literal notranslate"><span class="pre">include_children=False</span></code>, the listing will only contain non-child objects.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-read-atomic-vector-module">
-<h2>dolomite_base.read_atomic_vector module<a class="headerlink" href="#dolomite-base-read-atomic-vector-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.load_vector_from_hdf5">
+<span id="dolomite-base-load-vector-from-hdf5-module"></span><h2>dolomite_base.load_vector_from_hdf5 module<a class="headerlink" href="#module-dolomite_base.load_vector_from_hdf5" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.load_vector_from_hdf5.load_vector_from_hdf5">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.load_vector_from_hdf5.</span></span><span class="sig-name descname"><span class="pre">load_vector_from_hdf5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_1darray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/load_vector_from_hdf5.html#load_vector_from_hdf5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.load_vector_from_hdf5.load_vector_from_hdf5" title="Link to this definition">¶</a></dt>
+<dd><p>Load a vector from a 1-dimensional HDF5 dataset, with coercion to the expected type.
+Any missing value placeholders are used to set Nones or to create masks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span>) – Handle to a HDF5 dataset.</p></li>
+<li><p><strong>expected_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a></span>) – Expected type of the output vector. This should be one of
+<code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">str</span></code> or <code class="docutils literal notranslate"><span class="pre">bool</span></code>.</p></li>
+<li><p><strong>report_1darray</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to report the output as a 1-dimensional NumPy array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringList</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">IntegerList</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">FloatList</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanList</span></code> | <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The contents of the dataset as a vector-like object. By default, this
+is a typed <code class="xref py py-class docutils literal notranslate"><span class="pre">NamedList</span></code> subclass with
+missing values represented by None. If <code class="docutils literal notranslate"><span class="pre">keep_as_1darray</span> <span class="pre">=</span> <span class="pre">True</span></code>, a
+1-dimensional NumPy array is returned instead, possibly with masking.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-read-data-frame-module">
-<h2>dolomite_base.read_data_frame module<a class="headerlink" href="#dolomite-base-read-data-frame-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.read_atomic_vector">
+<span id="dolomite-base-read-atomic-vector-module"></span><h2>dolomite_base.read_atomic_vector module<a class="headerlink" href="#module-dolomite_base.read_atomic_vector" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.read_atomic_vector.read_atomic_vector">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.read_atomic_vector.</span></span><span class="sig-name descname"><span class="pre">read_atomic_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atomic_vector_use_numeric_1darray</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/read_atomic_vector.html#read_atomic_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.read_atomic_vector.read_atomic_vector" title="Link to this definition">¶</a></dt>
+<dd><p>Read an atomic vector from its on-disk representation. In general, this
+function should not be called directly but instead via
+<a class="reference internal" href="#dolomite_base.read_object.read_object" title="dolomite_base.read_object.read_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_object()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to the directory containing the object.</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>) – Metadata for the object.</p></li>
+<li><p><strong>atomic_vector_use_numeric_1darray</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether numeric vectors should be represented as 1-dimensional
+NumPy arrays. This is more memory-efficient than regular Python
+lists but discards the distinction between vectors and 1-D arrays.
+We set this to <code class="docutils literal notranslate"><span class="pre">False</span></code> by default to ensure that we can load
+names via <code class="xref py py-class docutils literal notranslate"><span class="pre">NamedList</span></code> subclasses.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, passed to nested objects.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringList</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">IntegerList</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">FloatList</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanList</span></code> | <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An atomic vector, represented as a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">StringList</span></code>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">IntegerList</span></code>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">FloatList</span></code>,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanList</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-read-object-module">
-<h2>dolomite_base.read_object module<a class="headerlink" href="#dolomite-base-read-object-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.read_data_frame">
+<span id="dolomite-base-read-data-frame-module"></span><h2>dolomite_base.read_data_frame module<a class="headerlink" href="#module-dolomite_base.read_data_frame" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.read_data_frame.read_data_frame">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.read_data_frame.</span></span><span class="sig-name descname"><span class="pre">read_data_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_frame_represent_numeric_column_as_1darray</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/read_data_frame.html#read_data_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.read_data_frame.read_data_frame" title="Link to this definition">¶</a></dt>
+<dd><p>Load a data frame from a HDF5 file. In general, this function should not
+be called directly but instead via <a class="reference internal" href="#dolomite_base.read_object.read_object" title="dolomite_base.read_object.read_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_object()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to the directory containing the object.</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>) – Metadata for the object.</p></li>
+<li><p><strong>data_frame_represent_numeric_column_as_1darray</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether numeric columns should be represented as 1-dimensional
+NumPy arrays. This is more efficient than regular Python lists but
+discards the distinction between vectors and 1-D arrays. Usually
+this is not an important difference, but nonetheless, users can set
+this flag to <code class="docutils literal notranslate"><span class="pre">False</span></code> to load columns as (typed) lists instead.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, passed to nested objects.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.6.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A data frame.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-read-object-file-module">
-<h2>dolomite_base.read_object_file module<a class="headerlink" href="#dolomite-base-read-object-file-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.read_object">
+<span id="dolomite-base-read-object-module"></span><h2>dolomite_base.read_object module<a class="headerlink" href="#module-dolomite_base.read_object" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.read_object.read_object">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.read_object.</span></span><span class="sig-name descname"><span class="pre">read_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/read_object.html#read_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.read_object.read_object" title="Link to this definition">¶</a></dt>
+<dd><p>Read an object from its on-disk representation. This will dispatch to
+individual reading functions - possibly from different packages in the
+<strong>dolomite</strong> framework based on the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> from the <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> file.</p>
+<p>Application developers can control the dispatch process by modifying
+<code class="docutils literal notranslate"><span class="pre">read_object_registry</span></code>. Each key is a string containing the object type,
+e.g., <code class="docutils literal notranslate"><span class="pre">data_frame</span></code>, while the value can either be a string specifying the
+fully qualified name of a reader function (including all modules, which
+will be loaded upon dispatch) or the reader function itself.</p>
+<p>Any reader functions should accept the same arguments as
+:py:func`~dolomite_base.read-object.read_object` and return the loaded
+object. Readers may assume that the <code class="docutils literal notranslate"><span class="pre">metadata</span></code> argument is available,
+i.e., no need to account for the None case.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a directory containing the object.</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> | <a class="reference external" href="https://docs.python.org/3.14/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Metadata for the object. If None, the metadata is read from the
+<code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> file inside <code class="docutils literal notranslate"><span class="pre">path</span></code>.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, passed to individual methods.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Some kind of object.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-read-simple-list-module">
-<h2>dolomite_base.read_simple_list module<a class="headerlink" href="#dolomite-base-read-simple-list-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.read_object_file">
+<span id="dolomite-base-read-object-file-module"></span><h2>dolomite_base.read_object_file module<a class="headerlink" href="#module-dolomite_base.read_object_file" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.read_object_file.read_object_file">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.read_object_file.</span></span><span class="sig-name descname"><span class="pre">read_object_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/read_object_file.html#read_object_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.read_object_file.read_object_file" title="Link to this definition">¶</a></dt>
+<dd><p>Read the <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> file in each directory, which provides some high-level
+metadata of the object represented by that directory. It is guaranteed to
+have a ‘type’ property that specifies the object type; individual objects
+may add their own information to this file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a directory containing the object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary containing the object metadata.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-read-string-factor-module">
-<h2>dolomite_base.read_string_factor module<a class="headerlink" href="#dolomite-base-read-string-factor-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.read_simple_list">
+<span id="dolomite-base-read-simple-list-module"></span><h2>dolomite_base.read_simple_list module<a class="headerlink" href="#module-dolomite_base.read_simple_list" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.read_simple_list.read_simple_list">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.read_simple_list.</span></span><span class="sig-name descname"><span class="pre">read_simple_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/read_simple_list.html#read_simple_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.read_simple_list.read_simple_list" title="Link to this definition">¶</a></dt>
+<dd><p>Read an R-style list from its on-disk representation in the <strong>uzuki2</strong>
+format.  In general, this function should not be called directly but
+instead via <a class="reference internal" href="#dolomite_base.read_object.read_object" title="dolomite_base.read_object.read_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_object()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to the directory containing the object.</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>) – Metadata for the object.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, passed to nested objects.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> | <a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list or dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-save-atomic-vector-module">
-<h2>dolomite_base.save_atomic_vector module<a class="headerlink" href="#dolomite-base-save-atomic-vector-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.read_string_factor">
+<span id="dolomite-base-read-string-factor-module"></span><h2>dolomite_base.read_string_factor module<a class="headerlink" href="#module-dolomite_base.read_string_factor" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.read_string_factor.read_string_factor">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.read_string_factor.</span></span><span class="sig-name descname"><span class="pre">read_string_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/read_string_factor.html#read_string_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.read_string_factor.read_string_factor" title="Link to this definition">¶</a></dt>
+<dd><p>Read a string factor from disk.</p>
+<p>In general, this function should not be called directly
+but instead via
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">load_object()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to the directory containing the object.</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>) – Metadata for the object.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, passed to nested objects.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Factor</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">Factor</span></code> object.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-save-data-frame-module">
-<h2>dolomite_base.save_data_frame module<a class="headerlink" href="#dolomite-base-save-data-frame-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.save_atomic_vector">
+<span id="dolomite-base-save-atomic-vector-module"></span><h2>dolomite_base.save_atomic_vector module<a class="headerlink" href="#module-dolomite_base.save_atomic_vector" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.save_atomic_vector.save_atomic_vector_from_boolean_list">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.save_atomic_vector.</span></span><span class="sig-name descname"><span class="pre">save_atomic_vector_from_boolean_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_atomic_vector.html#save_atomic_vector_from_boolean_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_atomic_vector.save_atomic_vector_from_boolean_list" title="Link to this definition">¶</a></dt>
+<dd><p>Method for saving <code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanList</span></code> objects
+to their corresponding file representation, see
+<a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanList</span></code></span>) – Object to be saved.</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to save the object.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>x</cite> is saved to <cite>path</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.save_atomic_vector.save_atomic_vector_from_float_list">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.save_atomic_vector.</span></span><span class="sig-name descname"><span class="pre">save_atomic_vector_from_float_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_atomic_vector.html#save_atomic_vector_from_float_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_atomic_vector.save_atomic_vector_from_float_list" title="Link to this definition">¶</a></dt>
+<dd><p>Method for saving <code class="xref py py-class docutils literal notranslate"><span class="pre">FloatList</span></code> objects
+to their corresponding file representation, see
+<a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">FloatList</span></code></span>) – Object to be saved.</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to save the object.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>x</cite> is saved to <cite>path</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.save_atomic_vector.save_atomic_vector_from_integer_list">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.save_atomic_vector.</span></span><span class="sig-name descname"><span class="pre">save_atomic_vector_from_integer_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_atomic_vector.html#save_atomic_vector_from_integer_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_atomic_vector.save_atomic_vector_from_integer_list" title="Link to this definition">¶</a></dt>
+<dd><p>Method for saving <code class="xref py py-class docutils literal notranslate"><span class="pre">IntegerList</span></code> objects
+to their corresponding file representation, see
+<a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntegerList</span></code></span>) – Object to be saved.</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to save the object.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>x</cite> is saved to <cite>path</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.save_atomic_vector.save_atomic_vector_from_string_list">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.save_atomic_vector.</span></span><span class="sig-name descname"><span class="pre">save_atomic_vector_from_string_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">string_list_vls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_atomic_vector.html#save_atomic_vector_from_string_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_atomic_vector.save_atomic_vector_from_string_list" title="Link to this definition">¶</a></dt>
+<dd><p>Method for saving <code class="xref py py-class docutils literal notranslate"><span class="pre">StringList</span></code> objects to their corresponding file representation,
+see <a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringList</span></code></span>) – Object to be saved.</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to save the object.</p></li>
+<li><p><strong>string_list_vls</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> | <a class="reference external" href="https://docs.python.org/3.14/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Whether to save variable-length strings into a custom VLS array format.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, this is automatically determined by comparing the required storage with that of fixed-length strings.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>x</cite> is saved to <cite>path</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-save-object-module">
-<h2>dolomite_base.save_object module<a class="headerlink" href="#dolomite-base-save-object-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.save_data_frame">
+<span id="dolomite-base-save-data-frame-module"></span><h2>dolomite_base.save_data_frame module<a class="headerlink" href="#module-dolomite_base.save_data_frame" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dolomite_base.save_data_frame.</span></span><span class="sig-name descname"><span class="pre">Hdf5ColumnOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">otherable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_list_to_vector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_1darray_to_vector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_vls</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#tuple" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.__annotate_func__">
+<span class="sig-name descname"><span class="pre">__annotate_func__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__annotate_func__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.__annotations_cache__">
+<span class="sig-name descname"><span class="pre">__annotations_cache__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__annotations_cache__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.__getnewargs__">
+<span class="sig-name descname"><span class="pre">__getnewargs__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__getnewargs__" title="Link to this definition">¶</a></dt>
+<dd><p>Return self as a plain tuple.  Used by copy and pickle.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.__match_args__">
+<span class="sig-name descname"><span class="pre">__match_args__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('handle',</span> <span class="pre">'otherable',</span> <span class="pre">'convert_list_to_vector',</span> <span class="pre">'convert_1darray_to_vector',</span> <span class="pre">'use_vls')</span></em><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__match_args__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.__new__">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">__new__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">otherable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_list_to_vector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convert_1darray_to_vector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_vls</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__new__" title="Link to this definition">¶</a></dt>
+<dd><p>Create new instance of Hdf5ColumnOutput(handle, otherable, convert_list_to_vector, convert_1darray_to_vector, use_vls)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.__replace__">
+<span class="sig-name descname"><span class="pre">__replace__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__replace__" title="Link to this definition">¶</a></dt>
+<dd><p>Return a new Hdf5ColumnOutput object replacing specified fields with new values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__repr__" title="Link to this definition">¶</a></dt>
+<dd><p>Return a nicely formatted representation string</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.__slots__">
+<span class="sig-name descname"><span class="pre">__slots__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">()</span></em><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__slots__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.convert_1darray_to_vector">
+<span class="sig-name descname"><span class="pre">convert_1darray_to_vector</span></span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.convert_1darray_to_vector" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.convert_list_to_vector">
+<span class="sig-name descname"><span class="pre">convert_list_to_vector</span></span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.convert_list_to_vector" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.handle">
+<span class="sig-name descname"><span class="pre">handle</span></span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.handle" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.otherable">
+<span class="sig-name descname"><span class="pre">otherable</span></span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.otherable" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.Hdf5ColumnOutput.use_vls">
+<span class="sig-name descname"><span class="pre">use_vls</span></span><a class="headerlink" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.use_vls" title="Link to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.save_data_frame.save_data_frame">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.save_data_frame.</span></span><span class="sig-name descname"><span class="pre">save_data_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_frame_convert_list_to_vector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_frame_convert_1darray_to_vector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_frame_string_list_vls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_data_frame.html#save_data_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_data_frame.save_data_frame" title="Link to this definition">¶</a></dt>
+<dd><p>Method for saving <a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.6.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a>
+objects to the corresponding file representations, see
+<a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://biocpy.github.io/BiocFrame/api/biocframe.html#biocframe.BiocFrame.BiocFrame" title="(in BiocFrame v0.6.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BiocFrame</span></code></a></span>) – Object to be saved.</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a directory in which to save <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p></li>
+<li><p><strong>data_frame_convert_list_to_vector</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – If a column is a regular Python list where all entries are of the
+same basic type (integer, string, float, boolean) or None, should
+it be converted to a typed vector in the on-disk representation?
+This avoids creating a separate file to store this column but
+changes the class of the column when the <code class="docutils literal notranslate"><span class="pre">BiocFrame</span></code> is read back
+into a Python session. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, the list is saved as an
+external object instead.</p></li>
+<li><p><strong>data_frame_convert_1darray_to_vector</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – If a column is a 1D NumPy array, should it be saved as a typed
+vector? This avoids creating a separate file for the column but
+discards the distinction between 1D arrays and vectors. Usually
+this is not an important difference, but nonetheless, users can
+set this flag to <code class="docutils literal notranslate"><span class="pre">False</span></code> to save all 1D NumPy arrays as an
+external “dense array” object instead.</p></li>
+<li><p><strong>data_frame_string_list_vls</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to save columns of variable-length strings into a custom VLS array format.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, this is automatically determined by comparing the required storage with that of fixed-length strings.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, passed to internal <a class="reference internal" href="#dolomite_base.alt_save_object.alt_save_object" title="dolomite_base.alt_save_object.alt_save_object"><code class="xref py py-func docutils literal notranslate"><span class="pre">alt_save_object()</span></code></a> calls.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><cite>x</cite> is saved to <cite>path</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-save-object-file-module">
-<h2>dolomite_base.save_object_file module<a class="headerlink" href="#dolomite-base-save-object-file-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.save_object">
+<span id="dolomite-base-save-object-module"></span><h2>dolomite_base.save_object module<a class="headerlink" href="#module-dolomite_base.save_object" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.save_object.save_object">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.save_object.</span></span><span class="sig-name descname"><span class="pre">save_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_object.html#save_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_object.save_object" title="Link to this definition">¶</a></dt>
+<dd><p>Save an object to its on-disk representation. <strong>dolomite</strong> extensions
+should define methods for this generic to stage different object classes.</p>
+<p>Saver methods may accept additional arguments in the <code class="docutils literal notranslate"><span class="pre">kwargs</span></code>; these
+should be prefixed by the object type to avoid conflicts (see
+<a class="reference internal" href="#dolomite_base.save_data_frame.save_data_frame" title="dolomite_base.save_data_frame.save_data_frame"><code class="xref py py-func docutils literal notranslate"><span class="pre">save_data_frame()</span></code></a> for examples).</p>
+<p>Saver methods should also use the <a class="reference internal" href="#dolomite_base.save_object.validate_saves" title="dolomite_base.save_object.validate_saves"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_saves()</span></code></a> decorator
+to ensure that the generated output in <code class="docutils literal notranslate"><span class="pre">path</span></code> is valid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>) – Object to be saved.</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to the output directory.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments to be passed to individual methods.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>x</cite> is saved to <cite>path</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.save_object.validate_saves">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.save_object.</span></span><span class="sig-name descname"><span class="pre">validate_saves</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_object.html#validate_saves"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_object.validate_saves" title="Link to this definition">¶</a></dt>
+<dd><p>Decorator to validate the output of <a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-func docutils literal notranslate"><span class="pre">save_object()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fn</strong> – Function that implements a method for <code class="docutils literal notranslate"><span class="pre">save_object</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A wrapped version of the function that validates the directory
+containing the on-disk representation of the saved object.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-save-simple-list-module">
-<h2>dolomite_base.save_simple_list module<a class="headerlink" href="#dolomite-base-save-simple-list-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.save_object_file">
+<span id="dolomite-base-save-object-file-module"></span><h2>dolomite_base.save_object_file module<a class="headerlink" href="#module-dolomite_base.save_object_file" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.save_object_file.save_object_file">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.save_object_file.</span></span><span class="sig-name descname"><span class="pre">save_object_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_object_file.html#save_object_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_object_file.save_object_file" title="Link to this definition">¶</a></dt>
+<dd><p>Saves object-specific metadata into the <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> file inside each
+directory, to be used by, e.g., <a class="reference internal" href="#dolomite_base.read_object_file.read_object_file" title="dolomite_base.read_object_file.read_object_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_object_file()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to the directory representing an object. An <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> file
+will be created inside this directory.</p></li>
+<li><p><strong>object_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – <p>Type of the object.</p>
+<dl class="simple">
+<dt>extra:</dt><dd><p>Extra metadata to be written to the <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> file in <code class="docutils literal notranslate"><span class="pre">path</span></code>.
+Any entry named <code class="docutils literal notranslate"><span class="pre">type</span></code> will be overwritten by <code class="docutils literal notranslate"><span class="pre">object_type</span></code>.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-save-string-factor-module">
-<h2>dolomite_base.save_string_factor module<a class="headerlink" href="#dolomite-base-save-string-factor-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.save_simple_list">
+<span id="dolomite-base-save-simple-list-module"></span><h2>dolomite_base.save_simple_list module<a class="headerlink" href="#module-dolomite_base.save_simple_list" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.save_simple_list.save_simple_list_from_NamedList">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.save_simple_list.</span></span><span class="sig-name descname"><span class="pre">save_simple_list_from_NamedList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simple_list_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simple_list_string_list_vls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_simple_list.html#save_simple_list_from_NamedList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_simple_list.save_simple_list_from_NamedList" title="Link to this definition">¶</a></dt>
+<dd><p>Method for saving a NamedList to its corresponding file representation,
+see <a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">NamedList</span></code></span>) – Object to be saved.</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a directory in which to save the object.</p></li>
+<li><p><strong>simple_list_mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'hdf5'</span></code>, <code class="docutils literal notranslate"><span class="pre">'json'</span></code>]</span>) – Whether to save in HDF5 or JSON mode.</p></li>
+<li><p><strong>simple_list_string_list_vls</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to save <code class="xref py py-class docutils literal notranslate"><span class="pre">StringList</span></code> objects of variable-length strings into a custom VLS array format for HDF5.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, this is automatically determined by comparing the required storage with that of fixed-length strings.
+Only relevant if <a href="#id1"><span class="problematic" id="id2">``</span></a>simple_list_mode = “hdf5”<a href="#id3"><span class="problematic" id="id4">`</span></a>.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>x</cite> is saved to <cite>path</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.save_simple_list.save_simple_list_from_dict">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.save_simple_list.</span></span><span class="sig-name descname"><span class="pre">save_simple_list_from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simple_list_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simple_list_string_list_vls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_simple_list.html#save_simple_list_from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_simple_list.save_simple_list_from_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Method for saving dictionaries (Python analogues to R-style named lists)
+to the corresponding file representations, see
+<a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>) – Object to be saved.</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a directory in which to save the object.</p></li>
+<li><p><strong>simple_list_mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'hdf5'</span></code>, <code class="docutils literal notranslate"><span class="pre">'json'</span></code>]</span>) – Whether to save in HDF5 or JSON mode.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>x</cite> is saved to <cite>path</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.save_simple_list.save_simple_list_from_list">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.save_simple_list.</span></span><span class="sig-name descname"><span class="pre">save_simple_list_from_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simple_list_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simple_list_string_list_vls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_simple_list.html#save_simple_list_from_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_simple_list.save_simple_list_from_list" title="Link to this definition">¶</a></dt>
+<dd><p>Method for saving lists (Python analogues to R-style unnamed lists) to
+the corresponding file representations, see
+<a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></span>) – Object to be saved.</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a directory in which to save the object.</p></li>
+<li><p><strong>simple_list_mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Literal</span></code></a>[<code class="docutils literal notranslate"><span class="pre">'hdf5'</span></code>, <code class="docutils literal notranslate"><span class="pre">'json'</span></code>]</span>) – Whether to save in HDF5 or JSON mode.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>x</cite> is saved to <cite>path</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-validate-directory-module">
-<h2>dolomite_base.validate_directory module<a class="headerlink" href="#dolomite-base-validate-directory-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.save_string_factor">
+<span id="dolomite-base-save-string-factor-module"></span><h2>dolomite_base.save_string_factor module<a class="headerlink" href="#module-dolomite_base.save_string_factor" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.save_string_factor.save_string_factor">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.save_string_factor.</span></span><span class="sig-name descname"><span class="pre">save_string_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/save_string_factor.html#save_string_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.save_string_factor.save_string_factor" title="Link to this definition">¶</a></dt>
+<dd><p>Method for saving <code class="xref py py-class docutils literal notranslate"><span class="pre">Factor</span></code> objects to their
+corresponding file representation, see
+<a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_object()</span></code></a> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Factor</span></code></span>) – Object to be saved.</p></li>
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to save the object.</p></li>
+<li><p><strong>kwargs</strong> – Further arguments, ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>x</cite> is saved to <cite>path</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-validate-object-module">
-<h2>dolomite_base.validate_object module<a class="headerlink" href="#dolomite-base-validate-object-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.validate_directory">
+<span id="dolomite-base-validate-directory-module"></span><h2>dolomite_base.validate_directory module<a class="headerlink" href="#module-dolomite_base.validate_directory" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.validate_directory.validate_directory">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.validate_directory.</span></span><span class="sig-name descname"><span class="pre">validate_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/validate_directory.html#validate_directory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.validate_directory.validate_directory" title="Link to this definition">¶</a></dt>
+<dd><p>Check whether each object in a directory is valid by calling <a class="reference internal" href="#dolomite_base.validate_object.validate_object" title="dolomite_base.validate_object.validate_object"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_object()</span></code></a> on each non-child object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dir</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to a directory with subdirectories populated by <a class="reference internal" href="#dolomite_base.save_object.save_object" title="dolomite_base.save_object.save_object"><code class="xref py py-func docutils literal notranslate"><span class="pre">save_object()</span></code></a>.
+<code class="docutils literal notranslate"><span class="pre">dir</span></code> itself may also correspond to an object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.List" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of the paths inside <code class="docutils literal notranslate"><span class="pre">dir</span></code> that were validated.
+This contains only <code class="docutils literal notranslate"><span class="pre">None</span></code> if <code class="docutils literal notranslate"><span class="pre">dir</span></code> itself corresponds to an object.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="dolomite-base-write-vector-to-hdf5-module">
-<h2>dolomite_base.write_vector_to_hdf5 module<a class="headerlink" href="#dolomite-base-write-vector-to-hdf5-module" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.validate_object">
+<span id="dolomite-base-validate-object-module"></span><h2>dolomite_base.validate_object module<a class="headerlink" href="#module-dolomite_base.validate_object" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.validate_object.validate_object">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.validate_object.</span></span><span class="sig-name descname"><span class="pre">validate_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/validate_object.html#validate_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.validate_object.validate_object" title="Link to this definition">¶</a></dt>
+<dd><p>Validate an on-disk representation of an object, typically using validators
+based on the <strong>takane</strong> specifications.</p>
+<p>Applications may also register their own validators by adding entries to
+<code class="docutils literal notranslate"><span class="pre">validate_object_registry</span></code>. Each key should be the object type and each
+value should be a function that accepts a path to a directory (string) and
+JSON-derived metadata (dictionary). The function should raise an error if
+the object in the directory is not valid for the specified object type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Path to the directory containing the object’s representation.</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a> | <a class="reference external" href="https://docs.python.org/3.14/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Metadata for the object. If None, this is read from the <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code>
+file in the <code class="docutils literal notranslate"><span class="pre">path</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Error if the validation fails.</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<section id="module-dolomite_base.write_vector_to_hdf5">
+<span id="dolomite-base-write-vector-to-hdf5-module"></span><h2>dolomite_base.write_vector_to_hdf5 module<a class="headerlink" href="#module-dolomite_base.write_vector_to_hdf5" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.write_vector_to_hdf5.write_boolean_vector_to_hdf5">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.write_vector_to_hdf5.</span></span><span class="sig-name descname"><span class="pre">write_boolean_vector_to_hdf5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placeholder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'missing-value-placeholder'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/write_vector_to_hdf5.html#write_boolean_vector_to_hdf5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.write_vector_to_hdf5.write_boolean_vector_to_hdf5" title="Link to this definition">¶</a></dt>
+<dd><p>Write a boolean vector to a HDF5 file as a 1-dimensional dataset with
+a 8-bit signed integer datatype. If <code class="docutils literal notranslate"><span class="pre">x</span></code> contains missing values, they
+are replaced with a placeholder value of -1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></span>) – A handle to a HDF5 group.</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the dataset in which to save the integer vector.</p></li>
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>]</span>) – Sequence containing booleans, Nones, and/or masked NumPy values.</p></li>
+<li><p><strong>placeholder_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the attribute in which to store the missing value
+placeholder, if <code class="docutils literal notranslate"><span class="pre">x</span></code> contains None or masked values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Handle for the newly created dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.write_vector_to_hdf5.write_float_vector_to_hdf5">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.write_vector_to_hdf5.</span></span><span class="sig-name descname"><span class="pre">write_float_vector_to_hdf5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h5type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'f8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placeholder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'missing-value-placeholder'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/write_vector_to_hdf5.html#write_float_vector_to_hdf5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.write_vector_to_hdf5.write_float_vector_to_hdf5" title="Link to this definition">¶</a></dt>
+<dd><p>Write a floating-point vector to a HDF5 file as a 1-dimensional dataset.
+If <code class="docutils literal notranslate"><span class="pre">x</span></code> contains missing values, a placeholder value is selected by
+<a class="reference internal" href="#dolomite_base.choose_missing_placeholder.choose_missing_float_placeholder" title="dolomite_base.choose_missing_placeholder.choose_missing_float_placeholder"><code class="xref py py-func docutils literal notranslate"><span class="pre">choose_missing_float_placeholder()</span></code></a>.
+and used to replace all of the missing values in the dataset. The
+placeholder value itself is stored as an attribute of the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></span>) – A handle to a HDF5 group.</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the dataset in which to save the integer vector.</p></li>
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.14/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>) – Sequence containing floats, Nones, and/or masked NumPy values.</p></li>
+<li><p><strong>h5type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Floating-point type of the HDF5 dataset to create.</p></li>
+<li><p><strong>placeholder_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the attribute in which to store the missing value
+placeholder, if <code class="docutils literal notranslate"><span class="pre">x</span></code> contains None or masked values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Handle for the newly created dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.write_vector_to_hdf5.write_integer_vector_to_hdf5">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.write_vector_to_hdf5.</span></span><span class="sig-name descname"><span class="pre">write_integer_vector_to_hdf5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h5type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'i4'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placeholder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'missing-value-placeholder'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_float_promotion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/write_vector_to_hdf5.html#write_integer_vector_to_hdf5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.write_vector_to_hdf5.write_integer_vector_to_hdf5" title="Link to this definition">¶</a></dt>
+<dd><p>Write an integer vector to a HDF5 file as a 1-dimensional dataset. If
+<code class="docutils literal notranslate"><span class="pre">x</span></code> contains missing values, a placeholder value is selected by
+<a class="reference internal" href="#dolomite_base.choose_missing_placeholder.choose_missing_integer_placeholder" title="dolomite_base.choose_missing_placeholder.choose_missing_integer_placeholder"><code class="xref py py-func docutils literal notranslate"><span class="pre">choose_missing_integer_placeholder()</span></code></a>
+and used to replace all of the missing values in the dataset. The
+placeholder value itself is stored as an attribute of the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></span>) – A handle to a HDF5 group.</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the dataset in which to save the integer vector.</p></li>
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.14/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span>) – Sequence containing integers, Nones, and/or masked NumPy values.</p></li>
+<li><p><strong>h5type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Integer type of the HDF5 dataset to create.</p></li>
+<li><p><strong>placeholder_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the attribute in which to store the missing value
+placeholder, if <code class="docutils literal notranslate"><span class="pre">x</span></code> contains None or masked values.</p></li>
+<li><p><strong>allow_float_promotion</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to save <code class="docutils literal notranslate"><span class="pre">x</span></code> into a 64-bit floating-point dataset if any
+values in <code class="docutils literal notranslate"><span class="pre">x</span></code> exceeds the range of values that can be represented
+by <code class="docutils literal notranslate"><span class="pre">h5type</span></code>, or if no missing value placeholder can be found
+within the acceptable range of integer values. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, an
+error is raised if <code class="docutils literal notranslate"><span class="pre">x</span></code> cannot be saved without promotion.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Handle for the newly created dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dolomite_base.write_vector_to_hdf5.write_string_vector_to_hdf5">
+<span class="sig-prename descclassname"><span class="pre">dolomite_base.write_vector_to_hdf5.</span></span><span class="sig-name descname"><span class="pre">write_string_vector_to_hdf5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placeholder_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'missing-value-placeholder'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dolomite_base/write_vector_to_hdf5.html#write_string_vector_to_hdf5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dolomite_base.write_vector_to_hdf5.write_string_vector_to_hdf5" title="Link to this definition">¶</a></dt>
+<dd><p>Write a string vector to a HDF5 file as a 1-dimensional dataset with a
+fixed-length string datatype. If <code class="docutils literal notranslate"><span class="pre">x</span></code> contains missing values, a suitable
+placeholder value is selected using
+<a class="reference internal" href="#dolomite_base.choose_missing_placeholder.choose_missing_string_placeholder" title="dolomite_base.choose_missing_placeholder.choose_missing_string_placeholder"><code class="xref py py-func docutils literal notranslate"><span class="pre">choose_missing_string_placeholder()</span></code></a>.
+and used to replace all missing values in the dataset. The placeholder
+itself is stored as an attribute of the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Group</span></code></span>) – A handle to a HDF5 group.</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the dataset in which to save the string vector.</p></li>
+<li><p><strong>x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/typing.html#typing.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Sequence containing strings, Nones, and/or masked NumPy values.</p></li>
+<li><p><strong>placeholder_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.14/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the attribute in which to store the missing value
+placeholder, if <code class="docutils literal notranslate"><span class="pre">x</span></code> contains None or masked values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Handle for the newly created dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-dolomite_base">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dolomite_base" title="Link to this heading">¶</a></h2>
 </section>
 </section>
 
@@ -357,27 +1251,117 @@
             <ul>
 <li><a class="reference internal" href="#">dolomite_base package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#dolomite-base-alt-read-object-module">dolomite_base.alt_read_object module</a></li>
-<li><a class="reference internal" href="#dolomite-base-alt-save-object-module">dolomite_base.alt_save_object module</a></li>
-<li><a class="reference internal" href="#dolomite-base-choose-missing-placeholder-module">dolomite_base.choose_missing_placeholder module</a></li>
-<li><a class="reference internal" href="#dolomite-base-list-objects-module">dolomite_base.list_objects module</a></li>
-<li><a class="reference internal" href="#dolomite-base-load-vector-from-hdf5-module">dolomite_base.load_vector_from_hdf5 module</a></li>
-<li><a class="reference internal" href="#dolomite-base-read-atomic-vector-module">dolomite_base.read_atomic_vector module</a></li>
-<li><a class="reference internal" href="#dolomite-base-read-data-frame-module">dolomite_base.read_data_frame module</a></li>
-<li><a class="reference internal" href="#dolomite-base-read-object-module">dolomite_base.read_object module</a></li>
-<li><a class="reference internal" href="#dolomite-base-read-object-file-module">dolomite_base.read_object_file module</a></li>
-<li><a class="reference internal" href="#dolomite-base-read-simple-list-module">dolomite_base.read_simple_list module</a></li>
-<li><a class="reference internal" href="#dolomite-base-read-string-factor-module">dolomite_base.read_string_factor module</a></li>
-<li><a class="reference internal" href="#dolomite-base-save-atomic-vector-module">dolomite_base.save_atomic_vector module</a></li>
-<li><a class="reference internal" href="#dolomite-base-save-data-frame-module">dolomite_base.save_data_frame module</a></li>
-<li><a class="reference internal" href="#dolomite-base-save-object-module">dolomite_base.save_object module</a></li>
-<li><a class="reference internal" href="#dolomite-base-save-object-file-module">dolomite_base.save_object_file module</a></li>
-<li><a class="reference internal" href="#dolomite-base-save-simple-list-module">dolomite_base.save_simple_list module</a></li>
-<li><a class="reference internal" href="#dolomite-base-save-string-factor-module">dolomite_base.save_string_factor module</a></li>
-<li><a class="reference internal" href="#dolomite-base-validate-directory-module">dolomite_base.validate_directory module</a></li>
-<li><a class="reference internal" href="#dolomite-base-validate-object-module">dolomite_base.validate_object module</a></li>
-<li><a class="reference internal" href="#dolomite-base-write-vector-to-hdf5-module">dolomite_base.write_vector_to_hdf5 module</a></li>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li><a class="reference internal" href="#module-dolomite_base.alt_read_object">dolomite_base.alt_read_object module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.alt_read_object.alt_read_object"><code class="docutils literal notranslate"><span class="pre">alt_read_object()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.alt_read_object.alt_read_object_function"><code class="docutils literal notranslate"><span class="pre">alt_read_object_function()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.alt_save_object">dolomite_base.alt_save_object module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.alt_save_object.alt_save_object"><code class="docutils literal notranslate"><span class="pre">alt_save_object()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.alt_save_object.alt_save_object_function"><code class="docutils literal notranslate"><span class="pre">alt_save_object_function()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.choose_missing_placeholder">dolomite_base.choose_missing_placeholder module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.choose_missing_placeholder.choose_missing_float_placeholder"><code class="docutils literal notranslate"><span class="pre">choose_missing_float_placeholder()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.choose_missing_placeholder.choose_missing_integer_placeholder"><code class="docutils literal notranslate"><span class="pre">choose_missing_integer_placeholder()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.choose_missing_placeholder.choose_missing_string_placeholder"><code class="docutils literal notranslate"><span class="pre">choose_missing_string_placeholder()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.lib_dolomite_base">dolomite_base.lib_dolomite_base module</a></li>
+<li><a class="reference internal" href="#module-dolomite_base.list_objects">dolomite_base.list_objects module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.list_objects.list_objects"><code class="docutils literal notranslate"><span class="pre">list_objects()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.load_vector_from_hdf5">dolomite_base.load_vector_from_hdf5 module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.load_vector_from_hdf5.load_vector_from_hdf5"><code class="docutils literal notranslate"><span class="pre">load_vector_from_hdf5()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.read_atomic_vector">dolomite_base.read_atomic_vector module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.read_atomic_vector.read_atomic_vector"><code class="docutils literal notranslate"><span class="pre">read_atomic_vector()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.read_data_frame">dolomite_base.read_data_frame module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.read_data_frame.read_data_frame"><code class="docutils literal notranslate"><span class="pre">read_data_frame()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.read_object">dolomite_base.read_object module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.read_object.read_object"><code class="docutils literal notranslate"><span class="pre">read_object()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.read_object_file">dolomite_base.read_object_file module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.read_object_file.read_object_file"><code class="docutils literal notranslate"><span class="pre">read_object_file()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.read_simple_list">dolomite_base.read_simple_list module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.read_simple_list.read_simple_list"><code class="docutils literal notranslate"><span class="pre">read_simple_list()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.read_string_factor">dolomite_base.read_string_factor module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.read_string_factor.read_string_factor"><code class="docutils literal notranslate"><span class="pre">read_string_factor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.save_atomic_vector">dolomite_base.save_atomic_vector module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.save_atomic_vector.save_atomic_vector_from_boolean_list"><code class="docutils literal notranslate"><span class="pre">save_atomic_vector_from_boolean_list()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_atomic_vector.save_atomic_vector_from_float_list"><code class="docutils literal notranslate"><span class="pre">save_atomic_vector_from_float_list()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_atomic_vector.save_atomic_vector_from_integer_list"><code class="docutils literal notranslate"><span class="pre">save_atomic_vector_from_integer_list()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_atomic_vector.save_atomic_vector_from_string_list"><code class="docutils literal notranslate"><span class="pre">save_atomic_vector_from_string_list()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.save_data_frame">dolomite_base.save_data_frame module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput</span></code></a><ul>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__annotate_func__"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.__annotate_func__</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__annotations_cache__"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.__annotations_cache__</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__getnewargs__"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.__getnewargs__()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__match_args__"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.__match_args__</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__new__"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.__new__()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__replace__"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.__replace__()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__repr__"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.__repr__()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.__slots__"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.__slots__</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.convert_1darray_to_vector"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.convert_1darray_to_vector</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.convert_list_to_vector"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.convert_list_to_vector</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.handle"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.handle</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.otherable"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.otherable</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.Hdf5ColumnOutput.use_vls"><code class="docutils literal notranslate"><span class="pre">Hdf5ColumnOutput.use_vls</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dolomite_base.save_data_frame.save_data_frame"><code class="docutils literal notranslate"><span class="pre">save_data_frame()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.save_object">dolomite_base.save_object module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.save_object.save_object"><code class="docutils literal notranslate"><span class="pre">save_object()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_object.validate_saves"><code class="docutils literal notranslate"><span class="pre">validate_saves()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.save_object_file">dolomite_base.save_object_file module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.save_object_file.save_object_file"><code class="docutils literal notranslate"><span class="pre">save_object_file()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.save_simple_list">dolomite_base.save_simple_list module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.save_simple_list.save_simple_list_from_NamedList"><code class="docutils literal notranslate"><span class="pre">save_simple_list_from_NamedList()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_simple_list.save_simple_list_from_dict"><code class="docutils literal notranslate"><span class="pre">save_simple_list_from_dict()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.save_simple_list.save_simple_list_from_list"><code class="docutils literal notranslate"><span class="pre">save_simple_list_from_list()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.save_string_factor">dolomite_base.save_string_factor module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.save_string_factor.save_string_factor"><code class="docutils literal notranslate"><span class="pre">save_string_factor()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.validate_directory">dolomite_base.validate_directory module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.validate_directory.validate_directory"><code class="docutils literal notranslate"><span class="pre">validate_directory()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.validate_object">dolomite_base.validate_object module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.validate_object.validate_object"><code class="docutils literal notranslate"><span class="pre">validate_object()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base.write_vector_to_hdf5">dolomite_base.write_vector_to_hdf5 module</a><ul>
+<li><a class="reference internal" href="#dolomite_base.write_vector_to_hdf5.write_boolean_vector_to_hdf5"><code class="docutils literal notranslate"><span class="pre">write_boolean_vector_to_hdf5()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.write_vector_to_hdf5.write_float_vector_to_hdf5"><code class="docutils literal notranslate"><span class="pre">write_float_vector_to_hdf5()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.write_vector_to_hdf5.write_integer_vector_to_hdf5"><code class="docutils literal notranslate"><span class="pre">write_integer_vector_to_hdf5()</span></code></a></li>
+<li><a class="reference internal" href="#dolomite_base.write_vector_to_hdf5.write_string_vector_to_hdf5"><code class="docutils literal notranslate"><span class="pre">write_string_vector_to_hdf5()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-dolomite_base">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -389,7 +1373,7 @@
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=3f1b9271"></script>
+</div><script src="../_static/documentation_options.js?v=c24578c3"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
