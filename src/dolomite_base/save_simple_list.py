@@ -37,7 +37,7 @@ def save_simple_list_from_dict(x: dict, path: str, simple_list_mode: Literal["hd
             Further arguments, ignored.
 
     Returns:
-        `x` is saved to `path`.
+        ``x`` is saved to ``path``.
     """
     _save_simple_list_internal(x, path, simple_list_mode, simple_list_string_list_vls=simple_list_string_list_vls, **kwargs)
     return
@@ -64,7 +64,7 @@ def save_simple_list_from_list(x: list, path: str, simple_list_mode: Literal["hd
             Further arguments, ignored.
 
     Returns:
-        `x` is saved to `path`.
+        ``x`` is saved to ``path``.
     """
     _save_simple_list_internal(x, path, simple_list_mode, simple_list_string_list_vls=simple_list_string_list_vls, **kwargs)
     return
@@ -89,13 +89,13 @@ def save_simple_list_from_NamedList(x: NamedList, path: str, simple_list_mode: L
         simple_list_string_list_vls:
             Whether to save :py:class:`~biocutils.StringList.StringList` objects of variable-length strings into a custom VLS array format for HDF5.
             If ``None``, this is automatically determined by comparing the required storage with that of fixed-length strings.
-            Only relevant if ``simple_list_mode = "hdf5"`.
+            Only relevant if ``simple_list_mode = "hdf5"``.
 
         kwargs: 
             Further arguments, ignored.
 
     Returns:
-        `x` is saved to `path`.
+        ``x`` is saved to ``path``.
     """
     _save_simple_list_internal(x, path, simple_list_mode, simple_list_string_list_vls=simple_list_string_list_vls, **kwargs)
     return
