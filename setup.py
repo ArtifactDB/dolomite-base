@@ -30,6 +30,36 @@ def define_custom_builder(builder):
     return Tmp()
 
 
+def download_tarball(urls, path):
+    import urllib.request
+    import urllib.error
+    import time
+    if isinstance(urls, str):
+        urls = [urls]
+
+    req_headers = {'User-Agent': 'Mozilla/5.0'}
+    
+    last_err = None
+    for url in urls:
+        req = urllib.request.Request(url, headers=req_headers)
+        for i in range(5):
+            try:
+                with urllib.request.urlopen(req) as response, open(path, "wb") as out_file:
+                    out_file.write(response.read())
+                return
+            except urllib.error.HTTPError as e:
+                last_err = e
+                if e.code in (429, 403) and i < 4:
+                    time.sleep((2 ** i) * 5)
+                    continue
+                break
+            except Exception as e:
+                last_err = e
+                break
+
+    raise last_err
+
+
 def build_zlib(builder):
     install_dir = define_install_dir()
     if os.path.exists(install_dir) and os.path.exists(os.path.join(install_dir, ".ZLIB")):
@@ -45,9 +75,8 @@ def build_zlib(builder):
     if not os.path.exists(src_dir):
         tarball = os.path.join("extern", "zlib.tar.gz")
         if not os.path.exists(tarball):
-            import urllib.request
-            target_url = "https://github.com/madler/zlib/releases/download/" + version + "/zlib-" + version[1:] + ".tar.gz"
-            urllib.request.urlretrieve(target_url, tarball)
+            target_urls = ["https://github.com/madler/zlib/releases/download/" + version + "/zlib-" + version[1:] + ".tar.gz"]
+            download_tarball(target_urls, tarball)
         import tarfile
         with tarfile.open(tarball, "r") as tf:
             tf.extractall("extern")
@@ -97,12 +126,16 @@ def build_libaec(builder):
     if not os.path.exists(src_dir):
         tarball = os.path.join("extern", "libaec.tar.gz")
         if not os.path.exists(tarball):
-            import urllib.request
-            target_url = "https://gitlab.dkrz.de/k202009/libaec/-/archive/" + version + "/libaec-" + version + ".tar.gz" 
-            urllib.request.urlretrieve(target_url, tarball)
+            target_urls = [
+                "https://gitlab.dkrz.de/dkrz-sw/libaec/-/archive/" + version + "/libaec-" + version + ".tar.gz",
+                "https://ftp.openbsd.org/pub/OpenBSD/distfiles/libaec-" + version[1:] + ".tar.gz"
+            ]
+            download_tarball(target_urls, tarball)
         import tarfile
         with tarfile.open(tarball, "r") as tf:
             tf.extractall("extern")
+        if not os.path.exists(src_dir) and os.path.exists(os.path.join("extern", "libaec-" + version[1:])):
+            os.rename(os.path.join("extern", "libaec-" + version[1:]), src_dir)
 
     build_dir = os.path.join("extern", "build-libaec-" + version)
     if not os.path.exists(install_dir):
@@ -149,9 +182,8 @@ def build_hdf5(builder):
     if not os.path.exists(src_dir):
         tarball = os.path.join("extern", "hdf5.tar.gz")
         if not os.path.exists(tarball):
-            import urllib.request
-            target_url = "https://github.com/HDFGroup/hdf5/releases/download/" + version + "/hdf5-" + version + ".tar.gz"
-            urllib.request.urlretrieve(target_url, tarball)
+            target_urls = ["https://github.com/HDFGroup/hdf5/releases/download/" + version + "/hdf5-" + version + ".tar.gz"]
+            download_tarball(target_urls, tarball)
         import tarfile
         with tarfile.open(tarball, "r") as tf:
             tf.extractall("extern")
